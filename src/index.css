@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cream-50 text-navy-950 antialiased font-sans;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
