@@ -24,14 +24,14 @@ describe('isFutureDate', () => {
   const today = new Date(2026, 7, 11); // Aug 11 2026
 
   it('is true for tomorrow', () => {
-    expect(isFutureDate(formatDate(addDays(today, 1)), today)).toBe(true);
+    expect(isFutureDate(addDays(today, 1), today)).toBe(true);
   });
 
   it('is false for today', () => {
-    expect(isFutureDate(formatDate(today), today)).toBe(false);
+    expect(isFutureDate(today, today)).toBe(false);
   });
 
   it('is false for a past date', () => {
-    expect(isFutureDate(formatDate(addDays(today, -1)), today)).toBe(false);
+    expect(isFutureDate(addDays(today, -1), today)).toBe(false);
   });
 });

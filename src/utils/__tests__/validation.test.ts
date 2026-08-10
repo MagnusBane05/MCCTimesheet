@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry } from '../validation';
+import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry, canEmployeeViewDate } from '../validation';
 import type { TimeEntry } from '../../domain/timeEntry';
 
 function entry(overrides: Partial<TimeEntry> = {}): TimeEntry {
@@ -56,6 +56,20 @@ describe('canEmployeeModifyDate', () => {
   it('disallows future dates, including later this week', () => {
     expect(canEmployeeModifyDate('2026-08-12', today)).toBe(false);
     expect(canEmployeeModifyDate('2026-08-16', today)).toBe(false);
+  });
+});
+
+describe('canEmployeeViewDate', () => {
+  const today = new Date(2026, 7, 11); // Tuesday Aug 11 2026
+
+  it('allows any day in the past', () => {
+    expect(canEmployeeViewDate(new Date(2026, 7, 10), today)).toBe(true);
+  });
+  it('disallows future dates', () => {
+    expect(canEmployeeViewDate(new Date(2026, 7, 12), today)).toBe(false);
+  });
+  it('allows today', () => {
+    expect(canEmployeeViewDate(new Date(2026, 7, 11), today)).toBe(true);
   });
 });
 

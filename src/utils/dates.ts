@@ -46,8 +46,8 @@ export function getWeekEnd(date: Date): Date {
   return end;
 }
 
-export function isFutureDate(dateStr: string, today: Date): boolean {
-  return parseDate(dateStr).getTime() > startOfDay(today).getTime();
+export function isFutureDate(dateStr: Date, today: Date): boolean {
+  return dateStr.getTime() > startOfDay(today).getTime();
 }
 
 export function isSameOrBeforeDay(a: Date, b: Date): boolean {

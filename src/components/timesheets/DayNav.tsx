@@ -1,6 +1,8 @@
+import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
 
 const WEEKDAY_FORMAT = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+const TODAY = new Date();
 
 export function DayNav({
   date,
@@ -30,8 +32,13 @@ export function DayNav({
       >
         {WEEKDAY_FORMAT.format(date)}
       </button>
-      <Button variant="ghost" aria-label="Next day" onClick={onNext} className="!px-3 !py-3 text-lg">
-        ›
+      <Button 
+        variant="ghost" 
+        aria-label="Next day" 
+        onClick={onNext} 
+        disabled={canEmployeeViewDate(date, TODAY) === false}
+        className="!px-3 !py-3 text-lg">
+      ›
       </Button>
     </div>
   );

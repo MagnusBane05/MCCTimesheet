@@ -1,6 +1,6 @@
 import type { TimeEntry } from '../domain/timeEntry';
 import { getDurationHours, isValidTimeIncrement } from './time';
-import { getWeekStart, getWeekEnd, isFutureDate, startOfDay } from './dates';
+import { getWeekStart, getWeekEnd, isFutureDate, startOfDay, parseDate } from './dates';
 
 export interface OverlapCandidate {
   workDate: string;
@@ -29,6 +29,15 @@ export function canEmployeeModifyDate(workDate: string, today: Date): boolean {
 
   const previousWeekStart = getWeekStart(new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000));
   return date.getTime() >= previousWeekStart.getTime() && date.getTime() <= getWeekEnd(todayStart).getTime();
+}
+
+/**
+ * Employee viewing window: any day not in the future.
+ * @param workDate 
+ * @param today 
+ */
+export function canEmployeeViewDate(workDate: Date, today: Date): boolean {
+  return isFutureDate(workDate, today) === false;
 }
 
 export interface TimeEntryInput {
@@ -65,7 +74,7 @@ export function validateTimeEntry(input: TimeEntryInput, options: ValidateTimeEn
 
   if (!input.workDate) {
     errors.workDate = 'Date is required.';
-  } else if (isFutureDate(input.workDate, options.today)) {
+  } else if (isFutureDate(parseDate(input.workDate), options.today)) {
     errors.workDate = 'Future dates are not allowed.';
   } else if (options.enforceEditWindow && !canEmployeeModifyDate(input.workDate, options.today)) {
     errors.workDate = 'This date is outside the editing window.';
