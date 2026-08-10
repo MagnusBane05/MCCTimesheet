@@ -2,11 +2,10 @@ import { useMemo, useState, type FormEvent } from 'react';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import { formatDate } from '../../utils/dates';
-import { generateTimeOptions, formatTimeLabel, getDurationHours, formatHours } from '../../utils/time';
+import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
-
-const TIME_OPTIONS = generateTimeOptions();
+import { TimeSelect } from '../form/TimeSelect';
 
 export interface TimeEntryFormValues {
   workDate: string;
@@ -108,36 +107,28 @@ export function TimeEntryForm({
           <label htmlFor="entry-start" className="block text-sm font-medium text-navy-900">
             Start time
           </label>
-          <select
+          <TimeSelect
             id="entry-start"
+            label="Start time"
             value={startTime}
-            onChange={(event) => setStartTime(event.target.value)}
+            onChange={setStartTime}
+            minuteStep={MINUTE_INCREMENT}
             className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-          >
-            {TIME_OPTIONS.map((time) => (
-              <option key={time} value={time}>
-                {formatTimeLabel(time)}
-              </option>
-            ))}
-          </select>
+          />
           {visibleErrors.startTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.startTime}</p>}
         </div>
         <div>
           <label htmlFor="entry-end" className="block text-sm font-medium text-navy-900">
             End time
           </label>
-          <select
+          <TimeSelect
             id="entry-end"
+            label="End time"
             value={endTime}
-            onChange={(event) => setEndTime(event.target.value)}
+            onChange={setEndTime}
+            minuteStep={MINUTE_INCREMENT}
             className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-          >
-            {TIME_OPTIONS.map((time) => (
-              <option key={time} value={time}>
-                {formatTimeLabel(time)}
-              </option>
-            ))}
-          </select>
+          />
           {visibleErrors.endTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.endTime}</p>}
         </div>
       </div>

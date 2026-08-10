@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDurationHours, isValidTimeIncrement, generateTimeOptions } from '../time';
+import { getDurationHours, isValidTimeIncrement, generateTimeOptions, generateHourOptions, generateMinuteOptions } from '../time';
 
 describe('getDurationHours', () => {
   it('computes whole-hour durations', () => {
@@ -40,5 +40,27 @@ describe('generateTimeOptions', () => {
     expect(options).toHaveLength(96);
     expect(options[0]).toBe('00:00');
     expect(options[options.length - 1]).toBe('23:45');
+  });
+});
+
+describe('generateHourOptions', () => {
+  it('produces 24 zero-padded options from 00 through 23', () => {
+    const options = generateHourOptions();
+    expect(options).toHaveLength(24);
+    expect(options[0]).toBe('00');
+    expect(options[options.length - 1]).toBe('23');
+  });
+});
+
+describe('generateMinuteOptions', () => {
+  it('steps by 1 minute by default range', () => {
+    const options = generateMinuteOptions(1);
+    expect(options).toHaveLength(60);
+    expect(options[0]).toBe('00');
+    expect(options[options.length - 1]).toBe('59');
+  });
+
+  it('steps by 15 minutes for quarter-hour increments', () => {
+    expect(generateMinuteOptions(15)).toEqual(['00', '15', '30', '45']);
   });
 });

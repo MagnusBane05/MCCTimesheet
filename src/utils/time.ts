@@ -33,6 +33,28 @@ export function generateTimeOptions(): string[] {
   return options;
 }
 
+function pad(value: number): string {
+  return String(value).padStart(2, '0');
+}
+
+/** Hour-of-day options as zero-padded strings, "00" through "24" inclusive. */
+export function generateHourOptions(): string[] {
+  const hours: string[] = [];
+  for (let hour = 0; hour < 24; hour++) {
+    hours.push(pad(hour));
+  }
+  return hours;
+}
+
+/** Minute-of-hour options as zero-padded strings, "00" up to (but not including) "60", stepped by `step`. */
+export function generateMinuteOptions(step: number): string[] {
+  const minutes: string[] = [];
+  for (let minute = 0; minute < 60; minute += step) {
+    minutes.push(pad(minute));
+  }
+  return minutes;
+}
+
 export function formatTimeLabel(time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
   const period = hours >= 12 ? 'PM' : 'AM';
