@@ -43,6 +43,7 @@ export function TimeEntryForm({
   const [workDescription, setWorkDescription] = useState(existingEntry?.workDescription ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const projectOptions = useMemo(() => {
     const active = projects.filter((project) => project.active);
@@ -59,6 +60,7 @@ export function TimeEntryForm({
     excludeEntryId: existingEntry?.id,
     enforceEditWindow,
   });
+  const visibleErrors = hasAttemptedSubmit ? errors : {};
 
   const thisDuration = Math.max(getDurationHours(startTime, endTime), 0);
   const otherDailyTotal = otherEntries
@@ -67,6 +69,7 @@ export function TimeEntryForm({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    setHasAttemptedSubmit(true);
     if (Object.keys(errors).length > 0 || projectId === null) return;
     setSubmitting(true);
     setSubmitError(null);
@@ -81,6 +84,10 @@ export function TimeEntryForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm" noValidate>
+      <h2 className="text-base font-semibold text-navy-950">
+        {existingEntry ? 'Edit time entry' : 'New time entry'}
+      </h2>
+
       <div>
         <label htmlFor="entry-date" className="block text-sm font-medium text-navy-900">
           Date
@@ -93,7 +100,7 @@ export function TimeEntryForm({
           onChange={(event) => setWorkDate(event.target.value)}
           className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
         />
-        {errors.workDate && <p className="mt-1 text-sm text-red-700">{errors.workDate}</p>}
+        {visibleErrors.workDate && <p className="mt-1 text-sm text-red-700">{visibleErrors.workDate}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -113,7 +120,7 @@ export function TimeEntryForm({
               </option>
             ))}
           </select>
-          {errors.startTime && <p className="mt-1 text-sm text-red-700">{errors.startTime}</p>}
+          {visibleErrors.startTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.startTime}</p>}
         </div>
         <div>
           <label htmlFor="entry-end" className="block text-sm font-medium text-navy-900">
@@ -131,7 +138,7 @@ export function TimeEntryForm({
               </option>
             ))}
           </select>
-          {errors.endTime && <p className="mt-1 text-sm text-red-700">{errors.endTime}</p>}
+          {visibleErrors.endTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.endTime}</p>}
         </div>
       </div>
 
@@ -152,7 +159,7 @@ export function TimeEntryForm({
             </option>
           ))}
         </select>
-        {errors.projectId && <p className="mt-1 text-sm text-red-700">{errors.projectId}</p>}
+        {visibleErrors.projectId && <p className="mt-1 text-sm text-red-700">{visibleErrors.projectId}</p>}
       </div>
 
       <div>
@@ -166,7 +173,7 @@ export function TimeEntryForm({
           rows={2}
           className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
         />
-        {errors.workDescription && <p className="mt-1 text-sm text-red-700">{errors.workDescription}</p>}
+        {visibleErrors.workDescription && <p className="mt-1 text-sm text-red-700">{visibleErrors.workDescription}</p>}
       </div>
 
       <div className="flex justify-between rounded-lg bg-cream-50 px-3 py-2 text-sm text-navy-900/80">
@@ -189,7 +196,7 @@ export function TimeEntryForm({
           Cancel
         </Button>
         <Button type="submit" disabled={submitting}>
-          {submitting ? 'Saving…' : 'Save entry'}
+          {existingEntry ? (submitting ? 'Saving…' : 'Save changes') : (submitting ? 'Adding…' : 'Add entry')}
         </Button>
       </div>
     </form>

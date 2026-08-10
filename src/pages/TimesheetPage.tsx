@@ -10,7 +10,6 @@ import { canEmployeeModifyDate } from '../utils/validation';
 import { DayNav } from '../components/timesheets/DayNav';
 import { TimeEntryCard } from '../components/timesheets/TimeEntryCard';
 import { TimeEntryForm, type TimeEntryFormValues } from '../components/timesheets/TimeEntryForm';
-import { Button } from '../components/common/Button';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { LoadingState } from '../components/common/LoadingState';
 import { EmptyState } from '../components/common/EmptyState';
@@ -18,7 +17,7 @@ import { ErrorState } from '../components/common/ErrorState';
 
 const TODAY = new Date();
 
-type FormState = { mode: 'add' } | { mode: 'edit'; entry: TimeEntry } | null;
+type FormState = { mode: 'add' } | { mode: 'edit'; entry: TimeEntry };
 
 export function TimesheetPage() {
   const { currentUser } = useAuth();
@@ -27,7 +26,7 @@ export function TimesheetPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [formState, setFormState] = useState<FormState>(null);
+  const [formState, setFormState] = useState<FormState>({ mode: 'add' });
   const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
 
   const load = useCallback(async () => {
@@ -76,7 +75,7 @@ export function TimesheetPage() {
     } else {
       await timesheetService.createTimeEntry({ employeeId: currentUser.id, ...values });
     }
-    setFormState(null);
+    setFormState({ mode: 'add' });
     await load();
   }
 
@@ -119,24 +118,19 @@ export function TimesheetPage() {
 
       {!loading && !error && (
         <>
-          {formState ? (
-            <TimeEntryForm
-              today={TODAY}
-              defaultDate={selectedDateStr}
-              projects={projects}
-              existingEntry={formState.mode === 'edit' ? formState.entry : undefined}
-              otherEntries={entries}
-              onCancel={() => setFormState(null)}
-              onSubmit={handleFormSubmit}
-            />
-          ) : (
-            <Button onClick={() => setFormState({ mode: 'add' })} className="w-full">
-              + Add time entry
-            </Button>
-          )}
+          <TimeEntryForm
+            key={formState.mode === 'edit' ? `edit-${formState.entry.id}` : 'add'}
+            today={TODAY}
+            defaultDate={selectedDateStr}
+            projects={projects}
+            existingEntry={formState.mode === 'edit' ? formState.entry : undefined}
+            otherEntries={entries}
+            onCancel={() => setFormState({ mode: 'add' })}
+            onSubmit={handleFormSubmit}
+          />
 
           <div className="flex flex-col gap-3">
-            {dayEntries.length === 0 && !formState && <EmptyState message="No entries for this day." />}
+            {dayEntries.length === 0 && formState.mode === 'add' && <EmptyState message="No entries for this day." />}
             {dayEntries.map((entry) => (
               <TimeEntryCard
                 key={entry.id}
