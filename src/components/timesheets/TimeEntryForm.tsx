@@ -36,8 +36,8 @@ export function TimeEntryForm({
   onSubmit(values: TimeEntryFormValues): Promise<void>;
 }) {
   const [workDate, setWorkDate] = useState(existingEntry?.workDate ?? defaultDate);
-  const [startTime, setStartTime] = useState(existingEntry?.startTime ?? '08:00');
-  const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '09:00');
+  const [startTime, setStartTime] = useState(existingEntry?.startTime ?? '');
+  const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '');
   const [projectId, setProjectId] = useState<number | null>(existingEntry?.projectId ?? null);
   const [workDescription, setWorkDescription] = useState(existingEntry?.workDescription ?? '');
   const [submitting, setSubmitting] = useState(false);
@@ -61,10 +61,21 @@ export function TimeEntryForm({
   });
   const visibleErrors = hasAttemptedSubmit ? errors : {};
 
-  const thisDuration = Math.max(getDurationHours(startTime, endTime), 0);
+  const thisDuration = startTime && endTime ? Math.max(getDurationHours(startTime, endTime), 0) : 0;
   const otherDailyTotal = otherEntries
     .filter((entry) => entry.workDate === workDate && entry.id !== existingEntry?.id)
     .reduce((total, entry) => total + getDurationHours(entry.startTime, entry.endTime), 0);
+
+  function handleCancel() {
+    setWorkDate(existingEntry?.workDate ?? defaultDate);
+    setStartTime(existingEntry?.startTime ?? '');
+    setEndTime(existingEntry?.endTime ?? '');
+    setProjectId(existingEntry?.projectId ?? null);
+    setWorkDescription(existingEntry?.workDescription ?? '');
+    setHasAttemptedSubmit(false);
+    setSubmitError(null);
+    onCancel();
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -183,7 +194,7 @@ export function TimeEntryForm({
       )}
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={onCancel}>
+        <Button type="button" variant="secondary" onClick={handleCancel}>
           Cancel
         </Button>
         <Button type="submit" disabled={submitting}>

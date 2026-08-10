@@ -80,10 +80,14 @@ export function validateTimeEntry(input: TimeEntryInput, options: ValidateTimeEn
     errors.workDate = 'This date is outside the editing window.';
   }
 
-  if (!input.startTime || !isValidTimeIncrement(input.startTime)) {
+  if (!input.startTime) {
+    errors.startTime = 'Start time is required.';
+  } else if (!isValidTimeIncrement(input.startTime)) {
     errors.startTime = 'Start time must be in 15-minute increments.';
   }
-  if (!input.endTime || !isValidTimeIncrement(input.endTime)) {
+  if (!input.endTime) {
+    errors.endTime = 'End time is required.';
+  } else if (!isValidTimeIncrement(input.endTime)) {
     errors.endTime = 'End time must be in 15-minute increments.';
   }
 
