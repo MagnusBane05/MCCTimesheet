@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
-import { formatDate } from '../../utils/dates';
+import { formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
@@ -17,7 +17,7 @@ export interface TimeEntryFormValues {
 
 export function TimeEntryForm({
   today,
-  defaultDate,
+  workDate,
   projects,
   existingEntry,
   otherEntries,
@@ -26,7 +26,7 @@ export function TimeEntryForm({
   onSubmit,
 }: {
   today: Date;
-  defaultDate: string;
+  workDate: string;
   projects: Project[];
   existingEntry?: TimeEntry;
   /** This employee's other entries — used to compute overlap and the daily total preview. */
@@ -35,7 +35,6 @@ export function TimeEntryForm({
   onCancel(): void;
   onSubmit(values: TimeEntryFormValues): Promise<void>;
 }) {
-  const [workDate, setWorkDate] = useState(existingEntry?.workDate ?? defaultDate);
   const [startTime, setStartTime] = useState(existingEntry?.startTime ?? '');
   const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '');
   const [projectId, setProjectId] = useState<number | null>(existingEntry?.projectId ?? null);
@@ -67,7 +66,6 @@ export function TimeEntryForm({
     .reduce((total, entry) => total + getDurationHours(entry.startTime, entry.endTime), 0);
 
   function handleCancel() {
-    setWorkDate(existingEntry?.workDate ?? defaultDate);
     setStartTime(existingEntry?.startTime ?? '');
     setEndTime(existingEntry?.endTime ?? '');
     setProjectId(existingEntry?.projectId ?? null);
@@ -95,23 +93,14 @@ export function TimeEntryForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm" noValidate>
       <h2 className="text-base font-semibold text-navy-950">
-        {existingEntry ? 'Edit time entry' : 'New time entry'}
+        {existingEntry ? 'Edit' : 'New'} time entry for {formatShortDateLabel(parseDate(workDate))}
       </h2>
 
-      <div>
-        <label htmlFor="entry-date" className="block text-sm font-medium text-navy-900">
-          Date
-        </label>
-        <input
-          id="entry-date"
-          type="date"
-          value={workDate}
-          max={formatDate(today)}
-          onChange={(event) => setWorkDate(event.target.value)}
-          className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-        />
-        {visibleErrors.workDate && <p className="mt-1 text-sm text-red-700">{visibleErrors.workDate}</p>}
-      </div>
+      {visibleErrors.workDate && (
+        <p role="alert" className="text-sm text-red-700">
+          {visibleErrors.workDate}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>

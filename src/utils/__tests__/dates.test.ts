@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWeekStart, getWeekEnd, formatDate, isFutureDate, addDays } from '../dates';
+import { getWeekStart, getWeekEnd, formatDate, formatShortDateLabel, formatLongDateLabel, isFutureDate, addDays } from '../dates';
 
 describe('getWeekStart / getWeekEnd', () => {
   it('treats Monday as the start of the week', () => {
@@ -33,5 +33,25 @@ describe('isFutureDate', () => {
 
   it('is false for a past date', () => {
     expect(isFutureDate(addDays(today, -1), today)).toBe(false);
+  });
+});
+
+describe('formatShortDateLabel', () => {
+  it('formats a "YYYY-MM-DD" date as month and day', () => {
+    expect(formatShortDateLabel(new Date(2026, 7, 11))).toBe('August 11');
+  });
+
+  it('formats single-digit days without a leading zero', () => {
+    expect(formatShortDateLabel(new Date(2026, 7, 5))).toBe('August 5');
+  });
+});
+
+describe('formatLongDateLabel', () => {
+  it('formats a "YYYY-MM-DD" date as weekday, month and day', () => {
+    expect(formatLongDateLabel(new Date(2026, 7, 11))).toBe('Tuesday, August 11, 2026');
+  });
+
+  it('formats single-digit days without a leading zero', () => {
+    expect(formatLongDateLabel(new Date(2026, 7, 5))).toBe('Wednesday, August 5, 2026');
   });
 });

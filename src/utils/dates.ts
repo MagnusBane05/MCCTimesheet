@@ -57,3 +57,23 @@ export function isSameOrBeforeDay(a: Date, b: Date): boolean {
 export function daysBetween(a: Date, b: Date): number {
   return Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / DAY_MS);
 }
+
+// Locale is pinned (not `undefined`) so the display format doesn't shift with the host's default locale.
+const SHORT_DATE_FORMAT = new Intl.DateTimeFormat('en-CA', { day: 'numeric', month: 'long' });
+
+/** Formats a "YYYY-MM-DD" work date for display, e.g. "August 11" — used to label a time entry by day. */
+export function formatShortDateLabel(date: Date): string {
+  return SHORT_DATE_FORMAT.format(date);
+}
+
+// Locale is pinned (not `undefined`) so the display format doesn't shift with the host's default locale.
+const DATE_LABEL_FORMAT = new Intl.DateTimeFormat('en-CA', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+export function formatLongDateLabel(date: Date): string {
+  return DATE_LABEL_FORMAT.format(date);
+}

@@ -3,7 +3,7 @@ import { useAuth } from '../auth/AuthContext';
 import { timesheetService } from '../services/service';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
-import { addDays, formatDate, getWeekEnd, getWeekStart } from '../utils/dates';
+import { addDays, formatDate, getWeekEnd, getWeekStart, parseDate } from '../utils/dates';
 import { calculateRegularAndOvertime, calculateWeeklyHours } from '../utils/overtime';
 import { formatHours } from '../utils/time';
 import { canEmployeeModifyDate } from '../utils/validation';
@@ -90,9 +90,10 @@ export function TimesheetPage() {
     <div className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-4">
       <DayNav
         date={selectedDate}
+        today={TODAY}
         onPrevious={() => setSelectedDate((current) => addDays(current, -1))}
         onNext={() => setSelectedDate((current) => addDays(current, 1))}
-        onToday={() => setSelectedDate(TODAY)}
+        onDateChange={(newDate) => setSelectedDate(parseDate(newDate))}
       />
 
       <div className="grid grid-cols-2 gap-3">
@@ -121,7 +122,7 @@ export function TimesheetPage() {
           <TimeEntryForm
             key={formState.mode === 'edit' ? `edit-${formState.entry.id}` : 'add'}
             today={TODAY}
-            defaultDate={selectedDateStr}
+            workDate={selectedDateStr}
             projects={projects}
             existingEntry={formState.mode === 'edit' ? formState.entry : undefined}
             otherEntries={entries}
