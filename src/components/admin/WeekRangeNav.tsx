@@ -1,4 +1,4 @@
-import { addDays, formatDate, parseDate } from '../../utils/dates';
+import { addWeeks, formatDate, isFutureDate, parseDate } from '../../utils/dates';
 import { Button } from '../common/Button';
 
 /** Shared date-range control for the admin reporting pages (By Employee, By Job). */
@@ -7,13 +7,13 @@ export function WeekRangeNav({
   toDate,
   onRangeChange,
 }: {
-  fromDate: string;
-  toDate: string;
-  onRangeChange(fromDate: string, toDate: string): void;
+  fromDate: Date;
+  toDate: Date;
+  onRangeChange(fromDate: Date, toDate: Date): void;
 }) {
   function shiftWeek(direction: 1 | -1) {
-    const shiftedFrom = formatDate(addDays(parseDate(fromDate), 7 * direction));
-    const shiftedTo = formatDate(addDays(parseDate(toDate), 7 * direction));
+    const shiftedFrom = addWeeks(fromDate, direction);
+    const shiftedTo = addWeeks(toDate, direction);
     onRangeChange(shiftedFrom, shiftedTo);
   }
 
@@ -23,8 +23,12 @@ export function WeekRangeNav({
         <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
           ‹ Previous week
         </Button>
-        <Button variant="ghost" onClick={() => shiftWeek(1)} className="!px-3">
-          Next week ›
+        <Button 
+          variant="ghost"
+          disabled={isFutureDate(addWeeks(fromDate, 1), new Date())}
+          onClick={() => shiftWeek(1)} 
+          className="!px-3">
+            Next week ›
         </Button>
       </div>
       <div>
@@ -34,9 +38,9 @@ export function WeekRangeNav({
         <input
           id="range-from"
           type="date"
-          value={fromDate}
-          max={toDate}
-          onChange={(event) => onRangeChange(event.target.value, toDate)}
+          value={formatDate(fromDate)}
+          max={formatDate(toDate)}
+          onChange={(event) => onRangeChange(parseDate(event.target.value), toDate)}
           className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
         />
       </div>
@@ -47,9 +51,9 @@ export function WeekRangeNav({
         <input
           id="range-to"
           type="date"
-          value={toDate}
-          min={fromDate}
-          onChange={(event) => onRangeChange(fromDate, event.target.value)}
+          value={formatDate(toDate)}
+          min={formatDate(fromDate)}
+          onChange={(event) => onRangeChange(fromDate, parseDate(event.target.value))}
           className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
         />
       </div>

@@ -4,7 +4,7 @@ import { timesheetService } from '../../services/service';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import type { User } from '../../domain/user';
-import { formatDate, formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
+import { formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
 import { calculateWeeklyHours } from '../../utils/overtime';
 import { formatTimeLabel } from '../../utils/time';
 import { WeekRangeNav } from '../../components/admin/WeekRangeNav';
@@ -31,8 +31,8 @@ export function ByJobPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const [fromDate, setFromDate] = useState(formatDate(getWeekStart(TODAY)));
-  const [toDate, setToDate] = useState(formatDate(getWeekEnd(TODAY)));
+  const [fromDate, setFromDate] = useState(getWeekStart(TODAY));
+  const [toDate, setToDate] = useState(getWeekEnd(TODAY));
   const [customerFilter, setCustomerFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('customer');
@@ -67,7 +67,7 @@ export function ByJobPage() {
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
   const customers = Array.from(new Set(projects.map((project) => project.customer))).sort((a, b) => a.localeCompare(b));
 
-  const rangeEntries = entries.filter((entry) => entry.workDate >= fromDate && entry.workDate <= toDate);
+  const rangeEntries = entries.filter((entry) => parseDate(entry.workDate) >= fromDate && parseDate(entry.workDate) <= toDate);
 
   const searchTerm = search.trim().toLowerCase();
 
@@ -129,7 +129,7 @@ export function ByJobPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold text-navy-950">By Job</h1>
+      <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
 

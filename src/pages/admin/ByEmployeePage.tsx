@@ -4,7 +4,7 @@ import { timesheetService } from '../../services/service';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import type { User } from '../../domain/user';
-import { formatDate, formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
+import { formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
 import { calculateWeeklyHours } from '../../utils/overtime';
 import { formatTimeLabel } from '../../utils/time';
 import { WeekRangeNav } from '../../components/admin/WeekRangeNav';
@@ -31,8 +31,8 @@ export function ByEmployeePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const [fromDate, setFromDate] = useState(formatDate(getWeekStart(TODAY)));
-  const [toDate, setToDate] = useState(formatDate(getWeekEnd(TODAY)));
+  const [fromDate, setFromDate] = useState(getWeekStart(TODAY));
+  const [toDate, setToDate] = useState(getWeekEnd(TODAY));
   const [employeeFilter, setEmployeeFilter] = useState<'all' | number>('all');
   const [sortBy, setSortBy] = useState<SortBy>('name');
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -65,7 +65,7 @@ export function ByEmployeePage() {
   const projectsById = new Map(projects.map((project) => [project.id, project]));
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
 
-  const rangeEntries = entries.filter((entry) => entry.workDate >= fromDate && entry.workDate <= toDate);
+  const rangeEntries = entries.filter((entry) => parseDate(entry.workDate) >= fromDate && parseDate(entry.workDate) <= toDate);
 
   const groupsByEmployee = new Map<number, TimeEntry[]>();
   for (const entry of rangeEntries) {
@@ -121,7 +121,7 @@ export function ByEmployeePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold text-navy-950">By Employee</h1>
+      <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
 
