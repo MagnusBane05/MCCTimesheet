@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { formatDate, formatLongDateLabel } from '../../utils/dates';
+import { formatDate, formatLongDateLabel, addDays } from '../../utils/dates';
 import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
 
@@ -72,7 +72,7 @@ export function DayNav({
         variant="ghost"
         aria-label="Next day"
         onClick={onNext}
-        disabled={canEmployeeViewDate(date, today) === false}
+        disabled={canEmployeeViewDate(addDays(date, 1), today) === false}
         className="!px-3 !py-3 text-lg">
       ›
       </Button>

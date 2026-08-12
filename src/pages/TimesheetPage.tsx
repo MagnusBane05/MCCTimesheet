@@ -53,7 +53,8 @@ export function TimesheetPage() {
 
   if (!currentUser) return null;
 
-  const selectedDateStr = formatDate(selectedDate);
+  const selectedDateStr = formatDate(selectedDate);  
+  const insideEditWindow = canEmployeeModifyDate(selectedDateStr, TODAY);
   const dayEntries = entries
     .filter((entry) => entry.workDate === selectedDateStr)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -119,16 +120,18 @@ export function TimesheetPage() {
 
       {!loading && !error && (
         <>
-          <TimeEntryForm
-            key={formState.mode === 'edit' ? `edit-${formState.entry.id}` : 'add'}
-            today={TODAY}
-            workDate={selectedDateStr}
-            projects={projects}
-            existingEntry={formState.mode === 'edit' ? formState.entry : undefined}
-            otherEntries={entries}
-            onCancel={() => setFormState({ mode: 'add' })}
-            onSubmit={handleFormSubmit}
-          />
+          {insideEditWindow &&
+            <TimeEntryForm
+              key={formState.mode === 'edit' ? `edit-${formState.entry.id}` : 'add'}
+              today={TODAY}
+              workDate={selectedDateStr}
+              projects={projects}
+              existingEntry={formState.mode === 'edit' ? formState.entry : undefined}
+              otherEntries={entries}
+              onCancel={() => setFormState({ mode: 'add' })}
+              onSubmit={handleFormSubmit}
+            />
+          }
 
           <div className="flex flex-col gap-3">
             {dayEntries.length === 0 && formState.mode === 'add' && <EmptyState message="No entries for this day." />}
