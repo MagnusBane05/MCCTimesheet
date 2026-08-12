@@ -1,5 +1,21 @@
 import { describe, it, expect } from 'vitest';
-import { getWeekStart, getWeekEnd, formatDate, formatShortDateLabel, formatLongDateLabel, isFutureDate, addDays } from '../dates';
+import { getWeekStart, getWeekEnd, formatDate, formatShortDateLabel, formatLongDateLabel, isFutureDate, addDays, addWeeks } from '../dates';
+
+describe('addDays', () => {
+  it('adds days to a date', () => {
+    const date = new Date(2026, 7, 11); // Aug 11 2026
+    expect(formatDate(addDays(date, 5))).toBe('2026-08-16');
+    expect(formatDate(addDays(date, -3))).toBe('2026-08-08');
+  });
+});
+
+describe('addWeeks', () => {
+  it('adds weeks to a date', () => {
+    const date = new Date(2026, 7, 11); // Aug 11 2026
+    expect(formatDate(addWeeks(date, 2))).toBe('2026-08-25');
+    expect(formatDate(addWeeks(date, -1))).toBe('2026-08-04');
+  });
+});
 
 describe('getWeekStart / getWeekEnd', () => {
   it('treats Monday as the start of the week', () => {

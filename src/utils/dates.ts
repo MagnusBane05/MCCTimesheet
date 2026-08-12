@@ -30,6 +30,10 @@ export function addDays(date: Date, days: number): Date {
   return result;
 }
 
+export function addWeeks(date: Date, weeks: number): Date {
+  return addDays(date, weeks * 7);
+}
+
 /** Monday 00:00 of the week containing `date`. */
 export function getWeekStart(date: Date): Date {
   const start = startOfDay(date);
