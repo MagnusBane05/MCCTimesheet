@@ -19,8 +19,6 @@ import { ErrorState } from '../../components/common/ErrorState';
 
 const TODAY = new Date();
 
-type SortBy = 'name' | 'hours';
-
 export function ByEmployeePage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
@@ -33,8 +31,7 @@ export function ByEmployeePage() {
 
   const [fromDate, setFromDate] = useState(getWeekStart(TODAY));
   const [toDate, setToDate] = useState(getWeekEnd(TODAY));
-  const [employeeFilter, setEmployeeFilter] = useState<'all' | number>('all');
-  const [sortBy, setSortBy] = useState<SortBy>('name');
+  const [employeeFilter] = useState<'all' | number>('all');
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
   const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
@@ -85,11 +82,8 @@ export function ByEmployeePage() {
       totalHours: calculateWeeklyHours(groupEntries),
     }))
     .sort((a, b) => {
-      if (sortBy === 'hours') return b.totalHours - a.totalHours;
       return (a.employee?.displayName ?? '').localeCompare(b.employee?.displayName ?? '');
     });
-
-  const employeeOptions = [...employees].sort((a, b) => a.displayName.localeCompare(b.displayName));
 
   function toggleExpanded(employeeId: number) {
     setExpandedIds((current) => {
@@ -124,42 +118,6 @@ export function ByEmployeePage() {
       <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
-
-      <div className="flex flex-wrap gap-3">
-        <div>
-          <label htmlFor="employee-filter" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
-            Employee
-          </label>
-          <select
-            id="employee-filter"
-            value={employeeFilter}
-            onChange={(event) => setEmployeeFilter(event.target.value === 'all' ? 'all' : Number(event.target.value))}
-            className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-          >
-            <option value="all">All employees</option>
-            {employeeOptions.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.displayName}
-                {!employee.active && ' (inactive)'}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="sort-by" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
-            Sort by
-          </label>
-          <select
-            id="sort-by"
-            value={sortBy}
-            onChange={(event) => setSortBy(event.target.value as SortBy)}
-            className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-          >
-            <option value="name">Name (A–Z)</option>
-            <option value="hours">Total hours (high to low)</option>
-          </select>
-        </div>
-      </div>
 
       {loading && <LoadingState label="Loading employee hours…" />}
       {!loading && error && <ErrorState message="Unable to load time entries. Please try again." onRetry={load} />}
