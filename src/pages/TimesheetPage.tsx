@@ -4,7 +4,7 @@ import { timesheetService } from '../services/service';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
 import { addDays, formatDate, getWeekEnd, getWeekStart, parseDate } from '../utils/dates';
-import { calculateRegularAndOvertime, calculateWeeklyHours } from '../utils/overtime';
+import { calculateWeeklyHours } from '../utils/overtime';
 import { formatHours } from '../utils/time';
 import { canEmployeeModifyDate } from '../utils/validation';
 import { DayNav } from '../components/timesheets/DayNav';
@@ -65,7 +65,6 @@ export function TimesheetPage() {
 
   const dailyTotal = calculateWeeklyHours(dayEntries);
   const weeklyTotal = calculateWeeklyHours(weekEntries);
-  const { regularHours, overtimeHours } = calculateRegularAndOvertime(weeklyTotal);
 
   const projectsById = new Map(projects.map((project) => [project.id, project]));
 
@@ -104,14 +103,7 @@ export function TimesheetPage() {
         </div>
         <div className="rounded-xl bg-white p-3 text-center shadow-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-navy-900/60">Weekly total</p>
-          <p className="mt-1 text-lg font-semibold text-navy-950">
-            {formatHours(weeklyTotal)}
-            {overtimeHours > 0 && (
-              <span className="ml-1 text-xs font-medium text-accent-600">
-                ({formatHours(regularHours)} reg + {formatHours(overtimeHours)} OT)
-              </span>
-            )}
-          </p>
+          <p className="mt-1 text-lg font-semibold text-navy-950">{formatHours(weeklyTotal)}</p>
         </div>
       </div>
 
