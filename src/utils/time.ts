@@ -55,6 +55,16 @@ export function generateMinuteOptions(step: number): string[] {
   return minutes;
 }
 
+export function getHours(date: Date, step: number = 1): string {
+  const hours = date.getHours();
+  return pad(Math.floor(hours/step)*step);
+}
+
+export function getMinutes(date: Date, step: number = 1): string {
+  const minutes = date.getMinutes();
+  return pad(Math.floor(minutes/step)*step);
+}
+
 export function formatTimeLabel(time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
   const period = hours >= 12 ? 'PM' : 'AM';

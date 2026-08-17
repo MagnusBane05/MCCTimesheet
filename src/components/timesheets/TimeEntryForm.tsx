@@ -142,6 +142,7 @@ export function TimeEntryForm({
             id="entry-start"
             label="Start time"
             value={startTime}
+            today={today}
             onChange={setStartTime}
             minuteStep={MINUTE_INCREMENT}
             className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
@@ -156,6 +157,7 @@ export function TimeEntryForm({
             id="entry-end"
             label="End time"
             value={endTime}
+            today={today}
             onChange={setEndTime}
             minuteStep={MINUTE_INCREMENT}
             className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { formatTimeLabel, generateHourOptions, generateMinuteOptions } from '../../utils/time';
+import { formatTimeLabel, generateHourOptions, generateMinuteOptions, getHours, getMinutes } from '../../utils/time';
 
 export interface TimeSelectProps {
   id?: string;
   /** Accessible label for this control, e.g. "Start time" — used to label the hour and minute columns individually. */
   label: string;
-  /** Current time as an "HH:mm" 24-hour string, or '' when unset. */
+  /** Selected time as an "HH:mm" 24-hour string, or '' when unset. */
   value: string;
+  today: Date;
   onChange(time: string): void;
   /** Increment between minute options. Defaults to 1 (every minute). */
   minuteStep?: number;
@@ -24,7 +25,7 @@ function ClockIcon() {
 }
 
 /** A single time field that opens a two-column (hour, minute) picker, combining the selection into one "HH:mm" value. */
-export function TimeSelect({ id, label, value, onChange, minuteStep = 1, className, disabled }: TimeSelectProps) {
+export function TimeSelect({ id, label, value, today, onChange, minuteStep = 1, className, disabled }: TimeSelectProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const hourItemRef = useRef<HTMLButtonElement>(null);
@@ -58,12 +59,15 @@ export function TimeSelect({ id, label, value, onChange, minuteStep = 1, classNa
     minuteItemRef.current?.scrollIntoView({ block: 'center' });
   }, [open]);
 
+  const currHour = getHours(today);
+  const currMin = getMinutes(today, minuteStep);
+
   function selectHour(newHour: string) {
-    onChange(`${newHour}:${minute || '00'}`);
+    onChange(`${newHour}:${minute || currMin}`);
   }
 
   function selectMinute(newMinute: string) {
-    onChange(`${hour || '00'}:${newMinute}`);
+    onChange(`${hour || currHour}:${newMinute}`);
   }
 
   return (
@@ -90,7 +94,7 @@ export function TimeSelect({ id, label, value, onChange, minuteStep = 1, classNa
         >
           <div className="max-h-48 overflow-y-auto py-1">
             {hourOptions.map((option) => {
-              const selected = option === hour;
+              const selected = option === hour || (hour === '' && option === currHour);
               return (
                 <button
                   key={option}
@@ -110,7 +114,7 @@ export function TimeSelect({ id, label, value, onChange, minuteStep = 1, classNa
           </div>
           <div className="max-h-48 overflow-y-auto py-1">
             {minuteOptions.map((option) => {
-              const selected = option === minute;
+              const selected = option === minute || (minute === '' && option === currMin);
               return (
                 <button
                   key={option}

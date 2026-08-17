@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDurationHours, isValidTimeIncrement, generateTimeOptions, generateHourOptions, generateMinuteOptions } from '../time';
+import { getDurationHours, isValidTimeIncrement, generateTimeOptions, generateHourOptions, generateMinuteOptions, getHours, getMinutes } from '../time';
 
 describe('getDurationHours', () => {
   it('computes whole-hour durations', () => {
@@ -62,5 +62,21 @@ describe('generateMinuteOptions', () => {
 
   it('steps by 15 minutes for quarter-hour increments', () => {
     expect(generateMinuteOptions(15)).toEqual(['00', '15', '30', '45']);
+  });
+});
+
+describe('getHours', () => {
+  it('returns the hour of a date as a zero-padded string', () => {
+    const date = new Date('2024-06-01T08:30:00');
+    expect(getHours(date)).toBe('08');
+    expect(getHours(date, 3)).toBe('06'); // 8 rounded down to nearest multiple of 3 is 6
+  });
+});
+
+describe('getMinutes', () => {
+  it('returns the minutes of a date as a zero-padded string', () => {
+    const date = new Date('2024-06-01T08:33:00');
+    expect(getMinutes(date)).toBe('33');
+    expect(getMinutes(date, 15)).toBe('30');
   });
 });
