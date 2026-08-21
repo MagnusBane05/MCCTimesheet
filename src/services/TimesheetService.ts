@@ -40,14 +40,15 @@ export interface NewEmployeeInput {
 export type UpdateEmployeeInput = Partial<NewEmployeeInput>;
 
 /**
- * Prototype data-access contract. The mock implementation is the only thing
- * components should depend on today (see MockTimesheetService) — swapping in
- * a real Django REST client later means implementing this same interface
- * with fetch() calls, with no changes required in components/pages.
+ * Data-access contract shared by MockTimesheetService and ApiTimesheetService
+ * so components never need to know which backend is active.
  */
 export interface TimesheetService {
-  getCurrentUser(userId: number): Promise<User | null>;
-  findUserByUsername(username: string): Promise<User | null>;
+  /** Resolves the signed-in user from the current session, or null if not signed in. */
+  getCurrentUser(): Promise<User | null>;
+  /** Throws with a user-facing message (e.g. "Incorrect username or password.") on failure. */
+  login(username: string, password: string): Promise<User>;
+  logout(): Promise<void>;
 
   getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]>;
   createTimeEntry(input: NewTimeEntryInput): Promise<TimeEntry>;

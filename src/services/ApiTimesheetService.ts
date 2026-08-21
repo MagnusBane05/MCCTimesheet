@@ -1,7 +1,7 @@
 import type { User, UserRole } from '../domain/user';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
-import { apiRequest } from './apiClient';
+import { ApiError, apiRequest, ensureCsrfCookie } from './apiClient';
 import type {
   NewEmployeeInput,
   NewProjectInput,
@@ -86,20 +86,27 @@ function timeEntryFromApi(entry: ApiTimeEntry): TimeEntry {
  * Django REST implementation of TimesheetService
  */
 export class ApiTimesheetService implements TimesheetService {
-  async getCurrentUser(userId: number): Promise<User | null> {
-    // TODO(Phase B): Django must authenticate the *session*, not trust a
-    // client-supplied id — this should become a parameterless
-    // GET /api/auth/me/ once real auth lands, and AuthContext will need to
-    // stop persisting a userId itself.
-    const user = await apiRequest<ApiUser>(`/employees/${userId}/`);
-    return user ? userFromApi(user) : null;
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const user = await apiRequest<ApiUser>('/auth/me/');
+      return userFromApi(user);
+    } catch (error) {
+      // DRF's SessionAuthentication has no WWW-Authenticate challenge, so an
+      // unauthenticated request here comes back as 403, not 401.
+      if (error instanceof ApiError && (error.status === 401 || error.status === 403)) return null;
+      throw error;
+    }
   }
 
-  async findUserByUsername(): Promise<User | null> {
-    // TODO(Phase B): replaced entirely by POST /api/auth/login/ — the mock's
-    // "look up by username, check a hardcoded dev password" flow has no
-    // real backend equivalent and should not be ported as-is.
-    throw new Error('Not implemented — use POST /api/auth/login/ (Phase B).');
+  async login(username: string, password: string): Promise<User> {
+    await ensureCsrfCookie();
+    const user = await apiRequest<ApiUser>('/auth/login/', { method: 'POST', body: { username, password } });
+    return userFromApi(user);
+  }
+
+  async logout(): Promise<void> {
+    await ensureCsrfCookie();
+    await apiRequest<void>('/auth/logout/', { method: 'POST' });
   }
 
   async getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]> {

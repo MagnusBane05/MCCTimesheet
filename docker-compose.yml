@@ -8,6 +8,7 @@ services:
       - "3306:3306"
     volumes:
       - mcc_mysql_data:/var/lib/mysql
+      - ./backend/mysql-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s

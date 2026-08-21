@@ -17,6 +17,12 @@ import type {
 
 const SIMULATED_LATENCY_MS = 250;
 
+// PROTOTYPE-ONLY: every account accepts this literal password. Session is
+// just a user id in sessionStorage — nothing like this exists once
+// ApiTimesheetService (real Django auth) is the active service.
+const DEV_PASSWORD = 'demo';
+const SESSION_KEY = 'mcc_timesheet_mock_session';
+
 function delay<T>(value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), SIMULATED_LATENCY_MS));
 }
@@ -35,14 +41,27 @@ export class MockTimesheetService implements TimesheetService {
   private projects: Project[] = mockProjects.map((project) => ({ ...project }));
   private timeEntries: TimeEntry[] = mockTimeEntries.map((entry) => ({ ...entry }));
 
-  async getCurrentUser(userId: number): Promise<User | null> {
+  async getCurrentUser(): Promise<User | null> {
+    const userId = Number(sessionStorage.getItem(SESSION_KEY));
     const user = this.users.find((u) => u.id === userId) ?? null;
-    return delay(user ? { ...user } : null);
+    return delay(user && user.active ? { ...user } : null);
   }
 
-  async findUserByUsername(username: string): Promise<User | null> {
-    const user = this.users.find((u) => u.username.toLowerCase() === username.toLowerCase()) ?? null;
-    return delay(user ? { ...user } : null);
+  async login(username: string, password: string): Promise<User> {
+    if (password !== DEV_PASSWORD) {
+      throw new Error('Incorrect username or password.');
+    }
+    const user = this.users.find((u) => u.username.toLowerCase() === username.toLowerCase());
+    if (!user || !user.active) {
+      throw new Error('Incorrect username or password.');
+    }
+    sessionStorage.setItem(SESSION_KEY, String(user.id));
+    return delay({ ...user });
+  }
+
+  async logout(): Promise<void> {
+    sessionStorage.removeItem(SESSION_KEY);
+    return delay(undefined);
   }
 
   async getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]> {

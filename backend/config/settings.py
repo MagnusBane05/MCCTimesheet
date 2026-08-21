@@ -90,10 +90,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-ca'
-
-# TODO: the real business timezone has not been confirmed by the client yet.
-# UTC is a safe, explicit placeholder — change only this setting once known.
-TIME_ZONE = env('DJANGO_TIME_ZONE', default='UTC')
+TIME_ZONE = env('DJANGO_TIME_ZONE', default='America/Toronto')
 USE_I18N = True
 USE_TZ = True
 
@@ -115,6 +112,15 @@ REST_FRAMEWORK = {
     # (see core/exceptions.py) instead of DRF's default varying shapes.
     'EXCEPTION_HANDLER': 'core.exceptions.api_exception_handler',
 }
+
+# Local dev origins only — never widen this for production (see instructions).
+# Not needed at all if React and Django end up served from the same origin.
+CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:5173'])
+CORS_ALLOW_CREDENTIALS = True
+
+# Only needed if the frontend is ever served from a different origin than
+# Django (unsafe requests are rejected unless their Origin is trusted here).
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 
 # --- Production security (all opt-in via env vars; safe no-ops locally)
 SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=False)
