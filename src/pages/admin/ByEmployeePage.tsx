@@ -16,6 +16,7 @@ import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
+import { Counter } from '../../components/common/Counter';
 
 const TODAY = new Date();
 
@@ -63,6 +64,8 @@ export function ByEmployeePage() {
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
 
   const rangeEntries = entries.filter((entry) => parseDate(entry.workDate) >= fromDate && parseDate(entry.workDate) <= toDate);
+
+  const totalRangeHours = calculateWeeklyHours(rangeEntries);
 
   const groupsByEmployee = new Map<number, TimeEntry[]>();
   for (const entry of rangeEntries) {
@@ -117,13 +120,16 @@ export function ByEmployeePage() {
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
-      <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
-
       {loading && <LoadingState label="Loading employee hours…" />}
       {!loading && error && <ErrorState message="Unable to load time entries. Please try again." onRetry={load} />}
 
       {!loading && !error && (
         <>
+          <div className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-3 shadow-sm">
+            <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
+            <Counter title="Total entries" number={rangeEntries.length} />
+            <Counter title="Total hours" number={totalRangeHours} />
+          </div>
           {groups.length === 0 && <EmptyState message="No employees have hours in this date range." />}
           {groups.map((group) => (
             <HoursGroupCard

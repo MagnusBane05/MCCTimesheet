@@ -18,19 +18,17 @@ export function WeekRangeNav({
   }
 
   return (
-    <div className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-3 shadow-sm">
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
-          ‹ Previous week
-        </Button>
-        <Button 
-          variant="ghost"
-          disabled={isFutureDate(addWeeks(fromDate, 1), new Date())}
-          onClick={() => shiftWeek(1)} 
-          className="!px-3">
-            Next week ›
-        </Button>
-      </div>
+    <div className="flex flex-wrap items-end gap-3 rounded-xl">
+      <Button variant="secondary" onClick={() => shiftWeek(-1)} className="!px-3">
+        ‹ Previous week
+      </Button>
+      <Button 
+        variant="secondary"
+        disabled={isFutureDate(addWeeks(fromDate, 1), new Date())}
+        onClick={() => shiftWeek(1)} 
+        className="!px-3">
+          Next week ›
+      </Button>
       <div>
         <label htmlFor="range-from" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
           From date
