@@ -16,6 +16,8 @@ import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
+import { Select } from '../../components/common/Select';
+import { Input } from '../../components/common/Input';
 
 const TODAY = new Date();
 
@@ -138,11 +140,10 @@ export function ByJobPage() {
           <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
             Customer
           </label>
-          <select
+          <Select
             id="customer-filter"
             value={customerFilter}
             onChange={(event) => setCustomerFilter(event.target.value)}
-            className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           >
             <option value="all">All customers</option>
             {customers.map((customer) => (
@@ -150,35 +151,33 @@ export function ByJobPage() {
                 {customer}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div>
           <label htmlFor="job-search" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
             Search
           </label>
-          <input
+          <Input
             id="job-search"
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Project, customer, or project #"
-            className="mt-1 w-56 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           />
         </div>
         <div>
           <label htmlFor="sort-by" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
             Sort by
           </label>
-          <select
+          <Select
             id="sort-by"
             value={sortBy}
             onChange={(event) => setSortBy(event.target.value as SortBy)}
-            className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
           >
             <option value="customer">Customer (A–Z)</option>
             <option value="name">Project name (A–Z)</option>
             <option value="hours">Total hours (high to low)</option>
-          </select>
+          </Select>
         </div>
       </div>
 
