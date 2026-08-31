@@ -11,9 +11,17 @@ docker compose up -d db
 docker compose up -d backend # runs migrate, then starts the dev server
 ```
 
+``` bash
+cp backend/.env.example backend/.env
+# edit backend\.env: set a real DJANGO_SECRET_KEY and DB passwords
+docker compose up -d db
+docker compose up -d backend # runs migrate, then starts the dev server
+```
+
 API is then available at `http://localhost:8000/api/` (try `/api/health/`).
 Django admin is at `http://localhost:8000/admin/` (create a superuser first:
 `docker compose exec backend python manage.py createsuperuser`).
+Sample user: `admin`, password: `admin`
 
 ## Common commands
 ```powershell
