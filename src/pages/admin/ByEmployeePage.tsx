@@ -1,32 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../../auth/AuthContext';
 import { timesheetService } from '../../services/service';
-import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import type { User } from '../../domain/user';
+import type { Project } from '../../domain/project';
 import { formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
 import { calculateWeeklyHours } from '../../utils/overtime';
-import { formatTimeLabel } from '../../utils/time';
 import { WeekRangeNav } from '../../components/admin/WeekRangeNav';
 import { HoursGroupCard } from '../../components/admin/HoursGroupCard';
-import { TimeEntryDetailRow } from '../../components/admin/TimeEntryDetailRow';
-import { TimeEntryForm, type TimeEntryFormValues } from '../../components/timesheets/TimeEntryForm';
-import { Modal } from '../../components/common/Modal';
-import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { Counter } from '../../components/common/Counter';
+import { TimeEntryTable } from '../../components/admin/TimeEntryTable';
+import { useAuth } from '../../auth/AuthContext';
+import { useRowEditor } from '../../hooks/useRowEditor';
 
 const TODAY = new Date();
 
 export function ByEmployeePage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
-
+  
   const [employees, setEmployees] = useState<User[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
   const [entries, setEntries] = useState<TimeEntry[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -34,21 +31,19 @@ export function ByEmployeePage() {
   const [toDate, setToDate] = useState(getWeekEnd(TODAY));
   const [employeeFilter] = useState<'all' | number>('all');
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
-  const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(false);
     try {
-      const [employeeList, projectList, entryList] = await Promise.all([
+      const [employeeList, entryList, projectsList] = await Promise.all([
         timesheetService.getEmployees(),
-        timesheetService.getProjects(),
         timesheetService.getTimeEntries({}),
+        timesheetService.getProjects(),
       ]);
       setEmployees(employeeList);
-      setProjects(projectList);
       setEntries(entryList);
+      setProjects(projectsList);
     } catch {
       setError(true);
     } finally {
@@ -59,9 +54,17 @@ export function ByEmployeePage() {
   useEffect(() => {
     load();
   }, [load]);
+    
+  const {
+    editingItem: editingEntry,
+    startEditing,
+    cancelEditing,
+    updateField,
+    isEditing,
+  } = useRowEditor<TimeEntry>();
 
-  const projectsById = new Map(projects.map((project) => [project.id, project]));
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
+  const projectsById = new Map(projects.map((project) => [project.id, project]));
 
   const rangeEntries = entries.filter((entry) => parseDate(entry.workDate) >= fromDate && parseDate(entry.workDate) <= toDate);
 
@@ -97,22 +100,13 @@ export function ByEmployeePage() {
     });
   }
 
-  async function handleSaveInvoice(entry: TimeEntry, invoiceNumber: string | null) {
-    await timesheetService.updateTimeEntry(entry.id, { invoiceNumber });
+  async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
+    await timesheetService.updateTimeEntry(entryId, values);
     await load();
   }
 
-  async function handleEditSubmit(values: TimeEntryFormValues) {
-    if (!editingEntry) return;
-    await timesheetService.updateTimeEntry(editingEntry.id, values);
-    setEditingEntry(null);
-    await load();
-  }
-
-  async function handleDeleteConfirm() {
-    if (!deletingEntry) return;
-    await timesheetService.deleteTimeEntry(deletingEntry.id);
-    setDeletingEntry(null);
+  async function handleDeleteTimeEntry(entryId: number) {
+    await timesheetService.deleteTimeEntry(entryId);
     await load();
   }
 
@@ -121,14 +115,14 @@ export function ByEmployeePage() {
       <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       {loading && <LoadingState label="Loading employee hours…" />}
-      {!loading && error && <ErrorState message="Unable to load time entries. Please try again." onRetry={load} />}
+      {!loading && error && <ErrorState message="Unable to load employee hours. Please try again." onRetry={load} />}
 
       {!loading && !error && (
         <>
-          <div className="flex flex-wrap items-end gap-3 rounded-xl bg-white p-3 shadow-sm">
+          <div className="flex flex-wrap items-end gap-3 rounded-xl">
             <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
-            <Counter title="Total entries" number={rangeEntries.length} />
-            <Counter title="Total hours" number={totalRangeHours} />
+            <Counter title="Total entries" number={rangeEntries.length} variant="secondary" />
+            <Counter title="Total hours" number={totalRangeHours} variant="primary" />
           </div>
           {groups.length === 0 && <EmptyState message="No employees have hours in this date range." />}
           {groups.map((group) => (
@@ -147,59 +141,25 @@ export function ByEmployeePage() {
               expanded={expandedIds.has(group.employeeId)}
               onToggle={() => toggleExpanded(group.employeeId)}
             >
-              {group.entries.map((entry) => (
-                <TimeEntryDetailRow
-                  key={entry.id}
-                  entry={entry}
-                  project={projectsById.get(entry.projectId)}
-                  showProject
-                  isAdmin={isAdmin}
-                  onEdit={() => setEditingEntry(entry)}
-                  onDelete={() => setDeletingEntry(entry)}
-                  onSaveInvoice={(invoiceNumber) => handleSaveInvoice(entry, invoiceNumber)}
-                />
-              ))}
+              <TimeEntryTable 
+                entries={group.entries}
+                allEntries={entries}
+                projectsById={projectsById}
+                onUpdateEntry={handleUpdateTimeEntry}
+                onDeleteEntry={handleDeleteTimeEntry}
+                canEdit={isAdmin}
+                showInvoice 
+                showProject
+                editingEntry={editingEntry} 
+                isEditing={isEditing} 
+                onStartEditing={startEditing} 
+                onCancelEditing={cancelEditing} 
+                onUpdateField={updateField}
+              />
             </HoursGroupCard>
           ))}
         </>
       )}
-
-      <Modal open={!!editingEntry} title="Edit time entry" onClose={() => setEditingEntry(null)}>
-        {editingEntry && (
-          <TimeEntryForm
-            key={editingEntry.id}
-            today={TODAY}
-            workDate={editingEntry.workDate}
-            projects={projects}
-            existingEntry={editingEntry}
-            otherEntries={entries.filter((entry) => entry.employeeId === editingEntry.employeeId)}
-            enforceEditWindow={false}
-            dateEditable
-            hideHeading
-            onCancel={() => setEditingEntry(null)}
-            onSubmit={handleEditSubmit}
-          />
-        )}
-      </Modal>
-
-      <ConfirmDialog
-        open={!!deletingEntry}
-        title="Delete this time entry?"
-        description={
-          deletingEntry && (
-            <>
-              {formatLongDateLabel(parseDate(deletingEntry.workDate))}
-              <br />
-              {formatTimeLabel(deletingEntry.startTime)} – {formatTimeLabel(deletingEntry.endTime)}
-              <br />
-              {projectsById.get(deletingEntry.projectId)?.name ?? 'Unknown project'}
-            </>
-          )
-        }
-        confirmLabel="Delete"
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingEntry(null)}
-      />
     </div>
   );
 }

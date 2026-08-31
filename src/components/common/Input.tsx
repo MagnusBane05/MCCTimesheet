@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  variant?: 'default' | 'table';
+  variant?: 'default' | 'inline';
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -12,7 +12,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       className={`
         border border-navy-900/20 text-sm 
         focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 
-        ${variant === 'table' ? 'px-2 py-1 text-sm rounded' : 'px-3 py-2 rounded-lg mt-1 w-56'} ${className}`} 
+        ${variant === 'inline' ? 'px-2 py-1 text-sm rounded' : 'px-3 py-2 rounded-lg mt-1 w-56'} ${className}`} 
       {...props} 
     />
   );

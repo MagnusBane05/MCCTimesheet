@@ -15,7 +15,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
     <button 
       ref={ref} 
       type="button" 
-      className={`flex items-center gap-2 ${className}`}
+      className={`flex items-center gap-2 text-navy-950 ${className}`}
       {...props}
     >
       <Icon className="size-5" />

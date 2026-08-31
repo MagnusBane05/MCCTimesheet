@@ -6,18 +6,15 @@ import type { TimeEntry } from '../../domain/timeEntry';
 import type { User } from '../../domain/user';
 import { formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../utils/dates';
 import { calculateWeeklyHours } from '../../utils/overtime';
-import { formatTimeLabel } from '../../utils/time';
 import { WeekRangeNav } from '../../components/admin/WeekRangeNav';
 import { HoursGroupCard } from '../../components/admin/HoursGroupCard';
-import { TimeEntryDetailRow } from '../../components/admin/TimeEntryDetailRow';
-import { TimeEntryForm, type TimeEntryFormValues } from '../../components/timesheets/TimeEntryForm';
-import { Modal } from '../../components/common/Modal';
-import { ConfirmDialog } from '../../components/common/ConfirmDialog';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { Select } from '../../components/common/Select';
 import { Input } from '../../components/common/Input';
+import { TimeEntryTable } from '../../components/admin/TimeEntryTable';
+import { useRowEditor } from '../../hooks/useRowEditor';
 
 const TODAY = new Date();
 
@@ -39,8 +36,6 @@ export function ByJobPage() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('customer');
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
-  const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,6 +59,14 @@ export function ByJobPage() {
   useEffect(() => {
     load();
   }, [load]);
+      
+  const {
+    editingItem: editingEntry,
+    startEditing,
+    cancelEditing,
+    updateField,
+    isEditing,
+  } = useRowEditor<TimeEntry>();
 
   const projectsById = new Map(projects.map((project) => [project.id, project]));
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
@@ -110,22 +113,13 @@ export function ByJobPage() {
     });
   }
 
-  async function handleSaveInvoice(entry: TimeEntry, invoiceNumber: string | null) {
-    await timesheetService.updateTimeEntry(entry.id, { invoiceNumber });
+  async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
+    await timesheetService.updateTimeEntry(entryId, values);
     await load();
   }
 
-  async function handleEditSubmit(values: TimeEntryFormValues) {
-    if (!editingEntry) return;
-    await timesheetService.updateTimeEntry(editingEntry.id, values);
-    setEditingEntry(null);
-    await load();
-  }
-
-  async function handleDeleteConfirm() {
-    if (!deletingEntry) return;
-    await timesheetService.deleteTimeEntry(deletingEntry.id);
-    setDeletingEntry(null);
+  async function handleDeleteTimeEntry(entryId: number) {
+    await timesheetService.deleteTimeEntry(entryId);
     await load();
   }
 
@@ -204,60 +198,26 @@ export function ByJobPage() {
               expanded={expandedIds.has(group.projectId)}
               onToggle={() => toggleExpanded(group.projectId)}
             >
-              {group.entries.map((entry) => (
-                <TimeEntryDetailRow
-                  key={entry.id}
-                  entry={entry}
-                  project={group.project}
-                  showProject={false}
-                  employeeName={employeesById.get(entry.employeeId)?.displayName ?? 'Unknown employee'}
-                  isAdmin={isAdmin}
-                  onEdit={() => setEditingEntry(entry)}
-                  onDelete={() => setDeletingEntry(entry)}
-                  onSaveInvoice={(invoiceNumber) => handleSaveInvoice(entry, invoiceNumber)}
-                />
-              ))}
+              <TimeEntryTable 
+                entries={group.entries}
+                allEntries={entries}
+                projectsById={projectsById}
+                employeesById={employeesById}
+                onUpdateEntry={handleUpdateTimeEntry}
+                onDeleteEntry={handleDeleteTimeEntry}
+                canEdit={isAdmin}
+                showInvoice 
+                showEmployee
+                editingEntry={editingEntry} 
+                isEditing={isEditing} 
+                onStartEditing={startEditing} 
+                onCancelEditing={cancelEditing} 
+                onUpdateField={updateField}
+              />
             </HoursGroupCard>
           ))}
         </>
       )}
-
-      <Modal open={!!editingEntry} title="Edit time entry" onClose={() => setEditingEntry(null)}>
-        {editingEntry && (
-          <TimeEntryForm
-            key={editingEntry.id}
-            today={TODAY}
-            workDate={editingEntry.workDate}
-            projects={projects}
-            existingEntry={editingEntry}
-            otherEntries={entries.filter((entry) => entry.employeeId === editingEntry.employeeId)}
-            enforceEditWindow={false}
-            dateEditable
-            hideHeading
-            onCancel={() => setEditingEntry(null)}
-            onSubmit={handleEditSubmit}
-          />
-        )}
-      </Modal>
-
-      <ConfirmDialog
-        open={!!deletingEntry}
-        title="Delete this time entry?"
-        description={
-          deletingEntry && (
-            <>
-              {formatLongDateLabel(parseDate(deletingEntry.workDate))}
-              <br />
-              {formatTimeLabel(deletingEntry.startTime)} – {formatTimeLabel(deletingEntry.endTime)}
-              <br />
-              {projectsById.get(deletingEntry.projectId)?.name ?? 'Unknown project'}
-            </>
-          )
-        }
-        confirmLabel="Delete"
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingEntry(null)}
-      />
     </div>
   );
 }

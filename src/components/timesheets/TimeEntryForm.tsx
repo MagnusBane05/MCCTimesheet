@@ -5,7 +5,7 @@ import { formatDate, formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
-import { TimeSelect } from './TimeSelect';
+import { TimeSelect } from '../common/TimeSelect';
 
 export interface TimeEntryFormValues {
   workDate: string;

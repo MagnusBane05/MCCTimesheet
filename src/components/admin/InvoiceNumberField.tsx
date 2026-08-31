@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
+import { Input } from '../common/Input';
+
+interface InvoiceNumberFieldProps {
+  value: string | null;
+  id: string;
+  readOnly: boolean;
+  onSave(invoiceNumber: string | null): Promise<void>;
+}
 
 /** Inline "invoice number" editor shown beside an individual time entry. Read-only for VIEWER. */
 export function InvoiceNumberField({
   value,
+  id,
   readOnly,
   onSave,
-}: {
-  value: string | null;
-  readOnly: boolean;
-  onSave(invoiceNumber: string | null): Promise<void>;
-}) {
+}: InvoiceNumberFieldProps) {
   const [draft, setDraft] = useState(value ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
@@ -39,16 +44,17 @@ export function InvoiceNumberField({
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="invoice-number" className="sr-only">
+      <label htmlFor={id} className="sr-only">
         Invoice number
       </label>
-      <input
-        id="invoice-number"
+      <Input
+        id={id}
         type="text"
+        variant='inline'
         value={draft}
         placeholder="No invoice number"
         onChange={(event) => setDraft(event.target.value)}
-        className="w-36 rounded-lg border border-navy-900/20 px-2.5 py-1.5 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+        className="w-36"
       />
       {dirty && (
         <Button variant="secondary" className="!px-2.5 !py-1.5 text-xs" onClick={handleSave} disabled={saving}>

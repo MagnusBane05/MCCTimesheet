@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { formatHours } from '../../utils/time';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 /** Collapsible group card used by both the By Employee and By Job report pages. */
 export function HoursGroupCard({
@@ -22,7 +23,7 @@ export function HoursGroupCard({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl bg-white shadow-sm">
       <button
         type="button"
         onClick={onToggle}
@@ -31,6 +32,7 @@ export function HoursGroupCard({
       >
         <div className="flex min-w-0 flex-col">
           <span className="flex items-center gap-2 font-semibold text-navy-950">
+            <ChevronRightIcon className={`size-4 text-navy-900/60 transition-transform ${expanded ? 'rotate-90' : ''}`} />
             {title}
             {badge}
           </span>
@@ -46,7 +48,7 @@ export function HoursGroupCard({
           </span>
         </div>
       </button>
-      {expanded && <div className="flex flex-col gap-3 border-t border-navy-900/10 p-4">{children}</div>}
+      {expanded && <div className="border-t border-navy-900/10">{children}</div>}
     </div>
   );
 }

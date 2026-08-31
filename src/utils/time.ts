@@ -13,7 +13,10 @@ export function getDurationHours(startTime: string, endTime: string): number {
   return minutes / 60;
 }
 
-export function formatHours(hours: number): string {
+export function formatHours(hours: number, variant: 'short' | 'long' = 'long'): string {
+  if (variant === 'short') {
+    return `${hours.toFixed(2)}`;
+  }
   return `${hours.toFixed(2)} hrs`;
 }
 
@@ -65,9 +68,12 @@ export function getMinutes(date: Date, step: number = 1): string {
   return pad(Math.floor(minutes/step)*step);
 }
 
-export function formatTimeLabel(time: string): string {
+export function formatTimeLabel(time: string, variant: '12' | '24' = '12'): string {
   const [hours, minutes] = time.split(':').map(Number);
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-  return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+  if (variant === '12') {
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    return `${hour12}:${String(minutes).padStart(2, '0')} ${period}`;
+  }
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }

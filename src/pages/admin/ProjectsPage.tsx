@@ -5,11 +5,10 @@ import { LoadingState } from "../../components/common/LoadingState";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Table, TableHeader, TableCell, TableRow } from "../../components/common/Table";
 import { Button } from "../../components/common/Button";
-import { CheckIcon, PencilIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { IconButton } from "../../components/common/IconButton";
 import { Select } from "../../components/common/Select";
-import { Input } from "../../components/common/Input";
 import { useRowEditor } from "../../hooks/useRowEditor";
+import { EditDelete } from "../../components/common/EditDelete";
+import { EditableText } from "../../components/common/EditableText";
 
 export function ProjectsPage() {
   const [ projects, setProjects ] = useState<Project[]>([]);
@@ -78,7 +77,7 @@ export function ProjectsPage() {
       
       {!loading && !error && (
         <div>
-          <Table striped>
+          <Table striped rounded bordered>
             <thead>
               <tr>
                 <TableHeader>Customer</TableHeader>
@@ -100,46 +99,31 @@ export function ProjectsPage() {
               {filteredProjects.length > 0 && filteredProjects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>
-                    {isEditing(project) ? (
-                      <Input
-                        type="text"
-                        variant="table"
-                        value={editingProject?.customer ?? ''}
-                        onChange={(e) => updateField('customer', e.target.value)}
-                      />
-                    ) : (
-                      project.customer
-                    )}
+                    <EditableText
+                      text={isEditing(project) ? editingProject?.customer ?? '' : project.customer}
+                      isEditing={isEditing(project)}
+                      onEdit={(newText) => updateField('customer', newText)}
+                    />
                   </TableCell>
                   <TableCell>
-                    {isEditing(project) ? (
-                      <Input
-                        type="text"
-                        variant="table"
-                        value={editingProject?.name ?? ''}
-                        onChange={(e) => updateField('name', e.target.value)}
-                      />
-                    ) : (
-                      project.name
-                    )}
+                    <EditableText
+                      text={isEditing(project) ? editingProject?.name ?? '' : project.name}
+                      isEditing={isEditing(project)}
+                      onEdit={(newText) => updateField('name', newText)}
+                    />
                   </TableCell>
                   <TableCell>
-                    {isEditing(project) ? (
-                      <Input
-                        type="text"
-                        variant="table"
-                        value={editingProject?.projectNumber ?? ''}
-                        onChange={(e) => updateField('projectNumber', e.target.value)}
-                      />
-                    ) : (
-                      project.projectNumber
-                    )}
+                    <EditableText
+                      text={isEditing(project) ? editingProject?.projectNumber ?? '' : project.projectNumber}
+                      isEditing={isEditing(project)}
+                      onEdit={(newText) => updateField('projectNumber', newText)}
+                    />
                   </TableCell>
                   <TableCell>
                     {isEditing(project) ? (
                       <Select
                         value={editingProject?.active ? 'Active' : 'Inactive'}
-                        variant="table"
+                        variant="inline"
                         onChange={(e) => updateField('active', e.target.value === 'Active')}
                         className="rounded-full px-0 py-0"
                       >
@@ -158,7 +142,7 @@ export function ProjectsPage() {
                     {isEditing(project) ? (
                       <Select 
                         value={editingProject?.productionStatus ?? ''}
-                        variant="table"
+                        variant="inline"
                         onChange={(e) => updateField('productionStatus', e.target.value as ProductionStatus)}
                         className="rounded-full px-0 py-0"
                       >
@@ -175,30 +159,12 @@ export function ProjectsPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      {isEditing(project) ? (
-                        <>
-                          <IconButton 
-                            icon={CheckIcon} 
-                            onClick={handleSave} 
-                            aria-label="Save project"
-                          />
-                          <IconButton 
-                            icon={XMarkIcon} 
-                            onClick={cancelEditing} 
-                            aria-label="Cancel editing" 
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <IconButton 
-                            icon={PencilIcon} 
-                            onClick={() => startEditing(project)} 
-                            aria-label="Edit project" 
-                          />
-                        </>
-                      )}
-                    </div>
+                    <EditDelete
+                      isEditing={isEditing(project)}
+                      onEdit={() => startEditing(project)}
+                      onCancelEdit={cancelEditing}
+                      onSave={handleSave}               
+                    />
                   </TableCell>
                 </TableRow>
               ))}
