@@ -4,13 +4,14 @@ Local dev backend for the MCC Timesheet app. Runs in Docker because Python
 official Windows binary installer
 
 ## First-time setup
+**Powershell**
 ```powershell
 Copy-Item backend\.env.example backend\.env
 # edit backend\.env: set a real DJANGO_SECRET_KEY and DB passwords
 docker compose up -d db
 docker compose up -d backend # runs migrate, then starts the dev server
 ```
-
+**Bash**
 ``` bash
 cp backend/.env.example backend/.env
 # edit backend\.env: set a real DJANGO_SECRET_KEY and DB passwords
@@ -23,6 +24,16 @@ Django admin is at `http://localhost:8000/admin/` (create a superuser first:
 `docker compose exec backend python manage.py createsuperuser`).
 Sample user: `admin`, password: `admin`
 
+**Running backend locally**
+``` bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+python manage.py migrate
+python manage.py seed_dev_data
+python manage.py runserver
+```
+
 ## Common commands
 ```powershell
 # manage.py, e.g. makemigrations/migrate/shell
@@ -31,6 +42,43 @@ docker compose exec backend python manage.py <command>
 docker compose logs backend --tail 50
 # stop (add -v to also wipe the MySQL volume)
 docker compose down                                       
+```
+
+## Running Tests
+
+Test coverage includes permission enforcement, business rules validation, and API functionality.
+
+**With Docker:**
+```bash
+# Run all tests
+docker compose exec backend python manage.py test
+
+# Run specific app tests
+docker compose exec backend python manage.py test projects
+docker compose exec backend python manage.py test accounts
+
+# Run specific test class
+docker compose exec backend python manage.py test projects.tests.ProjectAPITestCase
+
+# Run specific test method
+docker compose exec backend python manage.py test projects.tests.ProjectAPITestCase.test_list_projects_authenticated
+
+# Run with verbose output
+docker compose exec backend python manage.py test --verbosity=2
+```
+
+**Locally** (after setup):
+```bash
+# Activate venv first
+source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+
+# Run all tests
+python manage.py test
+
+# Run with coverage
+pip install coverage
+coverage run --source='.' manage.py test
+coverage report  # or: coverage html for HTML report
 ```
 
 ## Updating dependencies
