@@ -93,14 +93,26 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 
 **models.py migration**: Only when models.py changes, `python manage.py makemigrations` locally, commit migration file then continue.
 
-**Package backend**: Zip contents of `backend/`, upload using cPanel -> File Manager and extract into `<application-root>`.
+**Package backend**: 
+1. Zip contents of `backend/` except for .env and any static files
+2. Upload to temporary folder on cPanel File Manager like backend-release
+3. Stop Python app
+4. Delete old files/folders, except .env and statiffiles from `<application-root>`
+5. Move files from backend-release to `<application-root>`
 
 **Install requirements**: In cPanel -> Setup Python App -> Configuration Files add `requirements.txt`, then Run Pip Install.
 
-**Release steps** via jailed SSH or a controlled cPanel script (like deploy_dev.py):
-1. `python manage.py migrate`
-2. `python manage.py collectstatic`
-3. `python manage.py createsuperuser` (first time only)
-4. `python manage.py check --deploy` before going live
+**Release steps** Under cPanel -> Setup Python App -> Execute python script, run deployment script (deploy_dev.py):
+  `manage.py check`
+  `manage.py migrate`
+  `manage.py collectstatic`
 
 **Static files**: copy `backend/staticfiles` to `static` folder in domain document root (not Application root)
+
+**Start application**: Start the python app.
+
+**Verify**: Check
+- `/backend/api/health/`
+- migration applied
+- affected workflow
+- logs for errors

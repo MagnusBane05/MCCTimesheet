@@ -14,7 +14,7 @@ export function ProjectsPage() {
   const [ projects, setProjects ] = useState<Project[]>([]);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(false);
-  const [ saveError, setSaveError ] = useState(false);
+  const [ _, setSaveError ] = useState(false);
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
 
   const load = useCallback(async () => {

@@ -20,8 +20,7 @@ from django.core.management import call_command
 print("Running Django checks...")
 call_command("check")
 print("\nApplying migrations...")
-call_command(
-    "migrate",
-    interactive=False,
-)
+call_command("migrate", interactive=False)
+print("\nCollecting static files...")
+call_command("collectstatic", interactive=False)
 print("\nDeployment tasks completed successfully.")
