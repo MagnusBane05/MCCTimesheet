@@ -29,4 +29,4 @@ class TimeEntry(models.Model):
         ordering = ['-work_date', 'start_time']
 
     def __str__(self):
-        return f'{self.employee_id} {self.work_date} {self.start_time}-{self.end_time}'
+        return f'{self.employee.id} {self.work_date} {self.start_time}-{self.end_time}'

@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes  # type: ignore[attr-defined]
 from rest_framework.permissions import AllowAny, IsAuthenticated  # type: ignore[attr-defined]
 from rest_framework.response import Response  # type: ignore[attr-defined]
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST  # type: ignore[attr-defined]
 
+from .models import User
 from .serializers import UserSerializer
 
 
@@ -65,3 +67,15 @@ def logout_view(request):  # type: ignore[no-untyped-def]
 def me_view(request):  # type: ignore[no-untyped-def]
     return Response(UserSerializer(request.user).data)  # type: ignore[attr-defined]
 
+
+class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[misc]
+    """
+    API endpoint for listing employees.
+    Only admins can see all employees; employees can only see themselves.
+    """
+
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # type: ignore[no-untyped-def]
+        return User.objects.filter(is_active=True).order_by('display_name')

@@ -95,9 +95,9 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 
 **Package backend**: 
 1. Zip contents of `backend/` except for .env and any static files
-2. Upload to temporary folder on cPanel File Manager like backend-release
+2. Upload to temporary folder on cPanel File Manager like backend-release and extract
 3. Stop Python app
-4. Delete old files/folders, except .env and statiffiles from `<application-root>`
+4. Delete old files/folders, except .env and staticfiles from `<application-root>`
 5. Move files from backend-release to `<application-root>`
 
 **Install requirements**: In cPanel -> Setup Python App -> Configuration Files add `requirements.txt`, then Run Pip Install.
