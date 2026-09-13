@@ -181,41 +181,51 @@ export function ByJobPage() {
       {!loading && !error && (
         <>
           {groups.length === 0 && <EmptyState message="No projects match these filters." />}
-          {groups.map((group) => (
-            <HoursGroupCard
-              key={group.projectId}
-              title={group.project?.name ?? 'Unknown project'}
-              subtitle={group.project ? `${group.project.customer} · ${group.project.projectNumber}` : undefined}
-              badge={
-                group.project && !group.project.active ? (
-                  <span className="rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium text-navy-900/60">
-                    Inactive
-                  </span>
-                ) : undefined
-              }
-              entryCount={group.entries.length}
-              totalHours={group.totalHours}
-              expanded={expandedIds.has(group.projectId)}
-              onToggle={() => toggleExpanded(group.projectId)}
-            >
-              <TimeEntryTable 
-                entries={group.entries}
-                allEntries={entries}
-                projectsById={projectsById}
-                employeesById={employeesById}
-                onUpdateEntry={handleUpdateTimeEntry}
-                onDeleteEntry={handleDeleteTimeEntry}
-                canEdit={isAdmin}
-                showInvoice 
-                showEmployee
-                editingEntry={editingEntry} 
-                isEditing={isEditing} 
-                onStartEditing={startEditing} 
-                onCancelEditing={cancelEditing} 
-                onUpdateField={updateField}
-              />
-            </HoursGroupCard>
-          ))}
+          {groups.map((group) => {
+            const allInvoiced = group.entries.every(entry => entry.invoiceNumber);
+            return (
+              <HoursGroupCard
+                key={group.projectId}
+                title={group.project?.name ?? 'Unknown project'}
+                subtitle={group.project ? `${group.project.customer} · ${group.project.projectNumber}` : undefined}
+                badge={
+                  group.project && !group.project.active ? (
+                    <span className="rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium text-navy-900/60">
+                      Inactive
+                    </span>
+                  ) : undefined
+                }
+                secondaryBadge={
+                  allInvoiced ? (
+                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                      Invoiced
+                    </span>
+                  ) : undefined
+                }
+                entryCount={group.entries.length}
+                totalHours={group.totalHours}
+                expanded={expandedIds.has(group.projectId)}
+                onToggle={() => toggleExpanded(group.projectId)}
+              >
+                <TimeEntryTable 
+                  entries={group.entries}
+                  allEntries={entries}
+                  projectsById={projectsById}
+                  employeesById={employeesById}
+                  onUpdateEntry={handleUpdateTimeEntry}
+                  onDeleteEntry={handleDeleteTimeEntry}
+                  canEdit={isAdmin}
+                  showInvoice 
+                  showEmployee
+                  editingEntry={editingEntry} 
+                  isEditing={isEditing} 
+                  onStartEditing={startEditing} 
+                  onCancelEditing={cancelEditing} 
+                  onUpdateField={updateField}
+                />
+              </HoursGroupCard>
+            );
+          })}
         </>
       )}
     </div>

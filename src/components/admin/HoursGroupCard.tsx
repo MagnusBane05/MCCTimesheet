@@ -7,6 +7,7 @@ export function HoursGroupCard({
   title,
   subtitle,
   badge,
+  secondaryBadge,
   entryCount,
   totalHours,
   expanded,
@@ -16,6 +17,7 @@ export function HoursGroupCard({
   title: string;
   subtitle?: string;
   badge?: ReactNode;
+  secondaryBadge?: ReactNode;
   entryCount: number;
   totalHours: number;
   expanded: boolean;
@@ -39,13 +41,11 @@ export function HoursGroupCard({
           {subtitle && <span className="truncate text-sm text-navy-900/60">{subtitle}</span>}
         </div>
         <div className="flex shrink-0 items-center gap-4">
+          {secondaryBadge}
           <span className="text-sm text-navy-900/60">
             {entryCount} {entryCount === 1 ? 'entry' : 'entries'}
           </span>
           <span className="text-sm font-semibold text-navy-950">{formatHours(totalHours)}</span>
-          <span className={`text-navy-900/60 transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden="true">
-            ▾
-          </span>
         </div>
       </button>
       {expanded && <div className="border-t border-navy-900/10">{children}</div>}

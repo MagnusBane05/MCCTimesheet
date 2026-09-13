@@ -148,7 +148,6 @@ export function ByEmployeePage() {
                 onUpdateEntry={handleUpdateTimeEntry}
                 onDeleteEntry={handleDeleteTimeEntry}
                 canEdit={isAdmin}
-                showInvoice 
                 showProject
                 editingEntry={editingEntry} 
                 isEditing={isEditing} 
