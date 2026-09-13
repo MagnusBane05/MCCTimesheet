@@ -159,7 +159,7 @@ export function TimeEntryTable({
         <tbody>
           {entries.map((entry) => {
             const editing = isEditing(entry);
-            const displayedEntry = isEditing(entry) ? editingEntry ?? entry : entry;
+            const displayedEntry = editing ? editingEntry ?? entry : entry;
             const rowErrors = editing ? visibleErrors : {};
             return (
               <TableRow key={entry.id}>
@@ -259,9 +259,7 @@ export function TimeEntryTable({
                       onDelete={() => setDeletingEntry(entry)}
                     />
                     {editing && submitError && (
-                      <p role="alert" className="text-sm text-red-700">
-                        {submitError}
-                      </p>
+                      <Error message={submitError} />
                     )}
                   </TableCell>
                 }

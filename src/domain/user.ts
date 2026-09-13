@@ -1,5 +1,7 @@
 export type UserRole = 'EMPLOYEE' | 'VIEWER' | 'ADMIN';
 
+export const USER_ROLES: UserRole[] = ['EMPLOYEE', 'VIEWER', 'ADMIN'];
+
 export interface User {
   id: number;
   username: string;

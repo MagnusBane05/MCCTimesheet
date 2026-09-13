@@ -9,6 +9,7 @@ import { Select } from "../../components/common/Select";
 import { useRowEditor } from "../../hooks/useRowEditor";
 import { EditDelete } from "../../components/common/EditDelete";
 import { EditableText } from "../../components/common/EditableText";
+import { ActiveToggle } from "../../components/common/ActiveToggle";
 
 export function ProjectsPage() {
   const [ projects, setProjects ] = useState<Project[]>([]);
@@ -51,7 +52,7 @@ export function ProjectsPage() {
     } catch {
       setSaveError(true);
     }
-  }
+  };
 
   const filteredProjects = projects.filter((project) => {
     if (filter === 'active') return project.active;
@@ -120,23 +121,11 @@ export function ProjectsPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    {isEditing(project) ? (
-                      <Select
-                        value={editingProject?.active ? 'Active' : 'Inactive'}
-                        variant="inline"
-                        onChange={(e) => updateField('active', e.target.value === 'Active')}
-                        className="rounded-full px-0 py-0"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </Select>
-                    ) : (
-                      project.active ? (
-                        <div className="bg-green-100 text-green-700 rounded-full font-bold text-xs text-center py-1 px-2 w-min">Active</div>
-                      ) : (
-                        <div className="bg-red-100 text-red-700 rounded-full font-bold text-xs text-center py-1 px-2 w-min">Inactive</div>
-                      )
-                    )}
+                    <ActiveToggle
+                      active={isEditing(project) ? editingProject?.active ?? false : project.active}
+                      editing={isEditing(project)}
+                      onToggle={(e) => updateField('active', e.target.value === 'Active')}
+                    />
                   </TableCell>
                   <TableCell>
                     {isEditing(project) ? (
