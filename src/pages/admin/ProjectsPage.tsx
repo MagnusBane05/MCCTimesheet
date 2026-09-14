@@ -10,8 +10,12 @@ import { useRowEditor } from "../../hooks/useRowEditor";
 import { EditDelete } from "../../components/common/EditDelete";
 import { EditableText } from "../../components/common/EditableText";
 import { ActiveToggle } from "../../components/common/ActiveToggle";
+import { useAuth } from "../../auth/AuthContext";
 
 export function ProjectsPage() {
+  const { currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'ADMIN';
+  
   const [ projects, setProjects ] = useState<Project[]>([]);
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState(false);
@@ -86,13 +90,13 @@ export function ProjectsPage() {
                 <TableHeader>PRJ #</TableHeader>
                 <TableHeader>Active</TableHeader>
                 <TableHeader>Production Status</TableHeader>
-                <TableHeader/>
+                {isAdmin && <TableHeader/>}
               </tr>
             </thead>
             <tbody>
               {filteredProjects.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center text-navy-950/50">
+                  <td colSpan={isAdmin ? 6 : 5} className="text-center text-navy-950/50">
                     No projects found.
                   </td>
                 </tr>
@@ -147,14 +151,16 @@ export function ProjectsPage() {
                         </div>
                     )}
                   </TableCell>
-                  <TableCell>
-                    <EditDelete
-                      isEditing={isEditing(project)}
-                      onEdit={() => startEditing(project)}
-                      onCancelEdit={cancelEditing}
-                      onSave={handleSave}               
-                    />
-                  </TableCell>
+                  {isAdmin && (
+                    <TableCell>
+                      <EditDelete
+                        isEditing={isEditing(project)}
+                        onEdit={() => startEditing(project)}
+                        onCancelEdit={cancelEditing}
+                        onSave={handleSave}               
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </tbody>

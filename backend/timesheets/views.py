@@ -1,4 +1,5 @@
-from typing import Any, cast
+from typing import cast, Optional
+from django.db.models import QuerySet
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
@@ -21,15 +22,30 @@ class TimeEntryViewSet(viewsets.ModelViewSet):
     serializer_class = TimeEntrySerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self) -> Any:
-        """Filter entries based on user role."""
+    def get_queryset(self) -> QuerySet[TimeEntry]: # type: ignore[override]
+        """Filter entries based on user role and query parameters."""
         user = cast(User, self.request.user)
+
         if user.role == UserRole.ADMIN.value:
-            return TimeEntry.objects.all()
+            queryset = TimeEntry.objects.all()
         elif user.role == UserRole.VIEWER.value:
-            return TimeEntry.objects.none()
+            queryset = TimeEntry.objects.all()
         else:  # EMPLOYEE
-            return TimeEntry.objects.filter(employee_id=user.id)  # type: ignore[attr-defined]
+            queryset = TimeEntry.objects.filter(employee_id=user.id)  # type: ignore[attr-defined]
+
+        date_from: Optional[str] = self.request.query_params.get('from') # type: ignore[assignment]
+        date_to: Optional[str] = self.request.query_params.get('to') # type: ignore[assignment]
+        employee_id: Optional[str] = self.request.query_params.get('employeeId') # type: ignore[assignment]
+
+        if date_from:
+            queryset = queryset.filter(work_date__gte=date_from)
+        if date_to:
+            queryset = queryset.filter(work_date__lte=date_to)
+        # Only allow employee ID filtering for admins
+        if employee_id and user.role == UserRole.ADMIN.value:
+            queryset = queryset.filter(employee_id=int(employee_id))
+
+        return queryset
 
     def perform_create(self, serializer: TimeEntrySerializer) -> None:
         """

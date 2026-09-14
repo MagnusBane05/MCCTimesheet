@@ -113,12 +113,23 @@ class TimeEntryAPITestCase(TestCase):
         self.assertEqual(len(response.data), 1)  # type: ignore[attr-defined]
         self.assertEqual(response.data[0]['employee'], self.employee_alice.id)  # type: ignore[attr-defined,index]
 
-    def test_list_entries_viewer_sees_nothing(self) -> None:
-        """Viewers cannot list entries directly."""
+    def test_list_entries_viewer_sees_all(self) -> None:
+        """Viewers can list all entries for reporting."""
+        # Create entry for Bob so we have multiple entries
+        today = timezone.now().date()
+        TimeEntry.objects.create(
+            employee=self.employee_bob,
+            project=self.project,
+            work_date=today,
+            start_time=time(14, 0),
+            end_time=time(17, 0),
+            work_description='Bob work',
+        )
+
         self.client.force_authenticate(user=self.viewer)  # type: ignore[attr-defined]
         response = self.client.get('/api/time-entries/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)  # type: ignore[attr-defined]
+        self.assertEqual(len(response.data), 2)  # type: ignore[attr-defined]
 
     def test_list_entries_admin_sees_all(self) -> None:
         """Admins can see all entries."""
@@ -359,3 +370,193 @@ class TimeEntryAPITestCase(TestCase):
         self.assertIn('created_at', response.data)  # type: ignore[attr-defined]
         self.assertIn('updated_at', response.data)  # type: ignore[attr-defined]
 
+    def test_filter_by_date_from(self) -> None:
+        """Time entries can be filtered by from date."""
+        from datetime import timedelta
+
+        today = timezone.now().date()
+        tomorrow = today + timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+
+        # Create entries on different dates
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=yesterday,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Yesterday work',
+        )
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=tomorrow,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Tomorrow work',
+        )
+
+        # Filter from today onwards
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.get(f'/api/time-entries/?from={today.isoformat()}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should get today and tomorrow entries
+        self.assertEqual(len(response.data), 2)  # type: ignore[attr-defined]
+        self.assertNotIn(yesterday.isoformat(), [e['work_date'] for e in response.data])  # type: ignore[attr-defined]
+
+    def test_filter_by_date_to(self) -> None:
+        """Time entries can be filtered by to date."""
+        from datetime import timedelta
+
+        today = timezone.now().date()
+        tomorrow = today + timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+
+        # Create entries on different dates
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=yesterday,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Yesterday work',
+        )
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=tomorrow,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Tomorrow work',
+        )
+
+        # Filter up to today
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.get(f'/api/time-entries/?to={today.isoformat()}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should get yesterday and today entries
+        self.assertEqual(len(response.data), 2)  # type: ignore[attr-defined]
+        self.assertNotIn(tomorrow.isoformat(), [e['work_date'] for e in response.data])  # type: ignore[attr-defined]
+
+    def test_filter_by_date_range(self) -> None:
+        """Time entries can be filtered by date range."""
+        from datetime import timedelta
+
+        today = timezone.now().date()
+        tomorrow = today + timedelta(days=1)
+        yesterday = today - timedelta(days=1)
+        two_days_ago = today - timedelta(days=2)
+
+        # Create entries on different dates
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=two_days_ago,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Two days ago',
+        )
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=yesterday,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Yesterday work',
+        )
+        TimeEntry.objects.create(
+            employee=self.employee_alice,
+            project=self.project,
+            work_date=tomorrow,
+            start_time=time(8, 0),
+            end_time=time(12, 0),
+            work_description='Tomorrow work',
+        )
+
+        # Filter from yesterday to tomorrow (should exclude two_days_ago)
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.get(f'/api/time-entries/?from={yesterday.isoformat()}&to={tomorrow.isoformat()}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should get yesterday, today, and tomorrow entries (3)
+        self.assertEqual(len(response.data), 3)  # type: ignore[attr-defined]
+        dates = [e['work_date'] for e in response.data]  # type: ignore[attr-defined]
+        self.assertNotIn(two_days_ago.isoformat(), dates)
+
+    def test_filter_by_employee_id(self) -> None:
+        """Time entries can be filtered by employee ID."""
+        today = timezone.now().date()
+
+        # Create entry for Bob
+        TimeEntry.objects.create(
+            employee=self.employee_bob,
+            project=self.project,
+            work_date=today,
+            start_time=time(14, 0),
+            end_time=time(17, 0),
+            work_description='Bob work',
+        )
+
+        # Admin filters by employee ID
+        self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
+        response = self.client.get(f'/api/time-entries/?employeeId={self.employee_alice.id}')  # type: ignore[attr-defined]
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should get only Alice's entry
+        self.assertEqual(len(response.data), 1)  # type: ignore[attr-defined]
+        self.assertEqual(response.data[0]['employee'], self.employee_alice.id)  # type: ignore[attr-defined,index]
+
+    def test_filter_by_employee_id_employee_can_only_see_own(self) -> None:
+        """Employees cannot use employee ID filter to see others' entries."""
+        today = timezone.now().date()
+
+        # Create entry for Bob
+        TimeEntry.objects.create(
+            employee=self.employee_bob,
+            project=self.project,
+            work_date=today,
+            start_time=time(14, 0),
+            end_time=time(17, 0),
+            work_description='Bob work',
+        )
+
+        # Alice tries to filter by Bob's ID (should be ignored by queryset filter)
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.get(f'/api/time-entries/?employeeId={self.employee_bob.id}')  # type: ignore[attr-defined]
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should still get only Alice's entry (her queryset filters to her only)
+        self.assertEqual(len(response.data), 1)  # type: ignore[attr-defined]
+        self.assertEqual(response.data[0]['employee'], self.employee_alice.id)  # type: ignore[attr-defined,index]
+
+    def test_viewer_cannot_create_time_entries(self) -> None:
+        """Viewers cannot create time entries."""
+        self.client.force_authenticate(user=self.viewer)  # type: ignore[attr-defined]
+        today = timezone.now().date()
+        response = self.client.post(
+            '/api/time-entries/',
+            {
+                'employee': self.employee_alice.id,  # type: ignore[attr-defined]
+                'project': self.project.id,  # type: ignore[attr-defined]
+                'work_date': today.isoformat(),
+                'start_time': '13:00',
+                'end_time': '17:00',
+                'work_description': 'Work',
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('viewer', str(response.data).lower())  # type: ignore[attr-defined]
+
+    def test_viewer_cannot_update_time_entries(self) -> None:
+        """Viewers cannot update time entries."""
+        self.client.force_authenticate(user=self.viewer)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/time-entries/{self.entry1.id}/',  # type: ignore[attr-defined]
+            {'work_description': 'Hacked description'},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('viewer', str(response.data).lower())  # type: ignore[attr-defined]
+
+    def test_viewer_cannot_delete_time_entries(self) -> None:
+        """Viewers cannot delete time entries."""
+        self.client.force_authenticate(user=self.viewer)  # type: ignore[attr-defined]
+        response = self.client.delete(f'/api/time-entries/{self.entry1.id}/')  # type: ignore[attr-defined]
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('viewer', str(response.data).lower())  # type: ignore[attr-defined]

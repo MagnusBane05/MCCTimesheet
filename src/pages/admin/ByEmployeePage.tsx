@@ -36,9 +36,11 @@ export function ByEmployeePage() {
     setLoading(true);
     setError(false);
     try {
+      const dateFrom = fromDate.toISOString().split('T')[0];
+      const dateTo = toDate.toISOString().split('T')[0];
       const [employeeList, entryList, projectsList] = await Promise.all([
         timesheetService.getEmployees(),
-        timesheetService.getTimeEntries({}),
+        timesheetService.getTimeEntries({ dateFrom, dateTo }),
         timesheetService.getProjects(),
       ]);
       setEmployees(employeeList);
@@ -49,7 +51,7 @@ export function ByEmployeePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fromDate, toDate]);
 
   useEffect(() => {
     load();

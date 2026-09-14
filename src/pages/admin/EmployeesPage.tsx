@@ -1,5 +1,6 @@
 import { Table, TableCell, TableHeader } from "../../components/common/Table";
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "../../auth/AuthContext";
 import { User, UserRole, USER_ROLES } from "../../domain/user";
 import { timesheetService } from "../../services/service";
 import { LoadingState } from "../../components/common/LoadingState";
@@ -13,6 +14,9 @@ import { EditableSelect } from "../../components/common/EditableSelect";
 import { Button } from "../../components/common/Button";
 
 export function EmployeesPage() {
+  const { currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'ADMIN';
+
   const [employees, setEmployees] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -90,13 +94,13 @@ export function EmployeesPage() {
               <TableHeader>Display Name</TableHeader>
               <TableHeader>Role</TableHeader>
               <TableHeader>Active</TableHeader>
-              <TableHeader/>
+              {isAdmin && <TableHeader/>}
             </tr>
           </thead>
           <tbody>
             {filteredEmployees.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center text-navy-950/50">
+                <td colSpan={isAdmin ? 5 : 4} className="text-center text-navy-950/50">
                   No employees found.
                 </td>
               </tr>
@@ -142,17 +146,19 @@ export function EmployeesPage() {
                       onToggle={(e) => updateField('active', e.target.value === 'Active')}>
                     </ActiveToggle>
                   </TableCell>
-                  <TableCell>
-                    <EditDelete
-                      isEditing={editing}
-                      onEdit={() => startEditing(employee)}
-                      onCancelEdit={handleCancelEditing}
-                      onSave={handleSave}
-                    />
-                    {editing && saveError && (
-                      <Error message={saveError} />
-                    )}
-                  </TableCell>
+                  {isAdmin && (
+                    <TableCell>
+                      <EditDelete
+                        isEditing={editing}
+                        onEdit={() => startEditing(employee)}
+                        onCancelEdit={handleCancelEditing}
+                        onSave={handleSave}
+                      />
+                      {editing && saveError && (
+                        <Error message={saveError} />
+                      )}
+                    </TableCell>
+                  )}
                 </tr>
               );
             })}
