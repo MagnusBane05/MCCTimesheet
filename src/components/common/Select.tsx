@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  variant?: 'default' | 'inline';
+  variant?: 'default' | 'inline' | 'large';
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
@@ -12,9 +12,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     <select
       ref={ref}
       className={`
-        border border-navy-900/20 text-sm 
+        border border-navy-900/20
         focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 
-        ${variant === 'inline' ? 'px-2 py-1 rounded' : 'px-3 py-2 rounded-lg mt-1'} ${className}`}
+        ${variant === 'inline' ? 'px-2 py-1 rounded text-sm ' : 
+          variant === 'large' ? 'mt-1 rounded-lg px-3 py-2.5 text-base' : 
+          'px-3 py-2 rounded-lg mt-1 text-sm '} ${className}`}
       {...props}
     />
   )

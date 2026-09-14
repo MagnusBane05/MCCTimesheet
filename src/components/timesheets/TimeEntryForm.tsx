@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { ChangeEvent, useMemo, useState, type FormEvent } from 'react';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import { formatDate, formatShortDateLabel, parseDate } from '../../utils/dates';
@@ -6,6 +6,7 @@ import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/tim
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
 import { TimeSelect } from '../common/TimeSelect';
+import { Select } from '../common/Select';
 
 export interface TimeEntryFormValues {
   workDate: string;
@@ -49,18 +50,28 @@ export function TimeEntryForm({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [customer, setCustomer] = useState(existingEntry?.projectId != null ? projects.find(p => p.id === existingEntry.projectId)?.customer ?? '' : '');
 
   // When dateEditable is false (the employee day-nav flow), always read the prop directly so
   // changing the selected day is reflected immediately with no stale internal state.
   const effectiveWorkDate = dateEditable ? internalWorkDate : workDate;
 
+  const activeProjects = useMemo(() => {
+    return projects.filter((project) => project.active);
+  }, [projects]);
+
+  const customerOptions = useMemo(() => {
+    const customers = activeProjects.map((project) => project.customer);
+    return Array.from(new Set(customers)).sort((a, b) => a.localeCompare(b));
+  }, [activeProjects]);
+
   const projectOptions = useMemo(() => {
-    const active = projects.filter((project) => project.active);
-    const options = existingEntry && !active.some((project) => project.id === existingEntry.projectId)
-      ? [...active, ...projects.filter((project) => project.id === existingEntry.projectId)]
-      : active;
+    const customerProjects = activeProjects.filter((project) => project.customer === customer);
+    const options = existingEntry && !customerProjects.some((project) => project.id === existingEntry.projectId)
+      ? [...customerProjects, ...projects.filter((project) => project.id === existingEntry.projectId)]
+      : customerProjects;
     return [...options].sort((a, b) => a.name.localeCompare(b.name));
-  }, [projects, existingEntry]);
+  }, [activeProjects, existingEntry, customer]);
 
   const input: TimeEntryInput = { workDate: effectiveWorkDate, startTime, endTime, projectId, workDescription };
   const errors = validateTimeEntry(input, {
@@ -75,6 +86,16 @@ export function TimeEntryForm({
   const otherDailyTotal = otherEntries
     .filter((entry) => entry.workDate === effectiveWorkDate && entry.id !== existingEntry?.id)
     .reduce((total, entry) => total + getDurationHours(entry.startTime, entry.endTime), 0);
+
+  function handleCustomerChange(event: ChangeEvent<HTMLSelectElement>) {
+    setCustomer(event.target.value);
+    const customerProjects = activeProjects.filter((project) => project.customer === event.target.value);
+    if (customerProjects.length === 1) {
+      setProjectId(customerProjects[0].id);
+    } else {
+      setProjectId(null);
+    }
+  }
 
   function handleCancel() {
     setStartTime(existingEntry?.startTime ?? '');
@@ -166,24 +187,49 @@ export function TimeEntryForm({
         </div>
       </div>
 
-      <div>
-        <label htmlFor="entry-project" className="block text-sm font-medium text-navy-900">
-          Project
-        </label>
-        <select
-          id="entry-project"
-          value={projectId ?? ''}
-          onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
-          className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
-        >
-          <option value="">Select a project…</option>
-          {projectOptions.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name} — {project.customer} ({project.projectNumber})
-            </option>
-          ))}
-        </select>
-        {visibleErrors.projectId && <p className="mt-1 text-sm text-red-700">{visibleErrors.projectId}</p>}
+      <div className="grid md:grid-cols-2 gap-3">
+        <div>
+          <label htmlFor="entry-customer" className="block text-sm font-medium text-navy-900">
+            Customer
+          </label>
+          <Select
+            id="entry-customer"
+            value={customer}
+            onChange={handleCustomerChange}
+            variant="large"
+            className="mt-1 w-full"
+          >
+            <option value="">Select a customer…</option>
+            {customerOptions.map((customer) => (
+              <option key={customer} value={customer}>
+                {customer}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div>
+          <label htmlFor="entry-project" className="block text-sm font-medium text-navy-900">
+            Project
+          </label>
+          <Select
+            id="entry-project"
+            value={projectId ?? ''}
+            onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
+            variant="large"
+            className="mt-1 w-full"
+            disabled={projectOptions.length <= 1}
+          >
+            {projectOptions.length === 0 && <option value="">Select a customer first</option>}
+            {projectOptions.length > 1 && <option value="">Select a project…</option>}
+            {projectOptions.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.projectNumber ? `(${project.projectNumber}) ` : ''}{project.name}
+              </option>
+            ))}
+          </Select>
+          {visibleErrors.projectId && <p className="mt-1 text-sm text-red-700">{visibleErrors.projectId}</p>}
+        </div>
       </div>
 
       <div>
