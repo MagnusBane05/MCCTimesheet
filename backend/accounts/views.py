@@ -1,11 +1,14 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import viewsets
+from rest_framework import viewsets, status  # type: ignore[attr-defined]
 from rest_framework.decorators import api_view, permission_classes  # type: ignore[attr-defined]
 from rest_framework.permissions import AllowAny, IsAuthenticated  # type: ignore[attr-defined]
+from rest_framework.request import Request  # type: ignore[attr-defined]
 from rest_framework.response import Response  # type: ignore[attr-defined]
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST  # type: ignore[attr-defined]
+from typing import Any
 
+from core.permissions import IsAdmin
 from .models import User
 from .serializers import UserSerializer
 
@@ -68,14 +71,37 @@ def me_view(request):  # type: ignore[no-untyped-def]
     return Response(UserSerializer(request.user).data)  # type: ignore[attr-defined]
 
 
-class EmployeeViewSet(viewsets.ReadOnlyModelViewSet):  # type: ignore[misc]
+class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
     """
-    API endpoint for listing employees.
-    Only admins can see all employees; employees can only see themselves.
+    API endpoint for employee management.
+
+    - GET /employees/: List employees
+    - GET /employees/{id}/: Retrieve employee
+    - POST /employees/: Create employee (ADMIN only)
+    - PATCH /employees/{id}/: Update employee (ADMIN only)
+    - DELETE /employees/{id}/: Not allowed (use PATCH with active: false to deactivate)
     """
 
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):  # type: ignore[no-untyped-def]
-        return User.objects.filter(is_active=True).order_by('display_name')
+        return User.objects.all().order_by('display_name')
+
+    def get_permissions(self) -> list[Any]:  # type: ignore[no-untyped-def]
+        """Override permission_classes based on the action."""
+        if self.action in ('list', 'retrieve'):
+            permission_classes = [IsAuthenticated]
+        elif self.action in ('create', 'update', 'partial_update', 'destroy'):
+            permission_classes = [IsAdmin]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Prevent deletion through the API; use PATCH to deactivate instead."""
+        return Response(
+            {'detail': 'Employees cannot be deleted. Use PATCH with active: false to deactivate instead.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
