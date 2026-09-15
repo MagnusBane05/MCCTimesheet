@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry, canEmployeeViewDate } from '../validation';
+import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry, canEmployeeViewDate, validateProject } from '../validation';
 import type { TimeEntry } from '../../domain/timeEntry';
 
 function entry(overrides: Partial<TimeEntry> = {}): TimeEntry {
@@ -133,5 +133,25 @@ describe('validateTimeEntry', () => {
       excludeEntryId: 42,
     });
     expect(editingSelf.startTime).toBeUndefined();
+  });
+});
+
+describe('validateProject', () => {
+  const baseInput = {
+    projectNumber: 'P123',
+    name: 'Project Name',
+    customer: 'Customer Name',
+  };
+
+  it('passes for a valid project', () => {
+    const errors = validateProject(baseInput);
+    expect(errors).toEqual({});
+  });
+
+  it('requires project number, name, and customer', () => {
+    const errors = validateProject({ projectNumber: '', name: '', customer: '' });
+    expect(errors.projectNumber).toBeTruthy();
+    expect(errors.name).toBeTruthy();
+    expect(errors.customer).toBeTruthy();
   });
 });

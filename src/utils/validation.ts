@@ -1,6 +1,7 @@
 import type { TimeEntry } from '../domain/timeEntry';
 import { getDurationHours, isValidTimeIncrement } from './time';
 import { getWeekStart, getWeekEnd, isFutureDate, startOfDay, parseDate } from './dates';
+import { NewProjectInput } from '../services/TimesheetService';
 
 export interface OverlapCandidate {
   workDate: string;
@@ -107,6 +108,26 @@ export function validateTimeEntry(input: TimeEntryInput, options: ValidateTimeEn
         errors.startTime = 'This overlaps with another entry on this date.';
       }
     }
+  }
+
+  return errors;
+}
+
+export type ProjectValidationErrors = Partial<Record<'projectNumber' | 'name' | 'customer', string>>;
+
+export function validateProject(input: NewProjectInput): ProjectValidationErrors {
+  const errors: ProjectValidationErrors = {};
+
+  if (!input.projectNumber.trim()) {
+    errors.projectNumber = 'Project number is required.';
+  }
+
+  if (!input.name.trim()) {
+    errors.name = 'Project name is required.';
+  }
+
+  if (!input.customer.trim()) {
+    errors.customer = 'Customer is required.';
   }
 
   return errors;

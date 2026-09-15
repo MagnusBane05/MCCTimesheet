@@ -11,6 +11,9 @@ import { EditDelete } from "../../components/common/EditDelete";
 import { EditableText } from "../../components/common/EditableText";
 import { ActiveToggle } from "../../components/common/ActiveToggle";
 import { useAuth } from "../../auth/AuthContext";
+import { CreateProjectForm } from "../../components/admin/CreateProjectForm";
+import { Modal } from "../../components/common/Modal";
+import { NewProjectInput } from "../../services/TimesheetService";
 
 export function ProjectsPage() {
   const { currentUser } = useAuth();
@@ -21,6 +24,7 @@ export function ProjectsPage() {
   const [ error, setError ] = useState(false);
   const [ _, setSaveError ] = useState(false);
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
+  const [ isCreateModalOpen, setIsCreateModalOpen ] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,6 +62,12 @@ export function ProjectsPage() {
     }
   };
 
+  async function handleCreateProject(project: NewProjectInput) {
+    await timesheetService.createProject(project);
+    setIsCreateModalOpen(false);
+    await load();
+  }
+
   const filteredProjects = projects.filter((project) => {
     if (filter === 'active') return project.active;
     if (filter === 'inactive') return !project.active;
@@ -73,7 +83,7 @@ export function ProjectsPage() {
           <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
         </div>
         <div>
-          <Button variant="primary" onClick={() => { /* TODO: Open create project modal */ }}>+ Create Project</Button>
+          <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>Create Project</Button>
         </div>
       </div>
 
@@ -167,6 +177,9 @@ export function ProjectsPage() {
           </Table>
         </div>
       )}
+      <Modal open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create Project">
+        <CreateProjectForm onCreateProject={handleCreateProject} />
+      </Modal>
     </div>
   );
 }
