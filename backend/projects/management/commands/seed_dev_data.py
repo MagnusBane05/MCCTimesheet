@@ -12,7 +12,8 @@ This command creates:
 from datetime import timedelta, time, date
 from typing import Any
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
@@ -27,6 +28,9 @@ class Command(BaseCommand):
     help = 'Seed the development database with representative test data'
 
     def handle(self, *args: Any, **options: Any) -> None:
+        if not settings.DEBUG:
+            raise CommandError('seed_dev_data cannot be run in production (DEBUG=False)')
+
         self.stdout.write(self.style.SUCCESS('Seeding development data...'))
 
         # Create test users if they don't exist

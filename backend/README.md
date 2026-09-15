@@ -89,7 +89,7 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 ```
 
 ## Production / BlackSun deployment
-**cPanel -> Setup Pyton App**: Application root: any name, Application URL: `backend`, Application startup file: `app.py`, Applicaiton entry point: `application`
+**cPanel -> Setup Pyton App**: Python version: `3.11.16`, Application root: any name, Application URL: `backend`, Application startup file: `app.py`, Applicaiton entry point: `application`
 
 **models.py migration**: Only when models.py changes, `python manage.py makemigrations` locally, commit migration file then continue.
 
@@ -100,7 +100,7 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 4. Delete old files/folders, except .env and staticfiles from `<application-root>`
 5. Move files from backend-release to `<application-root>`
 
-**Install requirements**: In cPanel -> Setup Python App -> Configuration Files add `requirements.txt`, then Run Pip Install.
+**Install requirements**: If requirements.txt changed, in cPanel -> Setup Python App -> Configuration Files add `requirements.txt`, then Run Pip Install.
 
 **Release steps** Under cPanel -> Setup Python App -> Execute python script, run deployment script (deploy_dev.py):
   `manage.py check`
@@ -116,3 +116,5 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 - migration applied
 - affected workflow
 - logs for errors
+
+**Frontend deployment**: Follow steps for frontend deployment in the project root's README
