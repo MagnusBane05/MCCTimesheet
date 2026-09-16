@@ -148,9 +148,8 @@ describe('validateProject', () => {
     expect(errors).toEqual({});
   });
 
-  it('requires project number, name, and customer', () => {
+  it('requires name, and customer', () => {
     const errors = validateProject({ projectNumber: '', name: '', customer: '' });
-    expect(errors.projectNumber).toBeTruthy();
     expect(errors.name).toBeTruthy();
     expect(errors.customer).toBeTruthy();
   });

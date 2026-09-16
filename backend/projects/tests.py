@@ -144,6 +144,22 @@ class ProjectAPITestCase(TestCase):
         self.assertEqual(response.data['project_number'], 'PRJ-003') # type: ignore[attr-defined]
         self.assertTrue(Project.objects.filter(project_number='PRJ-003').exists())
 
+    def test_create_project_without_project_number(self):
+        """Creating a project without a project number should succeed."""
+        self.client.force_authenticate(user=self.admin) # type: ignore[attr-defined]
+        response = self.client.post(
+            '/api/projects/',
+            {
+                'customer': 'New Corp',
+                'name': 'New Project',
+                'active': True,
+                'production_status': ProductionStatus.ON_DECK,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['project_number'], '') # type: ignore[attr-defined]
+        self.assertTrue(Project.objects.filter(name='New Project').exists())
+
     def test_update_project_as_employee_fails(self):
         """Employees cannot update projects."""
         self.client.force_authenticate(user=self.employee) # type: ignore[attr-defined]

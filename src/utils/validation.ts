@@ -113,14 +113,10 @@ export function validateTimeEntry(input: TimeEntryInput, options: ValidateTimeEn
   return errors;
 }
 
-export type ProjectValidationErrors = Partial<Record<'projectNumber' | 'name' | 'customer', string>>;
+export type ProjectValidationErrors = Partial<Record<'name' | 'customer', string>>;
 
 export function validateProject(input: NewProjectInput): ProjectValidationErrors {
   const errors: ProjectValidationErrors = {};
-
-  if (!input.projectNumber.trim()) {
-    errors.projectNumber = 'Project number is required.';
-  }
 
   if (!input.name.trim()) {
     errors.name = 'Project name is required.';

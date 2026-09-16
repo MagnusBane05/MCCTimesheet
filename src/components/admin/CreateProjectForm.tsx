@@ -52,12 +52,10 @@ export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
                         type="text" 
                         label="Project Number" 
                         containerClassName="w-full" 
-                        required
                         id="project-number" 
                         value={projectNumber} 
                         onChange={(e) => setProjectNumber(e.target.value)} 
                     />
-                    <Error message={visibleErrors.projectNumber} />
                 </div>
                 <div className="flex-1">
                     <Input 

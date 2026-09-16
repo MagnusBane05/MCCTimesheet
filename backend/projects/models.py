@@ -12,8 +12,8 @@ class ProductionStatus(models.TextChoices):
 class Project(models.Model):
     customer = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    # Not assumed globally unique
-    project_number = models.CharField(max_length=50)
+    # Not assumed globally unique, may be blank for new projects.
+    project_number = models.CharField(max_length=50, blank=True)
     # Projects are activated/deactivated, never deleted, through the normal API;
     # inactive projects must stay available for historical time entries.
     active = models.BooleanField(default=True)
@@ -22,4 +22,6 @@ class Project(models.Model):
     )
 
     def __str__(self):
-        return f'{self.project_number} - {self.name}'
+        if self.project_number == '':
+            return f'{self.name}'
+        return f'({self.project_number}) {self.name}'
