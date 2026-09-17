@@ -36,7 +36,7 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-navy-950 px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <h1 className="text-xl font-semibold text-navy-950">MCC Timesheets</h1>
-        <p className="mt-1 text-sm text-navy-900/60">Sign in to continue.</p>
+        <p className="mt-1 text-sm text-navy-900/60">Sign in to continue. If you don't have an account, please contact your administrator.</p>
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>
@@ -79,17 +79,6 @@ export function LoginPage() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
-
-        <div className="mt-6 rounded-lg bg-cream-50 p-4 text-xs text-navy-900/60">
-          <p className="font-semibold text-navy-900/80">Prototype demo accounts (password: demo)</p>
-          <ul className="mt-2 space-y-1">
-            {DEMO_ACCOUNTS.map((account) => (
-              <li key={account.username}>
-                <span className="font-mono">{account.username}</span> — {account.role}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </div>
   );
