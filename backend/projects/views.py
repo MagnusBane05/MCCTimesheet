@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from core.permissions import IsAdmin
+from core.permissions import IsAdmin, HasChangedInitialPassword
 from .models import Project
 from .serializers import ProjectSerializer
 
@@ -28,11 +28,11 @@ class ProjectViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
     def get_permissions(self) -> list[Any]:  # type: ignore[no-untyped-def]
         """Override permission_classes based on the action."""
         if self.action in ('list', 'retrieve'):  # type: ignore[attr-defined]
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthenticated, HasChangedInitialPassword]
         elif self.action in ('create', 'update', 'partial_update', 'destroy'):  # type: ignore[attr-defined]
-            permission_classes = [IsAdmin]
+            permission_classes = [IsAdmin, HasChangedInitialPassword]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthenticated, HasChangedInitialPassword]
         return [permission() for permission in permission_classes]
 
     def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:  # type: ignore[override,no-untyped-def]

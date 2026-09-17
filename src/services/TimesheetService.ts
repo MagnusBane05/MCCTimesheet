@@ -1,4 +1,4 @@
-import type { User, UserRole } from '../domain/user';
+import type { User, UserRole, EmployeeCreationResult } from '../domain/user';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
 
@@ -39,6 +39,10 @@ export interface NewEmployeeInput {
 
 export type UpdateEmployeeInput = Partial<NewEmployeeInput>;
 
+export interface ResetPasswordResult {
+  temporaryPassword: string;
+}
+
 /**
  * Data-access contract shared by MockTimesheetService and ApiTimesheetService
  * so components never need to know which backend is active.
@@ -60,6 +64,7 @@ export interface TimesheetService {
   updateProject(id: number, input: UpdateProjectInput): Promise<Project>;
 
   getEmployees(): Promise<User[]>;
-  createEmployee(input: NewEmployeeInput): Promise<User>;
+  createEmployee(input: NewEmployeeInput): Promise<EmployeeCreationResult>;
   updateEmployee(id: number, input: UpdateEmployeeInput): Promise<User>;
+  resetEmployeePassword(id: number): Promise<ResetPasswordResult>;
 }

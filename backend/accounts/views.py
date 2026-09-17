@@ -1,16 +1,16 @@
-from django.contrib.auth import authenticate, login as django_login, logout as django_logout
+from django.contrib.auth import authenticate, login as django_login, logout as django_logout, update_session_auth_hash
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import viewsets, status  # type: ignore[attr-defined]
-from rest_framework.decorators import api_view, permission_classes  # type: ignore[attr-defined]
+from rest_framework.decorators import api_view, permission_classes, action  # type: ignore[attr-defined]
 from rest_framework.permissions import AllowAny, IsAuthenticated  # type: ignore[attr-defined]
 from rest_framework.request import Request  # type: ignore[attr-defined]
 from rest_framework.response import Response  # type: ignore[attr-defined]
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST  # type: ignore[attr-defined]
 from typing import Any
 
-from core.permissions import IsAdmin
+from core.permissions import IsAdmin, HasChangedInitialPassword
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ChangePasswordSerializer, ResetPasswordSerializer
 
 
 def _auth_error(detail: str) -> Response:  # type: ignore[no-untyped-def]
@@ -46,7 +46,8 @@ def login_view(request):  # type: ignore[no-untyped-def]
         return _auth_error('Incorrect username or password.')
 
     django_login(request, user)
-    return Response(UserSerializer(user).data)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
 
 
 # DRF's APIView.as_view() marks every view csrf_exempt by default (relying on
@@ -68,7 +69,26 @@ def logout_view(request):  # type: ignore[no-untyped-def]
 @api_view(['GET'])  # type: ignore[misc]
 @permission_classes([IsAuthenticated])  # type: ignore[misc]
 def me_view(request):  # type: ignore[no-untyped-def]
-    return Response(UserSerializer(request.user).data)  # type: ignore[attr-defined]
+    serializer = UserSerializer(request.user)  # type: ignore[attr-defined]
+    return Response(serializer.data)
+
+
+@api_view(['POST'])  # type: ignore[misc]
+@permission_classes([IsAuthenticated])  # type: ignore[misc]
+def change_password_view(request):  # type: ignore[no-untyped-def]
+    """Allow user to change their password (or set it for the first time if must_change_password=True)."""
+    serializer = ChangePasswordSerializer(
+        data=request.data,  # type: ignore[attr-defined]
+        context={'user': request.user}  # type: ignore[attr-defined]
+    )
+    if serializer.is_valid():
+        user = serializer.save()
+        update_session_auth_hash(request, user)
+        return Response(
+            {'detail': 'Password changed successfully.'},
+            status=status.HTTP_200_OK
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
@@ -80,6 +100,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
     - POST /employees/: Create employee (ADMIN only)
     - PATCH /employees/{id}/: Update employee (ADMIN only)
     - DELETE /employees/{id}/: Not allowed (use PATCH with active: false to deactivate)
+    - POST /employees/{id}/reset-password/: Reset employee password (ADMIN only)
     """
 
     serializer_class = UserSerializer
@@ -91,11 +112,11 @@ class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
     def get_permissions(self) -> list[Any]:  # type: ignore[no-untyped-def]
         """Override permission_classes based on the action."""
         if self.action in ('list', 'retrieve'):
-            permission_classes = [IsAuthenticated]
-        elif self.action in ('create', 'update', 'partial_update', 'destroy'):
-            permission_classes = [IsAdmin]
+            permission_classes = [IsAuthenticated, HasChangedInitialPassword]
+        elif self.action in ('create', 'update', 'partial_update', 'destroy', 'reset_password'):
+            permission_classes = [IsAdmin, HasChangedInitialPassword]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthenticated, HasChangedInitialPassword]
         return [permission() for permission in permission_classes]
 
     def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -104,4 +125,12 @@ class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
             {'detail': 'Employees cannot be deleted. Use PATCH with active: false to deactivate instead.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
+
+    @action(detail=True, methods=['post'], url_path='reset-password')  # type: ignore[misc]
+    def reset_password(self, request: Request, pk: Any = None) -> Response:  # type: ignore[no-untyped-def]
+        """Admin endpoint to reset an employee's password."""
+        user = self.get_object()
+        serializer = ResetPasswordSerializer()
+        result = serializer.save(user)
+        return Response(result, status=status.HTTP_200_OK)
 

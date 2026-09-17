@@ -1,4 +1,4 @@
-import type { User } from '../domain/user';
+import type { User, EmployeeCreationResult } from '../domain/user';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
 import { mockUsers } from '../mock/users';
@@ -13,6 +13,7 @@ import type {
   UpdateEmployeeInput,
   UpdateProjectInput,
   UpdateTimeEntryInput,
+  ResetPasswordResult,
 } from './TimesheetService';
 
 const SIMULATED_LATENCY_MS = 250;
@@ -29,6 +30,15 @@ function delay<T>(value: T): Promise<T> {
 
 function nextId(records: { id: number }[]): number {
   return records.reduce((max, record) => Math.max(max, record.id), 0) + 1;
+}
+
+function generateMockPassword(length: number = 16): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
 
 /**
@@ -134,13 +144,16 @@ export class MockTimesheetService implements TimesheetService {
     return delay(this.users.map((user) => ({ ...user })));
   }
 
-  async createEmployee(input: NewEmployeeInput): Promise<User> {
-    const user: User = {
+  async createEmployee(input: NewEmployeeInput): Promise<EmployeeCreationResult> {
+    const temporaryPassword = generateMockPassword();
+    const user: EmployeeCreationResult = {
       id: nextId(this.users),
       username: input.username,
       displayName: input.displayName,
       role: input.role,
       active: input.active ?? true,
+      mustChangePassword: true,
+      temporaryPassword,
     };
     this.users.push(user);
     return delay({ ...user });
@@ -151,5 +164,13 @@ export class MockTimesheetService implements TimesheetService {
     if (!existing) throw new Error(`Employee ${id} not found`);
     Object.assign(existing, input);
     return delay({ ...existing });
+  }
+
+  async resetEmployeePassword(id: number): Promise<ResetPasswordResult> {
+    const user = this.users.find((u) => u.id === id);
+    if (!user) throw new Error(`Employee ${id} not found`);
+    const temporaryPassword = generateMockPassword();
+    user.mustChangePassword = true;
+    return delay({ temporaryPassword });
   }
 }

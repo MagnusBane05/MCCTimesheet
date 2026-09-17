@@ -29,3 +29,18 @@ class IsEmployeeOrAdmin(BasePermission):  # type: ignore[misc]
         if not (request.user and request.user.is_authenticated):  # type: ignore[union-attr,attr-defined]
             return False
         return bool(request.user.role in (UserRole.EMPLOYEE, UserRole.ADMIN))  # type: ignore[union-attr,attr-defined]
+
+
+class HasChangedInitialPassword(BasePermission):  # type: ignore[misc]
+    """
+    Permission that blocks API access until the user has changed their initial
+    (temporary) password. This is not applied to endpoints where password change
+    itself occurs (auth/me and auth/change-password).
+    """
+    def has_permission(self, request: Request, view: APIView) -> bool:  # type: ignore[override,no-untyped-def]
+        # Only allow authenticated users
+        if not (request.user and request.user.is_authenticated):  # type: ignore[union-attr,attr-defined]
+            return False
+
+        # Allow access if user has already changed their initial password
+        return not request.user.must_change_password  # type: ignore[union-attr,attr-defined]

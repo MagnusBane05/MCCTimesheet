@@ -4,6 +4,7 @@ from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAuthenticated
 
 from accounts.models import UserRole, User
+from core.permissions import HasChangedInitialPassword
 from .models import TimeEntry
 from .serializers import TimeEntrySerializer
 
@@ -20,7 +21,7 @@ class TimeEntryViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = TimeEntrySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasChangedInitialPassword]
 
     def get_queryset(self) -> QuerySet[TimeEntry]: # type: ignore[override]
         """Filter entries based on user role and query parameters."""

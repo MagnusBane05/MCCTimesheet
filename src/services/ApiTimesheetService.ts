@@ -1,4 +1,4 @@
-import type { User, UserRole } from '../domain/user';
+import type { User, UserRole, EmployeeCreationResult } from '../domain/user';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
 import { ApiError, apiRequest, ensureCsrfCookie } from './apiClient';
@@ -11,6 +11,7 @@ import type {
   UpdateEmployeeInput,
   UpdateProjectInput,
   UpdateTimeEntryInput,
+  ResetPasswordResult,
 } from './TimesheetService';
 
 // Wire shapes returned by Django (snake_case) — mapping to/from the
@@ -22,6 +23,16 @@ interface ApiUser {
   display_name: string;
   role: UserRole;
   active: boolean;
+  must_change_password: boolean;
+  temporary_password: string | null;
+}
+
+interface ApiEmployeeCreationResult extends ApiUser {
+  temporary_password: string;
+}
+
+interface ApiResetPasswordResult {
+  temporary_password: string;
 }
 
 interface ApiProject {
@@ -53,6 +64,19 @@ function userFromApi(user: ApiUser): User {
     displayName: user.display_name,
     role: user.role,
     active: user.active,
+    mustChangePassword: user.must_change_password,
+  };
+}
+
+function employeeCreationResultFromApi(user: ApiEmployeeCreationResult): EmployeeCreationResult {
+  return {
+    id: user.id,
+    username: user.username,
+    displayName: user.display_name,
+    role: user.role,
+    active: user.active,
+    mustChangePassword: user.must_change_password,
+    temporaryPassword: user.temporary_password,
   };
 }
 
@@ -189,17 +213,17 @@ export class ApiTimesheetService implements TimesheetService {
     return users.map(userFromApi);
   }
 
-  async createEmployee(input: NewEmployeeInput): Promise<User> {
+  async createEmployee(input: NewEmployeeInput): Promise<EmployeeCreationResult> {
     const user = await apiRequest<ApiUser>('/employees/', {
       method: 'POST',
       body: {
         username: input.username,
         display_name: input.displayName,
         role: input.role,
-        active: input.active,
+        active: input.active ?? true,
       },
     });
-    return userFromApi(user);
+    return employeeCreationResultFromApi(user);
   }
 
   async updateEmployee(id: number, input: UpdateEmployeeInput): Promise<User> {
@@ -213,5 +237,14 @@ export class ApiTimesheetService implements TimesheetService {
       },
     });
     return userFromApi(user);
+  }
+
+  async resetEmployeePassword(id: number): Promise<ResetPasswordResult> {
+    const result = await apiRequest<ApiResetPasswordResult>(`/employees/${id}/reset-password/`, {
+      method: 'POST',
+    });
+    return {
+      temporaryPassword: result.temporary_password,
+    };
   }
 }

@@ -17,6 +17,7 @@ class User(AbstractUser):
 
     display_name = models.CharField(max_length=150)
     role = models.CharField(max_length=20, choices=UserRole.choices, default=UserRole.EMPLOYEE)
+    must_change_password = models.BooleanField(default=False, help_text='User must change password on next login')
 
     def __str__(self):
         return self.username

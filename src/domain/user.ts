@@ -8,4 +8,9 @@ export interface User {
   displayName: string;
   role: UserRole;
   active: boolean;
+  mustChangePassword: boolean;
+}
+
+export interface EmployeeCreationResult extends User {
+  temporaryPassword: string;
 }
