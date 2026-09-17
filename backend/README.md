@@ -91,7 +91,7 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 ## Production / BlackSun deployment
 **cPanel -> Setup Pyton App**: Python version: `3.11.16`, Application root: any name, Application URL: `backend`, Application startup file: `app.py`, Applicaiton entry point: `application`
 
-**models.py migration**: Only when models.py changes, `python manage.py makemigrations` locally, commit migration file then continue.
+**models.py migration**: Only when models.py changes, `docker compose exec backend python manage.py makemigrations` locally, commit migration file then continue.
 
 **Package backend**: 
 1. Zip contents of `backend/` except for .env and any static files
