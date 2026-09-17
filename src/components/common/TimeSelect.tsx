@@ -112,11 +112,11 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
   const currMin = getMinutes(today, minuteStep);
 
   function selectHour(newHour: string) {
-    onChange(`${newHour}:${minute || currMin}`);
+    onChange(`${newHour}:${minute || currMin}:00`);
   }
 
   function selectMinute(newMinute: string) {
-    onChange(`${hour || currHour}:${newMinute}`);
+    onChange(`${hour || currHour}:${newMinute}:00`);
   }
 
   function updatePickerPosition() {
