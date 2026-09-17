@@ -130,12 +130,6 @@ export function EmployeesPage() {
     load();
   }
 
-  const filteredEmployees = employees.filter(employee => {
-    if (filter === 'active') return employee.active;
-    if (filter === 'inactive') return !employee.active;
-    return true;
-  });
-
   const getModalTitle = () => {
     if (modalState === 'create') return 'Create Employee';
     if (modalState === 'creation-success') return 'Employee Created';
@@ -152,6 +146,14 @@ export function EmployeesPage() {
       setModalState(null);
     }
   };
+
+  const filteredEmployees = employees.filter(employee => {
+    if (filter === 'active') return employee.active;
+    if (filter === 'inactive') return !employee.active;
+    return true;
+  });
+
+  const anyHavePasswordChangeRequired = filteredEmployees.some(employee => employee.mustChangePassword);
 
   return (
     <div>
@@ -215,7 +217,7 @@ export function EmployeesPage() {
               <TableHeader>Display Name</TableHeader>
               <TableHeader>Role</TableHeader>
               <TableHeader>Active</TableHeader>
-              <TableHeader>Password Status</TableHeader>
+              {anyHavePasswordChangeRequired && <TableHeader>Password Status</TableHeader>}
               {isAdmin && <TableHeader>Actions</TableHeader>}
             </tr>
           </thead>
@@ -261,18 +263,20 @@ export function EmployeesPage() {
                       ))}
                     </EditableSelect>
                   </TableCell>
-                  <TableCell>
-                    <ActiveToggle
-                      active={displayedEntry.active}
-                      editing={editing}
-                      onToggle={(e) => updateField('active', e.target.value === 'Active')}>
-                    </ActiveToggle>
-                  </TableCell>
+                    <TableCell>
+                      <ActiveToggle
+                        active={displayedEntry.active}
+                        editing={editing}
+                        onToggle={(e) => updateField('active', e.target.value === 'Active')}>
+                      </ActiveToggle>
+                    </TableCell>
+                  {anyHavePasswordChangeRequired && (
                   <TableCell>
                     {displayedEntry.mustChangePassword && (
                       <Badge variant="warning">Must Change Password</Badge>
                     )}
                   </TableCell>
+                  )}
                   {isAdmin && (
                     <TableCell>
                       {!editing && (
