@@ -164,7 +164,7 @@ export function EmployeesPage() {
           <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
         </div>
         <div>
-          <Button variant="primary" onClick={() => setModalState('create')}>+ Create Employee</Button>
+          <Button variant="primary" onClick={() => setModalState('create')}>Create Employee</Button>
         </div>
       </div>
 
