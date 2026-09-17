@@ -133,6 +133,18 @@ export class ApiTimesheetService implements TimesheetService {
     await apiRequest<void>('/auth/logout/', { method: 'POST' });
   }
 
+  async changePassword(newPassword: string, oldPassword?: string): Promise<void> {
+    await ensureCsrfCookie();
+    const body: Record<string, string> = { new_password: newPassword };
+    if (oldPassword) {
+      body.old_password = oldPassword;
+    }
+    await apiRequest<void>('/auth/change-password/', {
+      method: 'POST',
+      body,
+    });
+  }
+
   async getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]> {
     const entries = await apiRequest<ApiTimeEntry[]>('/time-entries/', {
       query: { employeeId: filter.employeeId, from: filter.dateFrom, to: filter.dateTo },
@@ -214,7 +226,7 @@ export class ApiTimesheetService implements TimesheetService {
   }
 
   async createEmployee(input: NewEmployeeInput): Promise<EmployeeCreationResult> {
-    const user = await apiRequest<ApiUser>('/employees/', {
+    const user = await apiRequest<ApiEmployeeCreationResult>('/employees/', {
       method: 'POST',
       body: {
         username: input.username,

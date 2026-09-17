@@ -74,6 +74,16 @@ export class MockTimesheetService implements TimesheetService {
     return delay(undefined);
   }
 
+  async changePassword(_newPassword: string, _oldPassword?: string): Promise<void> {
+    // In the mock, just clear the must_change_password flag for the current user
+    const userId = Number(sessionStorage.getItem(SESSION_KEY));
+    const user = this.users.find((u) => u.id === userId);
+    if (user) {
+      user.mustChangePassword = false;
+    }
+    return delay(undefined);
+  }
+
   async getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]> {
     const results = this.timeEntries.filter((entry) => {
       if (filter.employeeId !== undefined && entry.employeeId !== filter.employeeId) return false;

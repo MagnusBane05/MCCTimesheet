@@ -67,8 +67,14 @@ class ChangePasswordSerializer(serializers.Serializer):  # type: ignore[misc]
     new_password = serializers.CharField(write_only=True)
 
     def validate_new_password(self, value: str) -> str:  # type: ignore[no-untyped-def]
-        """Validate that new password meets minimum requirements."""
+        """Validate that new password meets minimum requirements and is different from current."""
         user = self.context.get('user')
+
+        if user.check_password(value):  # type: ignore[attr-defined]
+            raise serializers.ValidationError(
+                'New password must be different from your current password.'
+            )
+
         try:
             validate_password(value, user=user)
         except DjangoValidationError as error:

@@ -1,7 +1,9 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { RequireRole } from '../auth/RequireRole';
+import { RequirePasswordChange } from '../auth/RequirePasswordChange';
 import { LoginPage } from '../pages/LoginPage';
+import { SetNewPasswordPage } from '../pages/auth/SetNewPasswordPage';
 import { TimesheetPage } from '../pages/TimesheetPage';
 import { ByEmployeePage } from '../pages/admin/ByEmployeePage';
 import { ByJobPage } from '../pages/admin/ByJobPage';
@@ -16,8 +18,13 @@ import { EmployeesPage } from '../pages/admin/EmployeesPage';
  */
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  { path: '/set-new-password', element: <SetNewPasswordPage /> },
   {
-    element: <AppLayout />,
+    element: (
+      <RequirePasswordChange>
+        <AppLayout />
+      </RequirePasswordChange>
+    ),
     children: [
       {
         element: <RequireRole allowedRoles={['EMPLOYEE']} />,

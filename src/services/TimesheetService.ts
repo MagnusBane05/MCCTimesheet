@@ -53,6 +53,7 @@ export interface TimesheetService {
   /** Throws with a user-facing message (e.g. "Incorrect username or password.") on failure. */
   login(username: string, password: string): Promise<User>;
   logout(): Promise<void>;
+  changePassword(newPassword: string, oldPassword?: string): Promise<void>;
 
   getTimeEntries(filter: TimeEntryFilter): Promise<TimeEntry[]>;
   createTimeEntry(input: NewTimeEntryInput): Promise<TimeEntry>;

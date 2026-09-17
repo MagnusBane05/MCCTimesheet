@@ -7,6 +7,7 @@ interface AuthContextValue {
   loading: boolean;
   login(username: string, password: string): Promise<{ ok: true } | { ok: false; error: string }>;
   logout(): void;
+  refreshUser(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -40,7 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     timesheetService.logout().catch(() => {});
   }
 
-  return <AuthContext.Provider value={{ currentUser, loading, login, logout }}>{children}</AuthContext.Provider>;
+  async function refreshUser() {
+    try {
+      const user = await timesheetService.getCurrentUser();
+      setCurrentUser(user && user.active ? user : null);
+    } catch {
+      setCurrentUser(null);
+    }
+  }
+
+  return <AuthContext.Provider value={{ currentUser, loading, login, logout, refreshUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

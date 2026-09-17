@@ -252,27 +252,44 @@ class ChangePasswordTests(APITestCase):
                 'password': 'temp_password_123',
             },
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # pyright: ignore[reportAttributeAccessIssue]
 
         # Change the password using that session
         response = client.post(
             '/api/auth/change-password/',
             {'new_password': 'NewSecurePassword123!'},
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # pyright: ignore[reportAttributeAccessIssue]
 
         # Same session should still be authenticated
         response = client.get('/api/auth/me/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # pyright: ignore[reportAttributeAccessIssue]
         self.assertEqual(response.data['username'], 'session_test')  # type: ignore[attr-defined]
 
         # Normal API access should now be allowed too
         response = client.get('/api/employees/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK) # pyright: ignore[reportAttributeAccessIssue]
 
         test_user.refresh_from_db()
         self.assertFalse(test_user.must_change_password)
 
+
+    def test_change_password_fails_with_same_password(self):
+        """User cannot change password to their current password."""
+        self.employee.must_change_password = False
+        self.employee.set_password('temp_password_123')
+        self.employee.save()
+
+        self.client.force_authenticate(user=self.employee) # type: ignore[attr-defined]
+        response = self.client.post(
+            '/api/auth/change-password/',
+            {
+                'old_password': 'temp_password_123',
+                'new_password': 'temp_password_123',
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('different', str(response.data).lower())  # type: ignore[attr-defined]
 
     def test_change_password_fails_with_wrong_old_password(self):
         """Change password fails with wrong old password when not must_change."""
@@ -569,26 +586,26 @@ class MustChangePasswordEnforcementTests(APITestCase):
 
     def test_user_with_must_change_password_cannot_list_employees(self):
         """Users with must_change_password=True cannot list employees."""
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.get('/api/employees/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_with_must_change_password_cannot_retrieve_employee(self):
         """Users with must_change_password=True cannot retrieve an employee."""
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(f'/api/employees/{self.admin.id}/')
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
+        response = self.client.get(f'/api/employees/{self.admin.id}/') # pyright: ignore[reportAttributeAccessIssue]
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_with_must_change_password_can_access_auth_me(self):
         """Users with must_change_password=True can access /auth/me/."""
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.get('/api/auth/me/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'employee1')  # type: ignore[attr-defined]
 
     def test_user_with_must_change_password_can_access_change_password(self):
         """Users with must_change_password=True can access /auth/change-password/."""
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.post(
             '/api/auth/change-password/',
             {'new_password': 'NewSecurePassword123!'}
@@ -599,7 +616,7 @@ class MustChangePasswordEnforcementTests(APITestCase):
 
     def test_user_with_must_change_password_can_access_logout(self):
         """Users with must_change_password=True can access /auth/logout/."""
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.post('/api/auth/logout/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -607,7 +624,7 @@ class MustChangePasswordEnforcementTests(APITestCase):
         """Users without must_change_password can list employees normally."""
         self.user.must_change_password = False
         self.user.save()
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.get('/api/employees/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -615,7 +632,7 @@ class MustChangePasswordEnforcementTests(APITestCase):
         """Even admins with must_change_password=True cannot perform admin operations."""
         self.admin.must_change_password = True
         self.admin.save()
-        self.client.force_authenticate(user=self.admin)
+        self.client.force_authenticate(user=self.admin) # pyright: ignore[reportAttributeAccessIssue]
         response = self.client.post(
             '/api/employees/',
             {'username': 'newuser', 'display_name': 'New User', 'role': UserRole.EMPLOYEE}

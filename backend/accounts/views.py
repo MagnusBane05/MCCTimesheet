@@ -83,12 +83,22 @@ def change_password_view(request):  # type: ignore[no-untyped-def]
     )
     if serializer.is_valid():
         user = serializer.save()
-        update_session_auth_hash(request, user)
+        update_session_auth_hash(request, user)  # type: ignore[arg-type]
         return Response(
             {'detail': 'Password changed successfully.'},
             status=status.HTTP_200_OK
         )
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Format validation errors into a user-friendly detail message
+    error_messages = []
+    for errors in serializer.errors.values():  # type: ignore[attr-defined]
+        for message in errors:
+            error_messages.append(str(message))
+    detail = ' '.join(error_messages) if error_messages else 'Password validation failed.'
+
+    return Response(
+        {'detail': detail, 'errors': serializer.errors},  # type: ignore[attr-defined]
+        status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):  # type: ignore[misc]
