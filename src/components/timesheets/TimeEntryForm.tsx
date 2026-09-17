@@ -8,6 +8,12 @@ import { Button } from '../common/Button';
 import { TimeSelect } from '../common/TimeSelect';
 import { Select } from '../common/Select';
 
+function getCustomerFromProject(projectId: number | null, projects: Project[]): string {
+  if (projectId == null) return '';
+  const project = projects.find(p => p.id === projectId);
+  return project?.customer ?? '';
+}
+
 export interface TimeEntryFormValues {
   workDate: string;
   startTime: string;
@@ -50,7 +56,7 @@ export function TimeEntryForm({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-  const [customer, setCustomer] = useState(existingEntry?.projectId != null ? projects.find(p => p.id === existingEntry.projectId)?.customer ?? '' : '');
+  const [customer, setCustomer] = useState(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
 
   // When dateEditable is false (the employee day-nav flow), always read the prop directly so
   // changing the selected day is reflected immediately with no stale internal state.
@@ -100,6 +106,7 @@ export function TimeEntryForm({
   function handleCancel() {
     setStartTime(existingEntry?.startTime ?? '');
     setEndTime(existingEntry?.endTime ?? '');
+    setCustomer(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
     setProjectId(existingEntry?.projectId ?? null);
     setWorkDescription(existingEntry?.workDescription ?? '');
     setInternalWorkDate(existingEntry?.workDate ?? workDate);
