@@ -3,13 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Button } from '../components/common/Button';
 
-const DEMO_ACCOUNTS = [
-  { username: 'employee1', role: 'Employee' },
-  { username: 'employee2', role: 'Employee' },
-  { username: 'viewer', role: 'Viewer' },
-  { username: 'admin', role: 'Admin' },
-];
-
 export function LoginPage() {
   const { currentUser, login } = useAuth();
   const navigate = useNavigate();
