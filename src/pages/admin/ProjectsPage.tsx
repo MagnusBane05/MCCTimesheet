@@ -25,6 +25,7 @@ export function ProjectsPage() {
   const [ _, setSaveError ] = useState(false);
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
   const [ isCreateModalOpen, setIsCreateModalOpen ] = useState(false);
+  const [ sort, setSort ] = useState<'customer' | 'name' | 'prjNumber'>('customer');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -72,6 +73,11 @@ export function ProjectsPage() {
     if (filter === 'active') return project.active;
     if (filter === 'inactive') return !project.active;
     return true; // 'all'
+  }).sort((a, b) => {
+    if (sort === 'customer') return a.customer.localeCompare(b.customer);
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    if (sort === 'prjNumber') return a.projectNumber.localeCompare(b.projectNumber);
+    return 0;
   });
   
   return (
@@ -85,6 +91,16 @@ export function ProjectsPage() {
         <div>
           <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>Create Project</Button>
         </div>
+      </div>
+      <div className="mb-4">
+          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+            Sort by
+          </label>
+        <Select value={sort} onChange={(e) => { setSort(e.target.value as 'customer' | 'name' | 'prjNumber'); }}>
+          <option value="customer">Customer</option>
+          <option value="name">Name</option>
+          <option value="prjNumber">PRJ #</option>
+        </Select>
       </div>
 
       {loading && <LoadingState label="Loading projects..." />}
