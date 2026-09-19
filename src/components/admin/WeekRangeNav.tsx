@@ -1,5 +1,6 @@
 import { addWeeks, formatDate, getWeekEnd, getWeekStart, isFutureDate, parseDate } from '../../utils/dates';
 import { Button } from '../common/Button';
+import { Input } from '../common/Input';
 
 /** Shared date-range control for the admin reporting pages (By Employee, By Job). */
 export function WeekRangeNav({
@@ -30,29 +31,29 @@ export function WeekRangeNav({
           Next week ›
       </Button>
       <div>
-        <label htmlFor="range-from" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+        <label htmlFor="range-from" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
           From date
         </label>
-        <input
+        <Input
           id="range-from"
           type="date"
           value={formatDate(fromDate)}
           max={formatDate(toDate)}
           onChange={(event) => onRangeChange(parseDate(event.target.value), toDate)}
-          className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+          className="w-auto"
         />
       </div>
       <div>
-        <label htmlFor="range-to" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+        <label htmlFor="range-to" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
           To date
         </label>
-        <input
+        <Input
           id="range-to"
           type="date"
           value={formatDate(toDate)}
           min={formatDate(fromDate)}
           onChange={(event) => onRangeChange(fromDate, parseDate(event.target.value))}
-          className="mt-1 rounded-lg border border-navy-900/20 px-3 py-2 text-sm focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+          className="w-auto"
         />
       </div>
     </div>

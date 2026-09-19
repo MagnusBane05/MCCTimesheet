@@ -133,7 +133,7 @@ export function TimeEntryForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm" noValidate>
       {!hideHeading && (
-        <h2 className="text-base font-semibold text-navy-950">
+        <h2 className="text-base font-semibold text-midnight-950">
           {existingEntry ? 'Edit' : 'New'} time entry
           {!dateEditable && ` for ${formatShortDateLabel(parseDate(effectiveWorkDate))}`}
         </h2>
@@ -141,7 +141,7 @@ export function TimeEntryForm({
 
       {dateEditable && (
         <div>
-          <label htmlFor="entry-date" className="block text-sm font-medium text-navy-900">
+          <label htmlFor="entry-date" className="block text-sm font-medium text-lakehouse-900">
             Date
           </label>
           <input
@@ -150,7 +150,7 @@ export function TimeEntryForm({
             value={effectiveWorkDate}
             max={formatDate(today)}
             onChange={(event) => setInternalWorkDate(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
           />
         </div>
       )}
@@ -163,7 +163,7 @@ export function TimeEntryForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="entry-start" className="block text-sm font-medium text-navy-900">
+          <label htmlFor="entry-start" className="block text-sm font-medium text-lakehouse-900">
             Start time
           </label>
           <TimeSelect
@@ -173,12 +173,12 @@ export function TimeEntryForm({
             today={today}
             onChange={setStartTime}
             minuteStep={MINUTE_INCREMENT}
-            className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
           />
           {visibleErrors.startTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.startTime}</p>}
         </div>
         <div>
-          <label htmlFor="entry-end" className="block text-sm font-medium text-navy-900">
+          <label htmlFor="entry-end" className="block text-sm font-medium text-lakehouse-900">
             End time
           </label>
           <TimeSelect
@@ -188,7 +188,7 @@ export function TimeEntryForm({
             today={today}
             onChange={setEndTime}
             minuteStep={MINUTE_INCREMENT}
-            className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
           />
           {visibleErrors.endTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.endTime}</p>}
         </div>
@@ -196,7 +196,7 @@ export function TimeEntryForm({
 
       <div className="grid md:grid-cols-2 gap-3">
         <div>
-          <label htmlFor="entry-customer" className="block text-sm font-medium text-navy-900">
+          <label htmlFor="entry-customer" className="block text-sm font-medium text-lakehouse-900">
             Customer
           </label>
           <Select
@@ -216,7 +216,7 @@ export function TimeEntryForm({
         </div>
 
         <div>
-          <label htmlFor="entry-project" className="block text-sm font-medium text-navy-900">
+          <label htmlFor="entry-project" className="block text-sm font-medium text-lakehouse-900">
             Project
           </label>
           <Select
@@ -240,7 +240,7 @@ export function TimeEntryForm({
       </div>
 
       <div>
-        <label htmlFor="entry-description" className="block text-sm font-medium text-navy-900">
+        <label htmlFor="entry-description" className="block text-sm font-medium text-lakehouse-900">
           Work description
         </label>
         <textarea
@@ -248,16 +248,16 @@ export function TimeEntryForm({
           value={workDescription}
           onChange={(event) => setWorkDescription(event.target.value)}
           rows={2}
-          className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+          className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
         />
         {visibleErrors.workDescription && <p className="mt-1 text-sm text-red-700">{visibleErrors.workDescription}</p>}
       </div>
 
-      <div className="flex justify-between rounded-lg bg-cream-50 px-3 py-2 text-sm text-navy-900/80">
+      <div className="flex justify-between rounded-lg bg-pine-400 px-3 py-2 text-sm text-lakehouse-900/80">
         <span>Duration of this entry</span>
         <span className="font-semibold">{formatHours(thisDuration)}</span>
       </div>
-      <div className="flex justify-between rounded-lg bg-cream-50 px-3 py-2 text-sm text-navy-900/80">
+      <div className="flex justify-between rounded-lg bg-pine-400 px-3 py-2 text-sm text-lakehouse-900/80">
         <span>Daily total after this entry</span>
         <span className="font-semibold">{formatHours(otherDailyTotal + thisDuration)}</span>
       </div>

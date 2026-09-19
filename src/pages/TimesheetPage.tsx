@@ -98,12 +98,12 @@ export function TimesheetPage() {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl bg-white p-3 text-center shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-navy-900/60">Daily total</p>
-          <p className="mt-1 text-lg font-semibold text-navy-950">{formatHours(dailyTotal)}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">Daily total</p>
+          <p className="mt-1 text-lg font-semibold text-midnight-950">{formatHours(dailyTotal)}</p>
         </div>
         <div className="rounded-xl bg-white p-3 text-center shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-navy-900/60">Weekly total</p>
-          <p className="mt-1 text-lg font-semibold text-navy-950">{formatHours(weeklyTotal)}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">Weekly total</p>
+          <p className="mt-1 text-lg font-semibold text-midnight-950">{formatHours(weeklyTotal)}</p>
         </div>
       </div>
 

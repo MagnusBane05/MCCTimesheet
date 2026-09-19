@@ -114,7 +114,7 @@ export function ByEmployeePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
+      <h1 className="text-xl font-semibold text-midnight-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       {loading && <LoadingState label="Loading employee hours…" />}
       {!loading && error && <ErrorState message="Unable to load employee hours. Please try again." onRetry={load} />}
@@ -133,7 +133,7 @@ export function ByEmployeePage() {
               title={group.employee?.displayName ?? 'Unknown employee'}
               badge={
                 group.employee && !group.employee.active ? (
-                  <span className="rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium text-navy-900/60">
+                  <span className="rounded-full bg-lakehouse-900/10 px-2 py-0.5 text-xs font-medium text-lakehouse-900/60">
                     Inactive
                   </span>
                 ) : undefined

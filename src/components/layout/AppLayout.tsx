@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { Button } from '../common/Button';
+import { Logo } from '../common/Logo';
 
 const ADMIN_NAV = [
   { to: '/admin/by-employee', label: 'By Employee' },
@@ -15,10 +16,10 @@ export function AppLayout() {
   const isAdminOrViewer = currentUser?.role === 'ADMIN' || currentUser?.role === 'VIEWER';
 
   return (
-    <div className="min-h-screen bg-cream-50">
-      <header className="bg-navy-950 text-white">
+    <div className="min-h-screen bg-cedar-50">
+      <header className="bg-midnight-950 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <span className="text-lg font-semibold tracking-tight">MCC Timesheets</span>
+          <Logo variant="secondary" />
           {currentUser && (
             <div className="flex items-center gap-3">
               <span className="hidden text-sm text-white/70 sm:inline">
@@ -40,7 +41,7 @@ export function AppLayout() {
                 className={({ isActive }) =>
                   `whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'border-accent-500 text-white'
+                      ? 'border-cedar-500 text-white'
                       : 'border-transparent text-white/60 hover:text-white'
                   }`
                 }

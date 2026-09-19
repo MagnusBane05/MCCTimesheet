@@ -7,7 +7,7 @@ export const TableHeader = forwardRef<HTMLTableCellElement, React.HTMLAttributes
   return (
     <th
       ref={ref}
-      className={`bg-navy-950/10 px-4 py-2 text-left text-sm font-semibold text-navy-950 ${className}`}
+      className={`bg-pine-400 px-4 py-2 text-left text-sm font-semibold text-midnight-950 ${className}`}
       {...props}
     />
   )
@@ -20,7 +20,7 @@ export const TableCell = forwardRef<HTMLTableCellElement, React.HTMLAttributes<H
   return (
     <td
       ref={ref}
-      className={`px-4 py-2 text-sm text-navy-950 ${className}`}
+      className={`px-4 py-2 text-sm text-midnight-950 ${className}`}
       {...props}
     />
   )
@@ -33,7 +33,7 @@ export const TableRow = forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTM
   return (
     <tr
       ref={ref}
-      className={`border-b border-navy-900/10 hover:bg-navy-950/5 ${className}`}
+      className={`border-b border-lakehouse-900/10 hover:bg-pine-400/10 ${className}`}
       {...props}
     />
   )
@@ -54,9 +54,9 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
       ref={ref}
       className={`
         w-full border-separate border-spacing-0
-        ${bordered ? 'border border-navy-900/20' : ''} bg-white 
+        ${bordered ? 'border border-lakehouse-900/20' : ''} bg-white 
         ${rounded ? 'rounded-lg [&_thead_th:first-child]:rounded-tl-lg [&_thead_th:last-child]:rounded-tr-lg' : ''}
-        ${striped ? '[&_tbody_tr:nth-child(even)]:bg-navy-950/5' : ''} 
+        ${striped ? '[&_tbody_tr:nth-child(even)]:bg-pine-400/10' : ''} 
         ${className}`}
       {...props}
     />

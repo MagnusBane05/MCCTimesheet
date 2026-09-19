@@ -19,7 +19,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-navy-950/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-midnight-950/50 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -32,15 +32,15 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
         tabIndex={-1}
         className="w-full max-w-lg rounded-xl bg-white shadow-xl focus:outline-none"
       >
-        <div className="flex items-center justify-between border-b border-navy-900/10 px-4 py-3">
-          <h2 id="modal-title" className="text-base font-semibold text-navy-950">
+        <div className="flex items-center justify-between border-b border-lakehouse-900/10 px-4 py-3">
+          <h2 id="modal-title" className="text-base font-semibold text-midnight-950">
             {title}
           </h2>
           <button
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-navy-900/60 hover:bg-cream-100 hover:text-navy-950"
+            className="rounded-lg p-1.5 text-lakehouse-900/60 hover:bg-cedar-100 hover:text-midnight-950"
           >
             ✕
           </button>

@@ -28,14 +28,14 @@ export function EditDelete({
             icon={CheckIcon} 
             onClick={onSave} 
             disabled={submitting || disabled}
-            className='p-1 hover:bg-navy-950/10 hover:rounded'
+            className='p-1 hover:bg-midnight-950/10 hover:rounded'
             aria-label="Save changes"
           />
           <IconButton 
             icon={XMarkIcon} 
             onClick={onCancelEdit} 
             disabled={submitting || disabled}
-            className='p-1 hover:bg-navy-950/10 hover:rounded'
+            className='p-1 hover:bg-midnight-950/10 hover:rounded'
             aria-label="Cancel editing" 
           />
         </>
@@ -45,7 +45,7 @@ export function EditDelete({
             icon={PencilIcon} 
             onClick={onEdit} 
             disabled={disabled}
-            className='p-1 hover:bg-navy-950/10 hover:rounded'
+            className='p-1 hover:bg-midnight-950/10 hover:rounded'
             aria-label="Edit row" 
           />
           {onDelete && (
@@ -53,7 +53,7 @@ export function EditDelete({
               icon={TrashIcon} 
               onClick={onDelete} 
               disabled={disabled}
-              className='p-1 hover:bg-navy-950/10 hover:rounded'
+              className='p-1 hover:bg-midnight-950/10 hover:rounded'
               aria-label="Delete row" 
             />
           )}

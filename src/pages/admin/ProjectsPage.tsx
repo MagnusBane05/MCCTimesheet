@@ -93,7 +93,7 @@ export function ProjectsPage() {
         </div>
       </div>
       <div className="mb-4">
-          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
             Sort by
           </label>
         <Select value={sort} onChange={(e) => { setSort(e.target.value as 'customer' | 'name' | 'prjNumber'); }}>
@@ -122,7 +122,7 @@ export function ProjectsPage() {
             <tbody>
               {filteredProjects.length === 0 && (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="text-center text-navy-950/50">
+                  <td colSpan={isAdmin ? 6 : 5} className="text-center text-midnight-950/50">
                     No projects found.
                   </td>
                 </tr>

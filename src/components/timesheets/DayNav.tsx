@@ -48,12 +48,12 @@ export function DayNav({
         ‹
       </Button>
       <div className="relative flex flex-1 items-center justify-center gap-1.5">
-        <span className="text-base font-semibold text-navy-950">{formatLongDateLabel(date)}</span>
+        <span className="text-base font-semibold text-midnight-950">{formatLongDateLabel(date)}</span>
         <button
           type="button"
           aria-label="Choose date"
           onClick={openDatePicker}
-          className="rounded-lg p-1.5 text-navy-900/70 hover:bg-cream-100 hover:text-navy-950"
+          className="rounded-lg p-1.5 text-lakehouse-900/70 hover:bg-cedar-100 hover:text-midnight-950"
         >
           <CalendarIcon />
         </button>

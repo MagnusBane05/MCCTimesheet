@@ -5,19 +5,19 @@ import { formatTimeLabel, generateHourOptions, generateMinuteOptions, getHours, 
 const BUTTON_VARIANTS = {
   default: '',
   inline:
-    'rounded border border-navy-900/20 bg-white px-2 py-1.5 ' +
-    'hover:border-navy-900/30 ' +
-    'focus:outline-none focus:ring-1 focus:ring-accent-500',
+    'rounded border border-lakehouse-900/20 bg-white px-2 py-1.5 ' +
+    'hover:border-lakehouse-900/30 ' +
+    'focus:outline-none focus:ring-1 focus:ring-cedar-500',
 };
 
 const OPTION_VARIANTS = {
   default: {
-    selected: 'bg-accent-500 font-semibold text-white',
-    unselected: 'text-navy-900 hover:bg-cream-100',
+    selected: 'bg-cedar-500 font-semibold text-white',
+    unselected: 'text-lakehouse-900 hover:bg-cedar-100',
   },
   inline: {
-    selected: 'bg-accent-500 font-semibold text-white',
-    unselected: 'text-navy-900 hover:bg-cream-100',
+    selected: 'bg-cedar-500 font-semibold text-white',
+    unselected: 'text-lakehouse-900 hover:bg-cedar-100',
   },
 };
 
@@ -164,7 +164,7 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
               width: pickerPosition.width,
             }}
             className="
-              z-50 grid grid-cols-2 divide-x divide-navy-900/10 rounded-lg border border-navy-900/20 bg-white shadow-lg"
+              z-50 grid grid-cols-2 divide-x divide-lakehouse-900/10 rounded-lg border border-lakehouse-900/20 bg-white shadow-lg"
           >
             <div className="max-h-48 overflow-y-auto py-1">
               {hourOptions.map((option) => {
@@ -200,7 +200,7 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
                     aria-selected={selected}
                     onClick={() => selectMinute(option)}
                     className={`w-full px-3 py-1.5 text-center text-sm ${
-                      selected ? 'bg-accent-500 font-semibold text-white' : 'text-navy-900 hover:bg-cream-100'
+                      selected ? 'bg-cedar-500 font-semibold text-white' : 'text-lakehouse-900 hover:bg-cedar-100'
                     }`}
                   >
                     {option}

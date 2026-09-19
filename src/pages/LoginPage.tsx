@@ -2,6 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { Button } from '../components/common/Button';
+import { Logo } from '../components/common/Logo';
+import { Input } from '../components/common/Input';
 
 export function LoginPage() {
   const { currentUser, login } = useAuth();
@@ -26,31 +28,33 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-950 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
-        <h1 className="text-xl font-semibold text-navy-950">MCC Timesheets</h1>
-        <p className="mt-1 text-sm text-navy-900/60">Sign in to continue. If you don't have an account, please contact your administrator.</p>
+    <div className="flex min-h-screen items-center justify-center bg-midnight-950 px-4">
+      <div className="w-full max-w-sm rounded-2xl bg-birch-50 p-8 shadow-xl">
+        <div className="mb-6 flex justify-center">
+          <Logo className="h-16 w-auto" variant="secondary" />
+        </div>
+        <p className="text-center text-sm text-lakehouse-900/60">Sign in to continue. If you don't have an account, please contact your administrator.</p>
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-navy-900">
+            <label htmlFor="username" className="block text-sm font-medium text-lakehouse-900">
               Username
             </label>
-            <input
+            <Input
               id="username"
               name="username"
               autoComplete="username"
               required
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+              inputClassName="mt-1 w-full py-2.5"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-navy-900">
+            <label htmlFor="password" className="block text-sm font-medium text-lakehouse-900">
               Password
             </label>
-            <input
+            <Input
               id="password"
               name="password"
               type="password"
@@ -58,7 +62,7 @@ export function LoginPage() {
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-navy-900/20 px-3 py-2.5 text-base focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500"
+              inputClassName="mt-1 w-full py-2.5"
             />
           </div>
 

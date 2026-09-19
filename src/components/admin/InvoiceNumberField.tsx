@@ -25,7 +25,7 @@ export function InvoiceNumberField({
   }, [value]);
 
   if (readOnly) {
-    return <span className="text-sm text-navy-900/80">{value || '—'}</span>;
+    return <span className="text-sm text-lakehouse-900/80">{value || '—'}</span>;
   }
 
   const dirty = draft.trim() !== (value ?? '');

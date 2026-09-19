@@ -30,7 +30,7 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-midnight-950/50 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
@@ -39,10 +39,10 @@ export function ConfirmDialog({
       }}
     >
       <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-        <h2 id="confirm-dialog-title" className="text-lg font-semibold text-navy-950">
+        <h2 id="confirm-dialog-title" className="text-lg font-semibold text-midnight-950">
           {title}
         </h2>
-        {description && <div className="mt-2 text-sm text-navy-900/80">{description}</div>}
+        {description && <div className="mt-2 text-sm text-lakehouse-900/80">{description}</div>}
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="secondary" onClick={onCancel}>
             {cancelLabel}

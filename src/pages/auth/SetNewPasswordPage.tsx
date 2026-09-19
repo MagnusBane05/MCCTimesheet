@@ -5,6 +5,7 @@ import { Button } from '../../components/common/Button';
 import { Error as ErrorMessage } from '../../components/common/Error';
 import { LoadingState } from '../../components/common/LoadingState';
 import { timesheetService } from '../../services/service';
+import { Input } from '../../components/common/Input';
 
 export function SetNewPasswordPage() {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ export function SetNewPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-2 text-navy-950">Set Your Password</h1>
+        <h1 className="text-2xl font-bold mb-2 text-midnight-950">Set Your Password</h1>
         <p className="text-gray-600 mb-6">
           You've been assigned a temporary password. Please create a new password to continue.
         </p>
@@ -77,7 +78,7 @@ export function SetNewPasswordPage() {
             <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
               New Password
             </label>
-            <input
+            <Input
               id="new-password"
               type="password"
               value={newPassword}
@@ -85,7 +86,7 @@ export function SetNewPasswordPage() {
               disabled={formLoading}
               autoComplete="new-password"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 disabled:bg-gray-100"
+              inputClassName="w-full py-2 px-3"
               placeholder="Enter new password"
             />
             <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
@@ -95,7 +96,7 @@ export function SetNewPasswordPage() {
             <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
-            <input
+            <Input
               id="confirm-password"
               type="password"
               value={confirmPassword}
@@ -103,7 +104,7 @@ export function SetNewPasswordPage() {
               disabled={formLoading}
               autoComplete="new-password"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-500 disabled:bg-gray-100"
+              inputClassName="w-full py-2 px-3"
               placeholder="Confirm your password"
             />
           </div>

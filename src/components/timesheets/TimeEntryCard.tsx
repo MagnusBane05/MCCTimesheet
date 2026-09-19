@@ -22,20 +22,20 @@ export function TimeEntryCard({
     <div className="rounded-xl bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-semibold text-navy-950">
+          <p className="font-semibold text-midnight-950">
             {formatTimeLabel(entry.startTime)} – {formatTimeLabel(entry.endTime)}
           </p>
-          <p className="text-sm font-medium text-accent-600">{project?.name ?? 'Unknown project'}</p>
+          <p className="text-sm font-medium text-cedar-500">{project?.name ?? 'Unknown project'}</p>
           {project && (
-            <p className="text-xs text-navy-900/60">
+            <p className="text-xs text-lakehouse-900/60">
               {project.customer} · {project.projectNumber}
             </p>
           )}
         </div>
-        <p className="whitespace-nowrap text-sm font-semibold text-navy-950">{formatHours(duration)}</p>
+        <p className="whitespace-nowrap text-sm font-semibold text-midnight-950">{formatHours(duration)}</p>
       </div>
 
-      {entry.workDescription && <p className="mt-2 text-sm text-navy-900/80">{entry.workDescription}</p>}
+      {entry.workDescription && <p className="mt-2 text-sm text-lakehouse-900/80">{entry.workDescription}</p>}
 
       <div className="mt-3 flex items-center justify-between">
         {editable ? (
@@ -48,7 +48,7 @@ export function TimeEntryCard({
             </Button>
           </div>
         ) : (
-          <span className="rounded-full bg-navy-900/5 px-3 py-1 text-xs font-medium text-navy-900/60">
+          <span className="rounded-full bg-lakehouse-900/5 px-3 py-1 text-xs font-medium text-lakehouse-900/60">
             Editing period closed
           </span>
         )}

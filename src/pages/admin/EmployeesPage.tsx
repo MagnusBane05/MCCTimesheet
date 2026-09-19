@@ -224,7 +224,7 @@ export function EmployeesPage() {
           <tbody>
             {filteredEmployees.length === 0 && (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5} className="text-center text-navy-950/50">
+                <td colSpan={isAdmin ? 6 : 5} className="text-center text-midnight-950/50">
                   No employees found.
                 </td>
               </tr>

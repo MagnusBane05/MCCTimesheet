@@ -127,13 +127,13 @@ export function ByJobPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold text-navy-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
+      <h1 className="text-xl font-semibold text-midnight-950">Week of {formatLongDateLabel(getWeekStart(fromDate))}</h1>
 
       <WeekRangeNav fromDate={fromDate} toDate={toDate} onRangeChange={(f, t) => { setFromDate(f); setToDate(t); }} />
 
       <div className="flex flex-wrap gap-3">
         <div>
-          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
             Customer
           </label>
           <Select
@@ -150,19 +150,7 @@ export function ByJobPage() {
           </Select>
         </div>
         <div>
-          <label htmlFor="job-search" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
-            Search
-          </label>
-          <Input
-            id="job-search"
-            type="text"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Project, customer, or project #"
-          />
-        </div>
-        <div>
-          <label htmlFor="sort-by" className="block text-xs font-medium uppercase tracking-wide text-navy-900/60">
+          <label htmlFor="sort-by" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
             Sort by
           </label>
           <Select
@@ -174,6 +162,18 @@ export function ByJobPage() {
             <option value="name">Project name (A–Z)</option>
             <option value="hours">Total hours (high to low)</option>
           </Select>
+        </div>
+        <div>
+          <label htmlFor="job-search" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
+            Search
+          </label>
+          <Input
+            id="job-search"
+            type="text"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Project, customer, or project #"
+          />
         </div>
       </div>
 
@@ -192,14 +192,14 @@ export function ByJobPage() {
                 subtitle={group.project ? `${group.project.customer} · ${group.project.projectNumber}` : undefined}
                 badge={
                   group.project && !group.project.active ? (
-                    <span className="rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium text-navy-900/60">
+                    <span className="rounded-full bg-lakehouse-900/10 px-2 py-0.5 text-xs font-medium text-lakehouse-900/60">
                       Inactive
                     </span>
                   ) : undefined
                 }
                 secondaryBadge={
                   allInvoiced ? (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                    <span className="rounded-full bg-success-100 px-2 py-0.5 font-medium text-success-800">
                       Invoiced
                     </span>
                   ) : undefined
