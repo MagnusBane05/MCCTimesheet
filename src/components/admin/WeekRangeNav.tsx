@@ -1,4 +1,4 @@
-import { addWeeks, formatDate, isFutureDate, parseDate } from '../../utils/dates';
+import { addWeeks, formatDate, getWeekEnd, getWeekStart, isFutureDate, parseDate } from '../../utils/dates';
 import { Button } from '../common/Button';
 
 /** Shared date-range control for the admin reporting pages (By Employee, By Job). */
@@ -12,8 +12,8 @@ export function WeekRangeNav({
   onRangeChange(fromDate: Date, toDate: Date): void;
 }) {
   function shiftWeek(direction: 1 | -1) {
-    const shiftedFrom = addWeeks(fromDate, direction);
-    const shiftedTo = addWeeks(toDate, direction);
+    const shiftedFrom = addWeeks(getWeekStart(fromDate), direction);
+    const shiftedTo = addWeeks(getWeekEnd(fromDate), direction);
     onRangeChange(shiftedFrom, shiftedTo);
   }
 
