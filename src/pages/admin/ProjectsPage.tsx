@@ -3,6 +3,7 @@ import { PRODUCTION_STATUS_COLOURS, PRODUCTION_STATUS_LABELS, PRODUCTION_STATUSE
 import { timesheetService } from "../../services/service";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ErrorState } from "../../components/common/ErrorState";
+import { Error } from "../../components/common/Error";
 import { Table, TableHeader, TableCell, TableRow } from "../../components/common/Table";
 import { Button } from "../../components/common/Button";
 import { Select } from "../../components/common/Select";
@@ -14,6 +15,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { CreateProjectForm } from "../../components/admin/CreateProjectForm";
 import { Modal } from "../../components/common/Modal";
 import { NewProjectInput } from "../../services/TimesheetService";
+import { validateProject } from "../../utils/validation";
 
 export function ProjectsPage() {
   const { currentUser } = useAuth();
@@ -26,6 +28,7 @@ export function ProjectsPage() {
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
   const [ isCreateModalOpen, setIsCreateModalOpen ] = useState(false);
   const [ sort, setSort ] = useState<'customer' | 'name' | 'prjNumber'>('customer');
+  const [ hasAttemptedSubmit, setHasAttemptedSubmit ] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,14 +55,21 @@ export function ProjectsPage() {
     isEditing,
   } = useRowEditor<Project>();
 
+  const errors = editingProject ? validateProject(editingProject) : {};
+  const visibleErrors = hasAttemptedSubmit ? errors : {};
+
   async function handleSave() {
     if (!editingProject) return;
+    setHasAttemptedSubmit(true);
+    if (Object.keys(errors).length > 0) return;
     try {
       await timesheetService.updateProject(editingProject.id, editingProject);
       cancelEditing();
       await load();
     } catch {
       setSaveError(true);
+    } finally {
+      setHasAttemptedSubmit(false);
     }
   };
 
@@ -127,68 +137,73 @@ export function ProjectsPage() {
                   </td>
                 </tr>
               )}
-              {filteredProjects.length > 0 && filteredProjects.map((project) => (
-                <TableRow key={project.id}>
-                  <TableCell>
-                    <EditableText
-                      text={isEditing(project) ? editingProject?.customer ?? '' : project.customer}
-                      isEditing={isEditing(project)}
-                      onEdit={(newText) => updateField('customer', newText)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <EditableText
-                      text={isEditing(project) ? editingProject?.name ?? '' : project.name}
-                      isEditing={isEditing(project)}
-                      onEdit={(newText) => updateField('name', newText)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <EditableText
-                      text={isEditing(project) ? editingProject?.projectNumber ?? '' : project.projectNumber}
-                      isEditing={isEditing(project)}
-                      onEdit={(newText) => updateField('projectNumber', newText)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <ActiveToggle
-                      active={isEditing(project) ? editingProject?.active ?? false : project.active}
-                      editing={isEditing(project)}
-                      onToggle={(e) => updateField('active', e.target.value === 'Active')}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {isEditing(project) ? (
-                      <Select 
-                        value={editingProject?.productionStatus ?? ''}
-                        variant="inline"
-                        onChange={(e) => updateField('productionStatus', e.target.value as ProductionStatus)}
-                        className="rounded-full px-0 py-0"
-                      >
-                        {PRODUCTION_STATUSES.map((option: ProductionStatus) => (
-                          <option key={option} value={option}>
-                            {PRODUCTION_STATUS_LABELS[option]}
-                          </option>
-                        ))} 
-                      </Select>
-                    ) : (
-                        <div className={PRODUCTION_STATUS_COLOURS[project.productionStatus] + "w-fit whitespace-nowrap rounded-full px-2 py-1 text-center text-xs font-bold"}>
-                          {PRODUCTION_STATUS_LABELS[project.productionStatus]}
-                        </div>
-                    )}
-                  </TableCell>
-                  {isAdmin && (
+              {filteredProjects.length > 0 && filteredProjects.map((project) => {
+                const editing = isEditing(project);
+                const displayProject = editing ? editingProject : project;
+                return (
+                  <TableRow key={project.id}>
                     <TableCell>
-                      <EditDelete
-                        isEditing={isEditing(project)}
-                        onEdit={() => startEditing(project)}
-                        onCancelEdit={cancelEditing}
-                        onSave={handleSave}               
+                      <EditableText
+                        text={displayProject?.customer ?? ''}
+                        isEditing={editing}
+                        onEdit={(newText) => updateField('customer', newText)}
+                      />
+                      {editing && <Error message={visibleErrors.customer} />}
+                    </TableCell>
+                    <TableCell>
+                      <EditableText
+                        text={displayProject?.name ?? ''}
+                        isEditing={editing}
+                        onEdit={(newText) => updateField('name', newText)}
+                      />
+                      {editing && <Error message={visibleErrors.name} />}
+                    </TableCell>
+                    <TableCell>
+                      <EditableText
+                        text={displayProject?.projectNumber ?? ''}
+                        isEditing={editing}
+                        onEdit={(newText) => updateField('projectNumber', newText)}
                       />
                     </TableCell>
-                  )}
-                </TableRow>
-              ))}
+                    <TableCell>
+                      <ActiveToggle
+                        active={displayProject?.active ?? false}
+                        editing={editing}
+                        onToggle={(e) => updateField('active', e.target.value === 'Active')}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {editing ? (
+                        <Select 
+                          value={displayProject?.productionStatus ?? ''}
+                          variant="inline"
+                          onChange={(e) => updateField('productionStatus', e.target.value as ProductionStatus)}
+                          className="rounded-full px-0 py-0"
+                        >
+                          {PRODUCTION_STATUSES.map((option: ProductionStatus) => (
+                            <option key={option} value={option}>
+                              {PRODUCTION_STATUS_LABELS[option]}
+                            </option>
+                          ))} 
+                        </Select>
+                      ) : (
+                          <div className={PRODUCTION_STATUS_COLOURS[project.productionStatus] + "w-fit whitespace-nowrap rounded-full px-2 py-1 text-center text-xs font-bold"}>
+                            {PRODUCTION_STATUS_LABELS[project.productionStatus]}
+                          </div>
+                      )}
+                    </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <EditDelete
+                          isEditing={isEditing(project)}
+                          onEdit={() => startEditing(project)}
+                          onCancelEdit={cancelEditing}
+                          onSave={handleSave}               
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+              )})}
             </tbody>
           </Table>
         </div>
