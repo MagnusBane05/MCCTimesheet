@@ -11,7 +11,7 @@ class ProductionStatus(models.TextChoices):
 
 class Project(models.Model):
     customer = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     # Not assumed globally unique, may be blank for new projects.
     project_number = models.CharField(max_length=50, blank=True)
     # Projects are activated/deactivated, never deleted, through the normal API;

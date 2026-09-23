@@ -8,6 +8,7 @@ import { formatLongDateLabel, getWeekEnd, getWeekStart, parseDate } from '../../
 import { calculateWeeklyHours } from '../../utils/overtime';
 import { WeekRangeNav } from '../../components/admin/WeekRangeNav';
 import { HoursGroupCard } from '../../components/admin/HoursGroupCard';
+import { getProjectDisplayName } from '../../utils/projects';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
@@ -188,7 +189,7 @@ export function ByJobPage() {
             return (
               <HoursGroupCard
                 key={group.projectId}
-                title={group.project?.name ?? 'Unknown project'}
+                title={group.project ? getProjectDisplayName(group.project) : 'Unknown project'}
                 subtitle={group.project ? `${group.project.customer} · ${group.project.projectNumber}` : undefined}
                 badge={
                   group.project && !group.project.active ? (

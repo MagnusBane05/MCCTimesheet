@@ -15,6 +15,7 @@ import { EditableTime } from "../common/EditableTime";
 import { InvoiceNumberField } from "./InvoiceNumberField";
 import { EditableSelect } from "../common/EditableSelect";
 import { Error } from "../common/Error";
+import { getProjectDisplayName } from "../../utils/projects";
 
 const TODAY = new Date();
 
@@ -161,6 +162,7 @@ export function TimeEntryTable({
             const editing = isEditing(entry);
             const displayedEntry = editing ? editingEntry ?? entry : entry;
             const rowErrors = editing ? visibleErrors : {};
+            const project = (displayedEntry.projectId && projectsById) ? projectsById.get(displayedEntry.projectId) ?? null : null;
             return (
               <TableRow key={entry.id}>
                 <TableCell>
@@ -199,14 +201,14 @@ export function TimeEntryTable({
                 {showProject && projectsById && projectOptions && (
                   <TableCell>
                     <EditableSelect 
-                      text={displayedEntry.projectId ? projectsById.get(displayedEntry.projectId)?.name ?? 'Unknown project' : ''} 
+                      text={project ? getProjectDisplayName(project) : 'Unknown project'} 
                       id={`project-select-${entry.id}`} 
                       value={displayedEntry.projectId ?? -1}
                       isEditing={editing} 
                       onChange={(newValue) => onUpdateField('projectId', Number(newValue))}>
                         {projectOptions.map((project) => (
                           <option key={project.id} value={project.id}>
-                            {project.name}
+                            {getProjectDisplayName(project)}
                           </option>
                         ))}
                     </EditableSelect>

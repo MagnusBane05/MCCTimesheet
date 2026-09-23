@@ -62,12 +62,10 @@ export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
                         type="text" 
                         label="Project Name" 
                         containerClassName="w-full" 
-                        required
                         id="project-name" 
                         value={name} 
                         onChange={(e) => setName(e.target.value)} 
                     />
-                    <Error message={visibleErrors.name} />
                 </div>
             </div>
             <div className="flex flex-row">

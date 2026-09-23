@@ -7,6 +7,7 @@ import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
 import { TimeSelect } from '../common/TimeSelect';
 import { Select } from '../common/Select';
+import { getProjectDisplayName } from '../../utils/projects';
 
 function getCustomerFromProject(projectId: number | null, projects: Project[]): string {
   if (projectId == null) return '';
@@ -231,7 +232,7 @@ export function TimeEntryForm({
             {projectOptions.length > 1 && <option value="">Select a project…</option>}
             {projectOptions.map((project) => (
               <option key={project.id} value={project.id}>
-                {project.projectNumber ? `(${project.projectNumber}) ` : ''}{project.name}
+                {project.projectNumber ? `(${project.projectNumber}) ` : ''}{getProjectDisplayName(project)}
               </option>
             ))}
           </Select>

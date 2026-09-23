@@ -156,7 +156,6 @@ export function ProjectsPage() {
                         isEditing={editing}
                         onEdit={(newText) => updateField('name', newText)}
                       />
-                      {editing && <Error message={visibleErrors.name} />}
                     </TableCell>
                     <TableCell>
                       <EditableText
