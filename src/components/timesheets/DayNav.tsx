@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { formatDate, formatLongDateLabel, addDays } from '../../utils/dates';
 import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 function CalendarIcon() {
   return (
@@ -45,7 +46,7 @@ export function DayNav({
         onClick={onPrevious}
         className="!px-3 !py-3 text-lg"
       >
-        ‹
+        <ChevronLeftIcon className="h-4 w-4" />
       </Button>
       <div className="relative flex flex-1 items-center justify-center gap-1.5">
         <span className="text-base font-semibold text-midnight-950">{formatLongDateLabel(date)}</span>
@@ -74,7 +75,7 @@ export function DayNav({
         onClick={onNext}
         disabled={canEmployeeViewDate(addDays(date, 1), today) === false}
         className="!px-3 !py-3 text-lg">
-      ›
+        <ChevronRightIcon className="h-4 w-4" />
       </Button>
     </div>
   );
