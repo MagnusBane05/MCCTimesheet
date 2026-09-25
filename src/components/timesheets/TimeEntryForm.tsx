@@ -5,9 +5,10 @@ import { formatDate, formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
-import { TimeSelect } from '../common/TimeSelect';
-import { Select } from '../common/Select';
 import { getProjectDisplayName } from '../../utils/projects';
+import { TimeField } from '../form/TimeField';
+import { SelectField } from '../form/SelectField';
+import { TextAreaField } from '../form/TextAreaField';
 
 function getCustomerFromProject(projectId: number | null, projects: Project[]): string {
   if (projectId == null) return '';
@@ -78,7 +79,7 @@ export function TimeEntryForm({
       ? [...customerProjects, ...projects.filter((project) => project.id === existingEntry.projectId)]
       : customerProjects;
     return [...options].sort((a, b) => a.name.localeCompare(b.name));
-  }, [activeProjects, existingEntry, customer]);
+  }, [activeProjects, existingEntry, customer, projects]);
 
   const input: TimeEntryInput = { workDate: effectiveWorkDate, startTime, endTime, projectId, workDescription };
   const errors = validateTimeEntry(input, {
@@ -164,47 +165,40 @@ export function TimeEntryForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="entry-start" className="block text-sm font-medium text-lakehouse-900">
-            Start time
-          </label>
-          <TimeSelect
+          <TimeField
             id="entry-start"
-            label="Start time"
+            ariaLabel="Start time"
             value={startTime}
             today={today}
             onChange={setStartTime}
             minuteStep={MINUTE_INCREMENT}
-            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
+            label="Start time"
+            error={visibleErrors.startTime}
           />
-          {visibleErrors.startTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.startTime}</p>}
         </div>
         <div>
-          <label htmlFor="entry-end" className="block text-sm font-medium text-lakehouse-900">
-            End time
-          </label>
-          <TimeSelect
+          <TimeField
             id="entry-end"
-            label="End time"
+            ariaLabel="End time"
             value={endTime}
             today={today}
             onChange={setEndTime}
             minuteStep={MINUTE_INCREMENT}
-            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
+            label="End time"
+            error={visibleErrors.endTime}
           />
-          {visibleErrors.endTime && <p className="mt-1 text-sm text-red-700">{visibleErrors.endTime}</p>}
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-3">
         <div>
-          <label htmlFor="entry-customer" className="block text-sm font-medium text-lakehouse-900">
-            Customer
-          </label>
-          <Select
+          <SelectField
             id="entry-customer"
+            ariaLabel="Customer"
             value={customer}
-            onChange={handleCustomerChange}
             variant="large"
+            label="Customer"
+            onChange={handleCustomerChange}
             className="mt-1 w-full"
           >
             <option value="">Select a customer…</option>
@@ -213,20 +207,20 @@ export function TimeEntryForm({
                 {customer}
               </option>
             ))}
-          </Select>
+          </SelectField>
         </div>
 
         <div>
-          <label htmlFor="entry-project" className="block text-sm font-medium text-lakehouse-900">
-            Project
-          </label>
-          <Select
+          <SelectField
             id="entry-project"
+            ariaLabel="Project"
             value={projectId ?? ''}
-            onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
             variant="large"
+            label="Project"
+            error={visibleErrors.projectId}
             className="mt-1 w-full"
             disabled={projectOptions.length <= 1}
+            onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
           >
             {projectOptions.length === 0 && <option value="">Select a customer first</option>}
             {projectOptions.length > 1 && <option value="">Select a project…</option>}
@@ -235,23 +229,19 @@ export function TimeEntryForm({
                 {project.projectNumber ? `(${project.projectNumber}) ` : ''}{getProjectDisplayName(project)}
               </option>
             ))}
-          </Select>
-          {visibleErrors.projectId && <p className="mt-1 text-sm text-red-700">{visibleErrors.projectId}</p>}
+          </SelectField>
         </div>
       </div>
 
       <div>
-        <label htmlFor="entry-description" className="block text-sm font-medium text-lakehouse-900">
-          Work description
-        </label>
-        <textarea
+        <TextAreaField
           id="entry-description"
+          ariaLabel="Work description"
           value={workDescription}
           onChange={(event) => setWorkDescription(event.target.value)}
-          rows={2}
-          className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
+          label="Work description"
+          error={visibleErrors.workDescription}
         />
-        {visibleErrors.workDescription && <p className="mt-1 text-sm text-red-700">{visibleErrors.workDescription}</p>}
       </div>
 
       <div className="flex justify-between rounded-lg bg-midnight-950/5 px-3 py-2 text-sm text-lakehouse-900/80">

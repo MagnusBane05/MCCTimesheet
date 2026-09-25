@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext';
+import { useAuth } from '../../auth/useAuth';
 import { Button } from '../../components/common/Button';
 import { Error as ErrorMessage } from '../../components/common/Error';
 import { LoadingState } from '../../components/common/LoadingState';
 import { timesheetService } from '../../services/service';
-import { Input } from '../../components/common/Input';
+import { TextField } from '../../components/form/TextField';
 
 export function SetNewPasswordPage() {
   const navigate = useNavigate();
@@ -78,15 +78,16 @@ export function SetNewPasswordPage() {
             <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
               New Password
             </label>
-            <Input
+            <TextField
               id="new-password"
+              ariaLabel="New Password"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               disabled={formLoading}
               autoComplete="new-password"
               required
-              inputClassName="w-full py-2 px-3"
+              className="w-full py-2 px-3"
               placeholder="Enter new password"
             />
             <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
@@ -96,15 +97,16 @@ export function SetNewPasswordPage() {
             <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
-            <Input
+            <TextField
               id="confirm-password"
+              ariaLabel="Confirm Password"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={formLoading}
               autoComplete="new-password"
               required
-              inputClassName="w-full py-2 px-3"
+              className="w-full py-2 px-3"
               placeholder="Confirm your password"
             />
           </div>

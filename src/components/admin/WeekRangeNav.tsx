@@ -1,6 +1,6 @@
 import { addWeeks, formatDate, getWeekEnd, getWeekStart, isFutureDate, parseDate } from '../../utils/dates';
 import { Button } from '../common/Button';
-import { Input } from '../common/Input';
+import { DateField } from '../form/DateField';
 
 /** Shared date-range control for the admin reporting pages (By Employee, By Job). */
 export function WeekRangeNav({
@@ -31,28 +31,28 @@ export function WeekRangeNav({
           Next week ›
       </Button>
       <div>
-        <label htmlFor="range-from" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
-          From date
-        </label>
-        <Input
+        <DateField
           id="range-from"
+          ariaLabel="From date"
           type="date"
           value={formatDate(fromDate)}
           max={formatDate(toDate)}
           onChange={(event) => onRangeChange(parseDate(event.target.value), toDate)}
+          label='From date'
+          labelVariant="small"
           className="w-auto"
         />
       </div>
       <div>
-        <label htmlFor="range-to" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
-          To date
-        </label>
-        <Input
+        <DateField
           id="range-to"
+          ariaLabel="To date"
           type="date"
           value={formatDate(toDate)}
           min={formatDate(fromDate)}
           onChange={(event) => onRangeChange(fromDate, parseDate(event.target.value))}
+          label='To date'
+          labelVariant="small"
           className="w-auto"
         />
       </div>

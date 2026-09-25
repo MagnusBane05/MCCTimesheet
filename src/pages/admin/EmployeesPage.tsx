@@ -1,16 +1,13 @@
 import { Table, TableCell, TableHeader } from "../../components/common/Table";
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "../../auth/AuthContext";
+import { useAuth } from "../../auth/useAuth";
 import { User, UserRole, USER_ROLES, EmployeeCreationResult } from "../../domain/user";
 import { timesheetService } from "../../services/service";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ErrorState } from "../../components/common/ErrorState";
-import { ActiveToggle } from "../../components/common/ActiveToggle";
 import { EditDelete } from "../../components/common/EditDelete";
 import { useRowEditor } from "../../hooks/useRowEditor";
-import { EditableText } from "../../components/common/EditableText";
 import { Error } from "../../components/common/Error";
-import { EditableSelect } from "../../components/common/EditableSelect";
 import { Button } from "../../components/common/Button";
 import { Modal } from "../../components/common/Modal";
 import { ConfirmDialog } from "../../components/common/ConfirmDialog";
@@ -19,6 +16,8 @@ import { CreateEmployeeForm } from "../../components/admin/CreateEmployeeForm";
 import { EmployeeCreationSuccess } from "../../components/admin/EmployeeCreationSuccess";
 import { ResetPasswordSuccess } from "../../components/admin/ResetPasswordSuccess";
 import { NewEmployeeInput } from "../../services/TimesheetService";
+import { TextField } from "../../components/form/TextField";
+import { SelectField } from "../../components/form/SelectField";
 
 type ModalState = 'create' | 'creation-success' | 'reset-success' | null;
 
@@ -235,40 +234,60 @@ export function EmployeesPage() {
               return (
                 <tr key={employee.id}>
                   <TableCell>
-                    <EditableText
-                      text={displayedEntry.username}
-                      isEditing={editing}
-                      onEdit={(newText) => updateField('username', newText)}
+                    <TextField
+                      id={`username-${employee.id}`}
+                      ariaLabel="Username"
+                      value={displayedEntry.username}
+                      readOnly={!editing}
+                      variant="inline"
+                      onChange={(e) => updateField('username', e.target.value)}
                     />
                   </TableCell>
                   <TableCell>
-                    <EditableText
-                      text={displayedEntry.displayName}
-                      isEditing={editing}
-                      onEdit={(newText) => updateField('displayName', newText)}
+                    <TextField
+                      id={`displayName-${employee.id}`}
+                      ariaLabel="Display Name"
+                      value={displayedEntry.displayName}
+                      readOnly={!editing}
+                      variant="inline"
+                      onChange={(e) => updateField('displayName', e.target.value)}
                     />
                   </TableCell>
                   <TableCell>
-                    <EditableSelect
-                      text={displayedEntry.role}
+                    <SelectField
                       id={`role-select-${employee.id}`}
+                      ariaLabel="Role"
                       value={displayedEntry.role}
-                      isEditing={editing}
-                      onChange={(newValue) => updateField('role', newValue as UserRole)}
+                      readOnly={!editing}
+                      variant="inline"
+                      onChange={(e) => updateField('role', e.target.value as UserRole)}
                     >
                       {USER_ROLES.map((role) => (
                         <option key={role} value={role}>
                           {role}
                         </option>
                       ))}
-                    </EditableSelect>
+                    </SelectField>
                   </TableCell>
                     <TableCell>
-                      <ActiveToggle
-                        active={displayedEntry.active}
-                        editing={editing}
-                        onToggle={(e) => updateField('active', e.target.value === 'Active')}>
-                      </ActiveToggle>
+                      <SelectField
+                        id={`active-select-${employee.id}`}
+                        ariaLabel="Active"
+                        value={displayedEntry.active ? 'Active' : 'Inactive'}
+                        readOnly={!editing}
+                        readOnlyContent={
+                          displayedEntry.active ? (
+                            <Badge variant="success">Active</Badge>
+                          ) : (
+                            <Badge variant="danger">Inactive</Badge>
+                          )
+                        }
+                        variant="inline"
+                        onChange={(e) => updateField('active', e.target.value === 'Active')}
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </SelectField>
                     </TableCell>
                   {anyHavePasswordChangeRequired && (
                   <TableCell>

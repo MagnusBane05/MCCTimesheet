@@ -1,21 +1,19 @@
 import { forwardRef } from 'react';
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  variant?: 'default' | 'inline' | 'large';
-  label?: string;
+export type SelectVariant = 'default' | 'inline' | 'large';
+
+export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  variant?: SelectVariant;
   containerClassName?: string;
   selectClassName?: string;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-  { className = '', variant = 'default', label, containerClassName = '', selectClassName = '', ...props },
+  { className = '', variant = 'default', containerClassName = '', selectClassName = '', ...props },
   ref
 ) {
   return (
     <div className={`${className} ${containerClassName}`}>
-      {label && <label htmlFor={props.id} className="block text-sm font-medium text-lakehouse-900">
-        {label} {props.required && <span className="text-red-500">*</span>}
-      </label>}
       <select
         ref={ref}
         className={`

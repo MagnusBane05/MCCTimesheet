@@ -1,9 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatTimeLabel, generateHourOptions, generateMinuteOptions, getHours, getMinutes } from '../../utils/time';
 
 const BUTTON_VARIANTS = {
-  default: '',
+  default: 'mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base' + 
+  'focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500',
   inline:
     'rounded border border-lakehouse-900/20 bg-white px-2 py-1.5 ' +
     'hover:border-lakehouse-900/30 ' +
@@ -24,7 +25,7 @@ const OPTION_VARIANTS = {
 export interface TimeSelectProps {
   id?: string;
   /** Accessible label for this control, e.g. "Start time" — used to label the hour and minute columns individually. */
-  label: string;
+  ariaLabel: string;
   /** Selected time as an "HH:mm" 24-hour string, or '' when unset. */
   value: string;
   timeVariant?: '12' | '24';
@@ -47,7 +48,7 @@ function ClockIcon() {
 }
 
 /** A single time field that opens a two-column (hour, minute) picker, combining the selection into one "HH:mm" value. */
-export function TimeSelect({ id, label, value, timeVariant = '12', today, onChange, minuteStep = 1, className, disabled, variant = 'default' }: TimeSelectProps) {
+export function TimeSelect({ id, ariaLabel, value, timeVariant = '12', today, onChange, minuteStep = 1, className, disabled, variant = 'default' }: TimeSelectProps) {
   const [open, setOpen] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({top: 0, left: 0, width: 0,});
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,6 +89,17 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
     };
   }, [open]);
 
+  const updatePickerPosition = useCallback(() => {
+    if (!buttonRef.current || !containerRef.current) return;
+    const buttonRect = buttonRef.current.getBoundingClientRect();
+    const containerRect = containerRef.current.getBoundingClientRect();
+    setPickerPosition({
+      top: buttonRect.bottom + window.scrollY + 4,
+      left: buttonRect.left + window.scrollX,
+      width: variant === 'inline' ? 160 : containerRect.width,
+    });
+  }, [variant]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -99,14 +111,14 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
     return () => {
       window.removeEventListener('resize', handlePositionChange);
     };
-  }, [open]);
+  }, [open, updatePickerPosition]);
 
   useLayoutEffect(() => {
     if (!open) return;
     updatePickerPosition();
     hourItemRef.current?.scrollIntoView({ block: 'center' });
     minuteItemRef.current?.scrollIntoView({ block: 'center' });
-  }, [open]);
+  }, [open, updatePickerPosition]);
 
   const currHour = getHours(today);
   const currMin = getMinutes(today, minuteStep);
@@ -119,24 +131,13 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
     onChange(`${hour || currHour}:${newMinute}:00`);
   }
 
-  function updatePickerPosition() {
-    if (!buttonRef.current || !containerRef.current) return;
-    const buttonRect = buttonRef.current.getBoundingClientRect();
-    const containerRect = containerRef.current.getBoundingClientRect();
-    setPickerPosition({
-      top: buttonRect.bottom + window.scrollY  + 4,
-      left: buttonRect.left + window.scrollX,
-      width: variant === 'inline' ? 160 : containerRect.width,
-    });
-  }
-
   return (
     <div ref={containerRef} className={variant === 'inline' ? 'relative inline-block' : 'relative'}>
       <button
         ref={buttonRef}
         type="button"
         id={id}
-        aria-label={label}
+        aria-label={ariaLabel}
         aria-haspopup="true"
         aria-expanded={open}
         disabled={disabled}
@@ -156,15 +157,15 @@ export function TimeSelect({ id, label, value, timeVariant = '12', today, onChan
           <div
             ref={pickerRef}
             role="listbox"
-            aria-label={label}
+            aria-label={ariaLabel}
             style={{
               position: 'absolute',
               top: pickerPosition.top,
               left: pickerPosition.left,
               width: pickerPosition.width,
             }}
-            className="
-              z-50 grid grid-cols-2 divide-x divide-lakehouse-900/10 rounded-lg border border-lakehouse-900/20 bg-white shadow-lg"
+            className="z-50 grid grid-cols-2 divide-x divide-lakehouse-900/10 rounded-lg 
+            border border-lakehouse-900/20 bg-white shadow-lg"
           >
             <div className="max-h-48 overflow-y-auto py-1">
               {hourOptions.map((option) => {

@@ -7,7 +7,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   secondary: 'rounded-lg px-4 py-2.5 bg-white text-lakehouse-900 border border-lakehouse-900/20 hover:bg-birch-50 focus-visible:outline-lake-800',
   danger: 'rounded-lg px-4 py-2.5 bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-800',
   ghost: 'rounded-lg px-4 py-2.5 bg-transparent text-lakehouse-900 hover:bg-lakehouse-900/5 focus-visible:outline-lake-800',
-  inline: 'rounded-full bg-transparent text-lakehouse-900 border border-lakehouse-900/20 hover:bg-birch-50 focus-visible:outline-lake-800'
+  inline: 'rounded-full bg-white text-lakehouse-900 border border-lakehouse-900/20 hover:bg-birch-50 focus-visible:outline-lake-800'
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

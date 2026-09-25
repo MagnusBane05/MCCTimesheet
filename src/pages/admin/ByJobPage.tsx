@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../../auth/AuthContext';
+import { useAuth } from '../../auth/useAuth';
 import { timesheetService } from '../../services/service';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
@@ -12,10 +12,10 @@ import { getProjectDisplayName } from '../../utils/projects';
 import { LoadingState } from '../../components/common/LoadingState';
 import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
-import { Select } from '../../components/common/Select';
-import { Input } from '../../components/common/Input';
 import { TimeEntryTable } from '../../components/admin/TimeEntryTable';
 import { useRowEditor } from '../../hooks/useRowEditor';
+import { SelectField } from '../../components/form/SelectField';
+import { TextField } from '../../components/form/TextField';
 
 const TODAY = new Date();
 
@@ -119,6 +119,7 @@ export function ByJobPage() {
   async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
     await timesheetService.updateTimeEntry(entryId, values);
     await load();
+    setEntries(entries.map(e => e.id === entryId ? { ...e, ...values } : e));
   }
 
   async function handleDeleteTimeEntry(entryId: number) {
@@ -134,11 +135,11 @@ export function ByJobPage() {
 
       <div className="flex flex-wrap gap-3">
         <div>
-          <label htmlFor="customer-filter" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
-            Customer
-          </label>
-          <Select
+          <SelectField
             id="customer-filter"
+            ariaLabel="Customer"
+            label="Customer"
+            labelVariant="small"
             value={customerFilter}
             onChange={(event) => setCustomerFilter(event.target.value)}
           >
@@ -148,28 +149,28 @@ export function ByJobPage() {
                 {customer}
               </option>
             ))}
-          </Select>
+          </SelectField>
         </div>
         <div>
-          <label htmlFor="sort-by" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
-            Sort by
-          </label>
-          <Select
+          <SelectField
             id="sort-by"
+            ariaLabel="Sort by"
+            label="Sort by"
+            labelVariant="small"
             value={sortBy}
             onChange={(event) => setSortBy(event.target.value as SortBy)}
           >
             <option value="customer">Customer (A–Z)</option>
             <option value="name">Project name (A–Z)</option>
             <option value="hours">Total hours (high to low)</option>
-          </Select>
+          </SelectField>
         </div>
         <div>
-          <label htmlFor="job-search" className="block text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">
-            Search
-          </label>
-          <Input
+          <TextField
             id="job-search"
+            ariaLabel="Search"
+            label="Search"
+            labelVariant="small"
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}

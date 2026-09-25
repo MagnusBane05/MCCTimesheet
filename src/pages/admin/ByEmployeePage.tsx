@@ -12,7 +12,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { ErrorState } from '../../components/common/ErrorState';
 import { Counter } from '../../components/common/Counter';
 import { TimeEntryTable } from '../../components/admin/TimeEntryTable';
-import { useAuth } from '../../auth/AuthContext';
+import { useAuth } from '../../auth/useAuth';
 import { useRowEditor } from '../../hooks/useRowEditor';
 
 const TODAY = new Date();
@@ -104,6 +104,7 @@ export function ByEmployeePage() {
 
   async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
     await timesheetService.updateTimeEntry(entryId, values);
+    setEntries(entries.map(e => e.id === entryId ? { ...e, ...values } : e));
     await load();
   }
 

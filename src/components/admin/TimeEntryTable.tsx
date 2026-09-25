@@ -6,16 +6,16 @@ import type { Project } from "../../domain/project";
 import type { User } from "../../domain/user";
 import type { TimeEntryInput, TimeEntryValidationErrors } from "../../utils/validation";
 import { validateTimeEntry } from "../../utils/validation";
-import { formatDate, formatLongDateLabel, parseDate } from "../../utils/dates";
+import { formatLongDateLabel, formatShortDateLabel, parseDate } from "../../utils/dates";
 import { formatHours, formatTimeLabel, getDurationHours, MINUTE_INCREMENT } from "../../utils/time";
 import { EditDelete } from "../common/EditDelete";
-import { EditableText } from "../common/EditableText";
-import { EditableDate } from "../common/EditableDate";
-import { EditableTime } from "../common/EditableTime";
 import { InvoiceNumberField } from "./InvoiceNumberField";
-import { EditableSelect } from "../common/EditableSelect";
 import { Error } from "../common/Error";
 import { getProjectDisplayName } from "../../utils/projects";
+import { SelectField } from "../form/SelectField";
+import { TextField } from "../form/TextField";
+import { TimeField } from "../form/TimeField";
+import { DateField } from "../form/DateField";
 
 const TODAY = new Date();
 
@@ -166,75 +166,91 @@ export function TimeEntryTable({
             return (
               <TableRow key={entry.id}>
                 <TableCell>
-                  <EditableDate
-                    date={parseDate(displayedEntry.workDate ?? '')}
-                    isEditing={editing}
-                    onEdit={(newDate) => onUpdateField('workDate', formatDate(newDate))}
+                  <DateField
+                    id={`work-date-field-${entry.id}`} 
+                    ariaLabel={`Work date for entry ${entry.id}`} 
+                    value={displayedEntry.workDate ?? ''}
+                    error={rowErrors.workDate}
+                    variant="inline"
+                    readOnly={!editing}
+                    readOnlyContent={formatShortDateLabel(parseDate(displayedEntry.workDate ?? ''))}
+                    onChange={(e) => onUpdateField('workDate', e.target.value)}
                   />
-                  <Error message={rowErrors.workDate} />
                 </TableCell>
                 <TableCell>
-                  <EditableTime
-                    time={displayedEntry.startTime}
-                    isEditing={editing}
-                    onEdit={(newTime) => onUpdateField('startTime', newTime)}
-                    variant={'24'}
+                  <TimeField
+                    id={`start-time-field-${entry.id}`} 
+                    ariaLabel={`Start time for entry ${entry.id}`} 
+                    value={displayedEntry.startTime}
+                    error={rowErrors.startTime}
+                    today={TODAY}
+                    timeVariant='24'
                     minuteStep={MINUTE_INCREMENT}
-                    label="Start Time"
+                    variant="inline"
+                    readOnly={!editing}
+                    readOnlyContent={formatTimeLabel(displayedEntry.startTime, '24')}
+                    onChange={(newTime) => onUpdateField('startTime', newTime)}
                   />
-                  <Error message={rowErrors.startTime} />
                 </TableCell>
                 <TableCell className="overflow-visible">
-                  <EditableTime
-                    time={displayedEntry.endTime}
-                    isEditing={editing}
-                    onEdit={(newTime) => onUpdateField('endTime', newTime)}
-                    variant={'24'}
+                  <TimeField
+                    id={`end-time-field-${entry.id}`} 
+                    ariaLabel={`End time for entry ${entry.id}`} 
+                    value={displayedEntry.endTime}
+                    error={rowErrors.endTime}
+                    today={TODAY}
+                    timeVariant='24'
                     minuteStep={MINUTE_INCREMENT}
-                    label="End Time"
+                    variant="inline"
+                    readOnly={!editing}
+                    readOnlyContent={formatTimeLabel(displayedEntry.endTime, '24')}
+                    onChange={(newTime) => onUpdateField('endTime', newTime)}
                   />
-                  <Error message={rowErrors.endTime} />
                 </TableCell>
                 <TableCell>
                   {formatHours(getDurationHours(displayedEntry.startTime, displayedEntry.endTime), 'short')}
                 </TableCell>
                 {showProject && projectsById && projectOptions && (
                   <TableCell>
-                    <EditableSelect 
-                      text={project ? getProjectDisplayName(project) : 'Unknown project'} 
+                    <SelectField
                       id={`project-select-${entry.id}`} 
+                      ariaLabel={`Project select for entry ${entry.id}`}
                       value={displayedEntry.projectId ?? -1}
-                      isEditing={editing} 
-                      onChange={(newValue) => onUpdateField('projectId', Number(newValue))}>
+                      error={rowErrors.projectId}
+                      readOnly={!editing} 
+                      readOnlyContent={project ? getProjectDisplayName(project) : 'Unknown project'} 
+                      onChange={(e) => onUpdateField('projectId', Number(e.target.value))}>
                         {projectOptions.map((project) => (
                           <option key={project.id} value={project.id}>
                             {getProjectDisplayName(project)}
                           </option>
                         ))}
-                    </EditableSelect>
-                    <Error message={rowErrors.projectId} />
+                    </SelectField>
                   </TableCell>
                 )}
                 {showEmployee && employeesById && employeeOptions && (
                   <TableCell>
-                    <EditableSelect 
-                      text={displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''} 
+                    <SelectField
                       id={`employee-select-${entry.id}`} 
+                      ariaLabel={`Employee select for entry ${entry.id}`}
                       value={displayedEntry.employeeId ?? -1}
-                      isEditing={editing} 
-                      onChange={(newValue) => onUpdateField('employeeId', Number(newValue))}>
+                      variant="inline"
+                      readOnly={!editing} 
+                      readOnlyContent={displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''} 
+                      onChange={(e) => onUpdateField('employeeId', Number(e.target.value))}>
                         {employeeOptions.map((employee) => (
                           <option key={employee.id} value={employee.id}>
                             {employee.displayName}
                           </option>
                         ))}
-                    </EditableSelect>
+                    </SelectField>
                   </TableCell>
                 )}
                 {showInvoice && (
                   <TableCell>
                     <InvoiceNumberField
                       id={`invoice-number-${entry.id}`}
+                      ariaLabel={`Invoice number for entry ${entry.id}`} 
                       value={entry.invoiceNumber ?? null}
                       readOnly={!canEdit || isAnyEntryEditing}
                       onSave={(newInvoiceNumber) => handleSaveInvoice(entry, newInvoiceNumber)}
@@ -242,12 +258,15 @@ export function TimeEntryTable({
                   </TableCell>
                 )}
                 <TableCell className="max-w-xs truncate">
-                  <EditableText
-                    text={displayedEntry.workDescription ?? ''}
-                    isEditing={editing}
-                    onEdit={(newText) => onUpdateField('workDescription', newText)}
+                  <TextField
+                    id={`work-description-${entry.id}`} 
+                    ariaLabel={`Work Description for entry ${entry.id}`} 
+                    value={displayedEntry.workDescription ?? ''}
+                    error={rowErrors.workDescription}
+                    variant="inline"
+                    readOnly={!editing}
+                    onChange={(e) => onUpdateField('workDescription', e.target.value)}
                   />
-                  <Error message={rowErrors.workDescription} />
                 </TableCell>
                 {canEdit && 
                   <TableCell>

@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 import { Button } from "../common/Button";
-import { Input } from "../common/Input";
 import { Error } from "../common/Error";
 import { NewEmployeeInput } from "../../services/TimesheetService";
 import { USER_ROLES, UserRole } from "../../domain/user";
-import { Select } from "../common/Select";
+import { SelectField } from "../form/SelectField";
+import { TextField } from "../form/TextField";
 
 export interface CreateEmployeeFormProps {
     onCreateEmployee: (employee: NewEmployeeInput) => void;
@@ -55,12 +55,13 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
     return (
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
-                <Select
-                    label="Role"
-                    containerClassName="w-full"
+                <SelectField
                     id="employee-role"
+                    ariaLabel="Role"
+                    label="Role"
                     required
                     value={role}
+                    pt={{container: "w-full"}}
                     onChange={(e) => setRole(e.target.value as UserRole)}
                 >
                     {USER_ROLES.map((option: UserRole) => (
@@ -68,31 +69,31 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
                             {option}
                         </option>
                     ))}
-                </Select>
+                </SelectField>
                 <div className="flex flex-row">
                     <div className="flex-1">
-                        <Input
-                            type="text"
-                            label="Username"
-                            containerClassName="w-full"
-                            required
+                        <TextField
                             id="employee-username"
+                            ariaLabel="Username"
+                            label="Username"
+                            required
                             value={username}
+                            error={visibleErrors.username}
+                            pt={{container: "w-full"}}
                             onChange={(e) => setUsername(e.target.value)}
                         />
-                        <Error message={visibleErrors.username} />
                     </div>
                     <div className="flex-1">
-                        <Input
-                            type="text"
-                            label="Display Name"
-                            containerClassName="w-full"
-                            required
+                        <TextField
                             id="employee-display-name"
+                            ariaLabel="Display Name"
+                            label="Display Name"
+                            required
                             value={displayName}
+                            error={visibleErrors.displayName}
+                            pt={{container: "w-full"}}
                             onChange={(e) => setDisplayName(e.target.value)}
                         />
-                        <Error message={visibleErrors.displayName} />
                     </div>
                 </div>
             </div>

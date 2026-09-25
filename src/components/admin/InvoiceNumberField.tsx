@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
-import { Input } from '../common/Input';
+import { TextField } from '../form/TextField';
 
 interface InvoiceNumberFieldProps {
   value: string | null;
   id: string;
+  ariaLabel: string;
   readOnly: boolean;
   onSave(invoiceNumber: string | null): Promise<void>;
 }
@@ -13,6 +14,7 @@ interface InvoiceNumberFieldProps {
 export function InvoiceNumberField({
   value,
   id,
+  ariaLabel,
   readOnly,
   onSave,
 }: InvoiceNumberFieldProps) {
@@ -44,14 +46,13 @@ export function InvoiceNumberField({
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor={id} className="sr-only">
-        Invoice number
-      </label>
-      <Input
+      <TextField
         id={id}
+        ariaLabel={ariaLabel}
         type="text"
         variant='inline'
         value={draft}
+        error={error ? "Unable to save." : undefined}
         placeholder="No invoice number"
         onChange={(event) => setDraft(event.target.value)}
         className="w-36"
@@ -61,7 +62,6 @@ export function InvoiceNumberField({
           {saving ? 'Saving…' : 'Save'}
         </Button>
       )}
-      {error && <span className="text-xs text-red-700">Unable to save.</span>}
     </div>
   );
 }

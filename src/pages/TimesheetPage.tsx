@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 import { timesheetService } from '../services/service';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';

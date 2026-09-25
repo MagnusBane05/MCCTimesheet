@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 import { Button } from '../components/common/Button';
 import { Logo } from '../components/common/Logo';
-import { Input } from '../components/common/Input';
+import { Error } from '../components/common/Error';
+import { TextField } from '../components/form/TextField';
 
 export function LoginPage() {
   const { currentUser, login } = useAuth();
@@ -37,39 +38,33 @@ export function LoginPage() {
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-lakehouse-900">
-              Username
-            </label>
-            <Input
+            <TextField
               id="username"
+              ariaLabel='Username'
               name="username"
               autoComplete="username"
-              required
+              label='Username'
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              inputClassName="mt-1 w-full py-2.5"
+              className="mt-1 w-full py-2.5"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-lakehouse-900">
-              Password
-            </label>
-            <Input
+            <TextField
               id="password"
+              ariaLabel='Password'
               name="password"
               type="password"
               autoComplete="current-password"
-              required
+              label='Password'
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              inputClassName="mt-1 w-full py-2.5"
+              className="mt-1 w-full py-2.5"
             />
           </div>
 
           {error && (
-            <p role="alert" className="text-sm text-red-700">
-              {error}
-            </p>
+            <Error message={error} />
           )}
 
           <Button type="submit" disabled={submitting} className="mt-2 w-full">

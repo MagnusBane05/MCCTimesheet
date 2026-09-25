@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import type { UserRole } from '../domain/user';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 function homeRouteFor(role: UserRole): string {
   return role === 'EMPLOYEE' ? '/timesheets' : '/admin/by-employee';
