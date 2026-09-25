@@ -1,7 +1,7 @@
-import { TimeSelect, TimeSelectProps } from "../common/TimeSelect";
-import { Field, FieldProps } from "./Field";
+import { TimeSelect, type TimeSelectProps } from "../common/TimeSelect";
+import { Field, type FieldProps } from "./Field";
 
-interface TimeFieldProps extends Omit<TimeSelectProps, 'id' | 'label'>, FieldProps { }
+interface TimeFieldProps extends Omit<TimeSelectProps, 'id'>, FieldProps { }
 
 export function TimeField({ id, label, pt, ariaLabel, required, error, readOnly, readOnlyContent, ...props }: TimeFieldProps) {
   return (

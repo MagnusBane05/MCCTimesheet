@@ -217,6 +217,7 @@ export function TimeEntryTable({
                       ariaLabel={`Project select for entry ${entry.id}`}
                       value={displayedEntry.projectId ?? -1}
                       error={rowErrors.projectId}
+                      variant="inline"
                       readOnly={!editing} 
                       readOnlyContent={project ? getProjectDisplayName(project) : 'Unknown project'} 
                       onChange={(e) => onUpdateField('projectId', Number(e.target.value))}>
@@ -230,7 +231,8 @@ export function TimeEntryTable({
                 )}
                 {showEmployee && employeesById && employeeOptions && (
                   <TableCell>
-                    <SelectField
+                    {displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''}
+                    {/* <SelectField
                       id={`employee-select-${entry.id}`} 
                       ariaLabel={`Employee select for entry ${entry.id}`}
                       value={displayedEntry.employeeId ?? -1}
@@ -243,7 +245,7 @@ export function TimeEntryTable({
                             {employee.displayName}
                           </option>
                         ))}
-                    </SelectField>
+                    </SelectField> */}
                   </TableCell>
                 )}
                 {showInvoice && (

@@ -1,5 +1,5 @@
-import { Input, InputProps } from "../common/Input";
-import { Field, FieldProps } from "./Field";
+import { Input, type InputProps } from "../common/Input";
+import { Field, type FieldProps } from "./Field";
 
 interface DateFieldProps extends Omit<InputProps, 'id'>, FieldProps { }
 

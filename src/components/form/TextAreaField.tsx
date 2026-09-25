@@ -1,7 +1,7 @@
 import { TextArea } from "../common/TextArea";
-import { Field, FieldProps } from "./Field";
+import { Field, type FieldProps } from "./Field";
 
-export interface TextAreaFieldProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "id">, FieldProps { }
+interface TextAreaFieldProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "id">, FieldProps { }
 
 export function TextAreaField({ label, pt, id, ariaLabel, required = false, error, readOnly, readOnlyContent, labelVariant, ...props }: TextAreaFieldProps) {
   return (

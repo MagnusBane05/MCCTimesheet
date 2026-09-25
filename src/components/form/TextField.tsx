@@ -1,7 +1,7 @@
-import { Input, InputProps } from "../common/Input";
-import { Field, FieldProps } from "./Field";
+import { Input, type InputProps } from "../common/Input";
+import { Field, type FieldProps } from "./Field";
 
-export interface TextFieldProps extends Omit<InputProps, "id">, FieldProps { }
+interface TextFieldProps extends Omit<InputProps, "id">, FieldProps { }
 
 export function TextField({ label, pt, id, ariaLabel, required = false, error, readOnly, readOnlyContent, labelVariant, ...props }: TextFieldProps) {
   return (

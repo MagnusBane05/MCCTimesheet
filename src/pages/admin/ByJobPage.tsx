@@ -119,7 +119,6 @@ export function ByJobPage() {
   async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
     await timesheetService.updateTimeEntry(entryId, values);
     await load();
-    setEntries(entries.map(e => e.id === entryId ? { ...e, ...values } : e));
   }
 
   async function handleDeleteTimeEntry(entryId: number) {

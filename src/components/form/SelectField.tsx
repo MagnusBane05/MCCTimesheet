@@ -1,7 +1,7 @@
-import { Select, SelectProps } from "../common/Select";
-import { Field, FieldProps } from "./Field";
+import { Select, type SelectProps } from "../common/Select";
+import { Field, type FieldProps } from "./Field";
 
-export interface SelectFieldProps extends Omit<SelectProps, "id">, FieldProps { }
+interface SelectFieldProps extends Omit<SelectProps, "id">, FieldProps { }
 
 export function SelectField({ label, pt, id, ariaLabel, required, error, readOnly, readOnlyContent, labelVariant, ...props }: SelectFieldProps) {
   return (

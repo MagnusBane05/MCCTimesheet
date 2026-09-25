@@ -104,7 +104,6 @@ export function ByEmployeePage() {
 
   async function handleUpdateTimeEntry(entryId: number, values: Partial<TimeEntry>) {
     await timesheetService.updateTimeEntry(entryId, values);
-    setEntries(entries.map(e => e.id === entryId ? { ...e, ...values } : e));
     await load();
   }
 
