@@ -231,7 +231,6 @@ export function TimeEntryTable({
                 )}
                 {showEmployee && employeesById && employeeOptions && (
                   <TableCell>
-                    {/* {displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''} */}
                     <SelectField
                       id={`employee-select-${entry.id}`} 
                       ariaLabel={`Employee select for entry ${entry.id}`}
@@ -274,7 +273,6 @@ export function TimeEntryTable({
                   <TableCell>
                     <EditDelete
                       isEditing={editing}
-                      disabled={editingEntry !== null && !editing}
                       submitting={submitting}
                       onEdit={() => handleStartEditing(entry)}
                       onCancelEdit={handleCancelEditing}

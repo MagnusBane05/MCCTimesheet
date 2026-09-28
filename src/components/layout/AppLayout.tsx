@@ -4,9 +4,7 @@ import { Button } from '../common/Button';
 import { Logo } from '../common/Logo';
 
 const ADMIN_NAV = [
-  { to: '/admin/by-employee', label: 'By Employee' },
-  { to: '/admin/by-job', label: 'By Job' },
-  // { to: '/admin/hours-summary', label: 'Hours Summary' },
+  { to: '/admin/timesheets', label: 'Timesheets' },
   { to: '/admin/projects', label: 'Projects' },
   { to: '/admin/employees', label: 'Employees' },
 ];

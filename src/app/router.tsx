@@ -1,12 +1,11 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
+import { TimesheetsListPage } from '../pages/admin/TimesheetsListPage';
 import { AppLayout } from '../components/layout/AppLayout';
 import { RequireRole } from '../auth/RequireRole';
 import { RequirePasswordChange } from '../auth/RequirePasswordChange';
 import { LoginPage } from '../pages/LoginPage';
 import { SetNewPasswordPage } from '../pages/auth/SetNewPasswordPage';
 import { TimesheetPage } from '../pages/TimesheetPage';
-import { ByEmployeePage } from '../pages/admin/ByEmployeePage';
-import { ByJobPage } from '../pages/admin/ByJobPage';
 import { HoursSummaryPage } from '../pages/admin/HoursSummaryPage';
 import { ProjectsPage } from '../pages/admin/ProjectsPage';
 import { EmployeesPage } from '../pages/admin/EmployeesPage';
@@ -34,8 +33,7 @@ export const router = createBrowserRouter([
         path: '/admin',
         element: <RequireRole allowedRoles={['VIEWER', 'ADMIN']} />,
         children: [
-          { path: 'by-employee', element: <ByEmployeePage /> },
-          { path: 'by-job', element: <ByJobPage /> },
+          { path: 'timesheets', element: <TimesheetsListPage /> },
           { path: 'hours-summary', element: <HoursSummaryPage /> },
           { path: 'projects', element: <ProjectsPage /> },
           { path: 'employees', element: <EmployeesPage /> },

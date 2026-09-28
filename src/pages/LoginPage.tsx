@@ -16,7 +16,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (!currentUser) return;
-    navigate(currentUser.role === 'EMPLOYEE' ? '/timesheets' : '/admin/by-employee', { replace: true });
+    navigate(currentUser.role === 'EMPLOYEE' ? '/timesheets' : '/admin/timesheets', { replace: true });
   }, [currentUser, navigate]);
 
   async function handleSubmit(event: FormEvent) {

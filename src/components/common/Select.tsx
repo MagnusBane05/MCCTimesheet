@@ -18,6 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         ref={ref}
         className={`
           border border-lakehouse-900/20 bg-white disabled:bg-midnight-950/10
+          text-midnight-950
           focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500 
           cursor-pointer
           ${variant === 'inline' ? 'px-2 py-1 rounded text-sm ' : 

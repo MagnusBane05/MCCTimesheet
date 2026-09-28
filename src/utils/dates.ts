@@ -13,6 +13,30 @@ export function formatDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+const SHORT_DATE_FORMAT = new Intl.DateTimeFormat('en-CA', { day: 'numeric', month: 'long' });
+
+/** Formats a "YYYY-MM-DD" work date for display, e.g. "August 11" — used to label a time entry by day. */
+export function formatShortDateLabel(date: Date): string {
+  return SHORT_DATE_FORMAT.format(date);
+}
+
+const DATE_LABEL_FORMAT = new Intl.DateTimeFormat('en-CA', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+const DATE_LABEL_FORMAT_WITHOUT_YEAR = new Intl.DateTimeFormat('en-CA', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+}); 
+
+export function formatLongDateLabel(date: Date, includeYear: boolean = true): string {
+  return includeYear ? DATE_LABEL_FORMAT.format(date) : DATE_LABEL_FORMAT_WITHOUT_YEAR.format(date);
+}
+
 export function parseDate(dateStr: string): Date {
   const [year, month, day] = dateStr.split('-').map(Number);
   return new Date(year, month - 1, day);
@@ -34,11 +58,31 @@ export function addWeeks(date: Date, weeks: number): Date {
   return addDays(date, weeks * 7);
 }
 
+export function addMonths(date: Date, months: number): Date {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
+
+export function getDaysInMonth(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+}
+
+/** JavaScript's getDay() returns 0 for Sunday ... 6 for Saturday. This function converts it to Monday = 0 ... Sunday = 6. */
+function jsFirstDayToCompanyFirstDay(jsDay: number): number {
+  return (jsDay + 6) % 7;
+}
+
+/** First day of the month containing `date`, where Monday = 0 and Sunday = 6. */
+export function getFirstDayOfMonth(date: Date): number {
+  const first = new Date(date.getFullYear(), date.getMonth(), 1);
+  return jsFirstDayToCompanyFirstDay(first.getDay());
+}
+
 /** Monday 00:00 of the week containing `date`. */
 export function getWeekStart(date: Date): Date {
   const start = startOfDay(date);
-  // getDay(): 0 = Sunday ... 6 = Saturday. Convert so Monday = 0.
-  const dayIndex = (start.getDay() + 6) % 7;
+  const dayIndex = jsFirstDayToCompanyFirstDay(start.getDay());
   return addDays(start, -dayIndex);
 }
 
@@ -62,22 +106,6 @@ export function daysBetween(a: Date, b: Date): number {
   return Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / DAY_MS);
 }
 
-// Locale is pinned (not `undefined`) so the display format doesn't shift with the host's default locale.
-const SHORT_DATE_FORMAT = new Intl.DateTimeFormat('en-CA', { day: 'numeric', month: 'long' });
-
-/** Formats a "YYYY-MM-DD" work date for display, e.g. "August 11" — used to label a time entry by day. */
-export function formatShortDateLabel(date: Date): string {
-  return SHORT_DATE_FORMAT.format(date);
-}
-
-// Locale is pinned (not `undefined`) so the display format doesn't shift with the host's default locale.
-const DATE_LABEL_FORMAT = new Intl.DateTimeFormat('en-CA', {
-  weekday: 'long',
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric',
-});
-
-export function formatLongDateLabel(date: Date): string {
-  return DATE_LABEL_FORMAT.format(date);
+export function areSameDay(a: Date, b: Date): boolean {
+  return startOfDay(a).getTime() === startOfDay(b).getTime();
 }

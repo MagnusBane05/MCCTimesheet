@@ -3,15 +3,7 @@ import { formatDate, formatLongDateLabel, addDays } from '../../utils/dates';
 import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-
-function CalendarIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M8 3v4M16 3v4M3 10h18" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+import { CalendarIcon } from "@heroicons/react/24/outline";
 
 export function DayNav({
   date,
@@ -56,7 +48,7 @@ export function DayNav({
           onClick={openDatePicker}
           className="rounded-lg p-1.5 text-lakehouse-900/70 hover:bg-cedar-100 hover:text-midnight-950"
         >
-          <CalendarIcon />
+          <CalendarIcon className="h-5 w-5 text-midnight-950" />
         </button>
         <input
           ref={dateInputRef}
