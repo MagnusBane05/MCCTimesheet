@@ -67,16 +67,16 @@ export function SetNewPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-birch-50 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
         <Title>Set Your Password</Title>
-        <p className="text-gray-600 mb-6">
+        <p className="text-lakehouse-900/60 mb-6">
           You've been assigned a temporary password. Please create a new password to continue.
         </p>
 
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="new-password" className="block text-sm font-medium text-midnight-950 mb-1">
               New Password
             </label>
             <TextField
@@ -91,11 +91,11 @@ export function SetNewPasswordPage() {
               className="w-full py-2 px-3"
               placeholder="Enter new password"
             />
-            <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+            <p className="mt-1 text-xs text-lakehouse-900/60">Minimum 8 characters</p>
           </div>
 
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-midnight-950 mb-1">
               Confirm Password
             </label>
             <TextField
@@ -124,8 +124,8 @@ export function SetNewPasswordPage() {
 
         {error && <ErrorMessage message={error} />}
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-600 mb-3">
+        <div className="mt-6 pt-6 border-t border-lakehouse-900/20">
+          <p className="text-xs text-lakehouse-900/60 mb-3">
             Or log out and try again later.
           </p>
           <Button
