@@ -231,8 +231,8 @@ export function TimeEntryTable({
                 )}
                 {showEmployee && employeesById && employeeOptions && (
                   <TableCell>
-                    {displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''}
-                    {/* <SelectField
+                    {/* {displayedEntry.employeeId ? employeesById.get(displayedEntry.employeeId)?.displayName ?? 'Unknown employee' : ''} */}
+                    <SelectField
                       id={`employee-select-${entry.id}`} 
                       ariaLabel={`Employee select for entry ${entry.id}`}
                       value={displayedEntry.employeeId ?? -1}
@@ -245,7 +245,7 @@ export function TimeEntryTable({
                             {employee.displayName}
                           </option>
                         ))}
-                    </SelectField> */}
+                    </SelectField>
                   </TableCell>
                 )}
                 {showInvoice && (

@@ -301,6 +301,15 @@ class TimeEntryAPITestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_entry_employee_cannot_steal_entry(self) -> None:
+        """Employees cannot update entries that do not belong to them by changing the employee field."""
+        self.client.force_authenticate(user=self.employee_bob)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/time-entries/{self.entry1.id}/',  # type: ignore[attr-defined]
+            {'employee': self.employee_bob.id},  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_entry_employee_own(self) -> None:
         """Employees can delete their own entries."""
         self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]

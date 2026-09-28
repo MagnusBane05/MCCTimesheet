@@ -178,6 +178,7 @@ export class ApiTimesheetService implements TimesheetService {
         end_time: input.endTime,
         work_description: input.workDescription,
         invoice_number: input.invoiceNumber,
+        employee: input.employeeId,
       },
     });
     return timeEntryFromApi(entry);

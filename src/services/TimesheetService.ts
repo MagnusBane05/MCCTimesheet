@@ -18,7 +18,7 @@ export interface NewTimeEntryInput {
   invoiceNumber?: string | null;
 }
 
-export type UpdateTimeEntryInput = Partial<Omit<NewTimeEntryInput, 'employeeId'>>;
+export type UpdateTimeEntryInput = Partial<NewTimeEntryInput>;
 
 export interface NewProjectInput {
   customer: string;
