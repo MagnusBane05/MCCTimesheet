@@ -154,7 +154,7 @@ export function TimeEntryTable({
             {showEmployee && <TableHeader>Employee</TableHeader>}
             {showInvoice && <TableHeader>Invoice</TableHeader>}
             <TableHeader>Description</TableHeader>
-            {canEdit && <TableHeader />}
+            {canEdit && <TableHeader>Actions</TableHeader>}
           </tr>
         </thead>
         <tbody>

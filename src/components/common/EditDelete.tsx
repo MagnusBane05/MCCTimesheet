@@ -1,4 +1,4 @@
-import { CheckIcon, PencilIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, PencilIcon, PencilSquareIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { IconButton } from "./IconButton";
 
 interface EditDeleteProps {
@@ -42,7 +42,7 @@ export function EditDelete({
       ) : (
         <>
           <IconButton 
-            icon={PencilIcon} 
+            icon={PencilSquareIcon} 
             onClick={onEdit} 
             disabled={disabled}
             className='p-1 hover:bg-midnight-950/10 hover:rounded'

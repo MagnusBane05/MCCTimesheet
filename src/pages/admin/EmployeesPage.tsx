@@ -20,6 +20,7 @@ import { TextField } from "../../components/form/TextField";
 import { SelectField } from "../../components/form/SelectField";
 import { validateEmployee } from "../../utils/validation";
 import { Title } from "../../components/common/Title";
+import { PlusIcon } from "@heroicons/react/24/solid";
 
 type ModalState = 'create' | 'creation-success' | 'reset-success' | null;
 
@@ -175,7 +176,9 @@ export function EmployeesPage() {
           <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
         </div>
         <div>
-          <Button variant="primary" onClick={() => setModalState('create')}>Create Employee</Button>
+          <Button variant="primary" onClick={() => setModalState('create')}>
+            <PlusIcon className="h-4 w-4" /> Create Employee
+          </Button>
         </div>
       </div>
 

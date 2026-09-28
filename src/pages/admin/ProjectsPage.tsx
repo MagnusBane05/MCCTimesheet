@@ -16,6 +16,7 @@ import { SelectField } from "../../components/form/SelectField";
 import { TextField } from "../../components/form/TextField";
 import { Badge } from "../../components/common/Badge";
 import { Title } from "../../components/common/Title";
+import { PlusIcon } from "@heroicons/react/24/solid";
 
 export function ProjectsPage() {
   const { currentUser } = useAuth();
@@ -115,7 +116,9 @@ export function ProjectsPage() {
           <option value="name">Name</option>
           <option value="prjNumber">PRJ #</option>
         </SelectField>
-        <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>Create Project</Button>
+        <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>
+          <PlusIcon className="h-4 w-4" /> Create Project 
+        </Button>
       </div>
 
       {loading && <LoadingState label="Loading projects..." />}
@@ -131,7 +134,7 @@ export function ProjectsPage() {
                 <TableHeader>PRJ #</TableHeader>
                 <TableHeader>Active</TableHeader>
                 <TableHeader>Production Status</TableHeader>
-                {isAdmin && <TableHeader/>}
+                {isAdmin && <TableHeader>Actions</TableHeader>}
               </tr>
             </thead>
             <tbody>
