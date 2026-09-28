@@ -29,6 +29,10 @@ export const PRODUCTION_STATUSES: ProductionStatus[] = [
   'COMPLETE',
 ];
 
+export function sortProjectStatuses(a: ProductionStatus, b: ProductionStatus): number {
+  return PRODUCTION_STATUSES.indexOf(a) - PRODUCTION_STATUSES.indexOf(b);
+}
+
 export interface Project {
   id: number;
   customer: string;

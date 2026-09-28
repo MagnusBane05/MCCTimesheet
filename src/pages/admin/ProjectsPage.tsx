@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { PRODUCTION_STATUS_COLOURS, PRODUCTION_STATUS_LABELS, PRODUCTION_STATUSES, ProductionStatus, Project } from "../../domain/project";
+import { PRODUCTION_STATUS_COLOURS, PRODUCTION_STATUS_LABELS, PRODUCTION_STATUSES, ProductionStatus, Project, sortProjectStatuses } from "../../domain/project";
 import { timesheetService } from "../../services/service";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -18,6 +18,8 @@ import { Badge } from "../../components/common/Badge";
 import { Title } from "../../components/common/Title";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
+type SortOption = 'customer' | 'name' | 'prjNumber' | 'productionStatus';
+
 export function ProjectsPage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
@@ -28,7 +30,7 @@ export function ProjectsPage() {
   const [ _, setSaveError ] = useState(false);
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
   const [ isCreateModalOpen, setIsCreateModalOpen ] = useState(false);
-  const [ sort, setSort ] = useState<'customer' | 'name' | 'prjNumber'>('customer');
+  const [ sort, setSort ] = useState<SortOption>('customer');
   const [ hasAttemptedSubmit, setHasAttemptedSubmit ] = useState(false);
 
   const load = useCallback(async () => {
@@ -93,6 +95,7 @@ export function ProjectsPage() {
     if (sort === 'customer') return a.customer.localeCompare(b.customer);
     if (sort === 'name') return a.name.localeCompare(b.name);
     if (sort === 'prjNumber') return a.projectNumber.localeCompare(b.projectNumber);
+    if (sort === 'productionStatus') return sortProjectStatuses(a.productionStatus, b.productionStatus);
     return 0;
   });
   
@@ -110,11 +113,12 @@ export function ProjectsPage() {
           ariaLabel="Sort by"
           label="Sort by" value={sort} 
           labelVariant="small"
-          onChange={(e) => { setSort(e.target.value as 'customer' | 'name' | 'prjNumber'); }}
+          onChange={(e) => { setSort(e.target.value as SortOption); }}
           pt={{ container: "mb-4" }} >
           <option value="customer">Customer</option>
           <option value="name">Name</option>
           <option value="prjNumber">PRJ #</option>
+          <option value="productionStatus">Production status</option>
         </SelectField>
         {isAdmin && (
           <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>
