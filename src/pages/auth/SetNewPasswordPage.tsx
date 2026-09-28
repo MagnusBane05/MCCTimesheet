@@ -91,7 +91,11 @@ export function SetNewPasswordPage() {
               className="w-full py-2 px-3"
               placeholder="Enter new password"
             />
-            <p className="mt-1 text-xs text-lakehouse-900/60">Minimum 8 characters</p>
+            <ul className="list-disc list-inside">
+              <li className="mt-1 text-xs text-lakehouse-900/60">Minimum 8 characters</li>
+              <li className="mt-1 text-xs text-lakehouse-900/60">Not too common or easily guessable</li>
+              <li className="mt-1 text-xs text-lakehouse-900/60">Not similar to username</li>
+            </ul>
           </div>
 
           <div>
