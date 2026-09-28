@@ -14,6 +14,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { LoadingState } from '../components/common/LoadingState';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
+import { Counter } from '../components/common/Counter';
 
 const TODAY = new Date();
 
@@ -86,26 +87,20 @@ export function TimesheetPage() {
     await load();
   }
 
+  function handleDateChange(newDate: Date) {
+    setSelectedDate(newDate);
+    setFormState({ mode: 'add' });
+  }
+
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-4">
       <DayNav
         date={selectedDate}
         today={TODAY}
-        onPrevious={() => setSelectedDate((current) => addDays(current, -1))}
-        onNext={() => setSelectedDate((current) => addDays(current, 1))}
-        onDateChange={(newDate) => setSelectedDate(parseDate(newDate))}
+        onPrevious={() => handleDateChange(addDays(selectedDate, -1))}
+        onNext={() => handleDateChange(addDays(selectedDate, 1))}
+        onDateChange={(newDate) => handleDateChange(parseDate(newDate))}
       />
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-white p-3 text-center shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">Daily total</p>
-          <p className="mt-1 text-lg font-semibold text-midnight-950">{formatHours(dailyTotal)}</p>
-        </div>
-        <div className="rounded-xl bg-white p-3 text-center shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-lakehouse-900/60">Weekly total</p>
-          <p className="mt-1 text-lg font-semibold text-midnight-950">{formatHours(weeklyTotal)}</p>
-        </div>
-      </div>
 
       {loading && <LoadingState label="Loading time entries…" />}
       {!loading && error && <ErrorState message="Unable to load time entries. Please try again." onRetry={load} />}
@@ -124,6 +119,11 @@ export function TimesheetPage() {
               onSubmit={handleFormSubmit}
             />
           }
+
+          <div className="grid grid-cols-2 gap-3">
+            <Counter title='Daily total' number={formatHours(dailyTotal)} />
+            <Counter title='Weekly total' number={formatHours(weeklyTotal)} />
+          </div>
 
           <div className="flex flex-col gap-3">
             {dayEntries.length === 0 && formState.mode === 'add' && <EmptyState message="No entries for this day." />}

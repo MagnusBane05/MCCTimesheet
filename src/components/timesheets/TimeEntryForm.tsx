@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo, useState, type FormEvent } from 'react';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
-import { formatDate, formatShortDateLabel, parseDate } from '../../utils/dates';
+import { formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
@@ -31,7 +31,6 @@ export function TimeEntryForm({
   existingEntry,
   otherEntries,
   enforceEditWindow = true,
-  dateEditable = false,
   hideHeading = false,
   onCancel,
   onSubmit,
@@ -43,8 +42,6 @@ export function TimeEntryForm({
   /** This employee's other entries — used to compute overlap and the daily total preview. */
   otherEntries: TimeEntry[];
   enforceEditWindow?: boolean;
-  /** Admin contexts (report pages) allow correcting the date itself; the employee day-nav flow never sets this. */
-  dateEditable?: boolean;
   /** Suppress the form's own heading when a wrapping Modal already shows a title. */
   hideHeading?: boolean;
   onCancel(): void;
@@ -54,15 +51,12 @@ export function TimeEntryForm({
   const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '');
   const [projectId, setProjectId] = useState<number | null>(existingEntry?.projectId ?? null);
   const [workDescription, setWorkDescription] = useState(existingEntry?.workDescription ?? '');
-  const [internalWorkDate, setInternalWorkDate] = useState(existingEntry?.workDate ?? workDate);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [customer, setCustomer] = useState(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
 
-  // When dateEditable is false (the employee day-nav flow), always read the prop directly so
-  // changing the selected day is reflected immediately with no stale internal state.
-  const effectiveWorkDate = dateEditable ? internalWorkDate : workDate;
+  const effectiveWorkDate = workDate;
 
   const activeProjects = useMemo(() => {
     return projects.filter((project) => project.active);
@@ -111,7 +105,6 @@ export function TimeEntryForm({
     setCustomer(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
     setProjectId(existingEntry?.projectId ?? null);
     setWorkDescription(existingEntry?.workDescription ?? '');
-    setInternalWorkDate(existingEntry?.workDate ?? workDate);
     setHasAttemptedSubmit(false);
     setSubmitError(null);
     onCancel();
@@ -133,140 +126,126 @@ export function TimeEntryForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl bg-white p-4 shadow-sm" noValidate>
+    <div>
       {!hideHeading && (
-        <h2 className="text-base font-semibold text-midnight-950">
-          {existingEntry ? 'Edit' : 'New'} entry
-          {!dateEditable && ` for ${formatShortDateLabel(parseDate(effectiveWorkDate))}`}
+        <h2 className="text-center text-base font-semibold text-white bg-lakehouse-900 p-2 rounded-t-xl">
+          {existingEntry ? 'Edit' : 'New'} entry for {formatShortDateLabel(parseDate(effectiveWorkDate))}
         </h2>
       )}
 
-      {dateEditable && (
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-b-xl bg-white p-4 shadow-sm " noValidate >
+
+        {visibleErrors.workDate && (
+          <p role="alert" className="text-sm text-red-700">
+            {visibleErrors.workDate}
+          </p>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <TimeField
+              id="entry-start"
+              ariaLabel="Start time"
+              value={startTime}
+              today={today}
+              onChange={setStartTime}
+              minuteStep={MINUTE_INCREMENT}
+              label="Start time"
+              error={visibleErrors.startTime}
+            />
+          </div>
+          <div>
+            <TimeField
+              id="entry-end"
+              ariaLabel="End time"
+              value={endTime}
+              today={today}
+              onChange={setEndTime}
+              minuteStep={MINUTE_INCREMENT}
+              label="End time"
+              error={visibleErrors.endTime}
+            />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-3">
+          <div>
+            <SelectField
+              id="entry-customer"
+              ariaLabel="Customer"
+              value={customer}
+              variant="large"
+              label="Customer"
+              onChange={handleCustomerChange}
+              className="mt-1 w-full"
+            >
+              <option value="">Select a customer…</option>
+              {customerOptions.map((customer) => (
+                <option key={customer} value={customer}>
+                  {customer}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+
+          <div>
+            <SelectField
+              id="entry-project"
+              ariaLabel="Project"
+              value={projectId ?? ''}
+              variant="large"
+              label="Project"
+              error={visibleErrors.projectId}
+              className="mt-1 w-full"
+              disabled={projectOptions.length <= 1}
+              onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
+            >
+              {projectOptions.length === 0 && <option value="">Select a customer first</option>}
+              {projectOptions.length > 1 && <option value="">Select a project…</option>}
+              {projectOptions.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.projectNumber ? `(${project.projectNumber}) ` : ''}{getProjectDisplayName(project)}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+        </div>
+
         <div>
-          <label htmlFor="entry-date" className="block text-sm font-medium text-lakehouse-900">
-            Date
-          </label>
-          <input
-            id="entry-date"
-            type="date"
-            value={effectiveWorkDate}
-            max={formatDate(today)}
-            onChange={(event) => setInternalWorkDate(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500"
+          <TextAreaField
+            id="entry-description"
+            ariaLabel="Work description"
+            value={workDescription}
+            onChange={(event) => setWorkDescription(event.target.value)}
+            label="Work description"
+            error={visibleErrors.workDescription}
           />
         </div>
-      )}
 
-      {visibleErrors.workDate && (
-        <p role="alert" className="text-sm text-red-700">
-          {visibleErrors.workDate}
-        </p>
-      )}
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <TimeField
-            id="entry-start"
-            ariaLabel="Start time"
-            value={startTime}
-            today={today}
-            onChange={setStartTime}
-            minuteStep={MINUTE_INCREMENT}
-            label="Start time"
-            error={visibleErrors.startTime}
-          />
+        <div className="flex justify-between rounded-lg bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
+          <span>Duration of this entry</span>
+          <span className="font-semibold">{formatHours(thisDuration)}</span>
         </div>
-        <div>
-          <TimeField
-            id="entry-end"
-            ariaLabel="End time"
-            value={endTime}
-            today={today}
-            onChange={setEndTime}
-            minuteStep={MINUTE_INCREMENT}
-            label="End time"
-            error={visibleErrors.endTime}
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-3">
-        <div>
-          <SelectField
-            id="entry-customer"
-            ariaLabel="Customer"
-            value={customer}
-            variant="large"
-            label="Customer"
-            onChange={handleCustomerChange}
-            className="mt-1 w-full"
-          >
-            <option value="">Select a customer…</option>
-            {customerOptions.map((customer) => (
-              <option key={customer} value={customer}>
-                {customer}
-              </option>
-            ))}
-          </SelectField>
+        <div className="flex justify-between rounded-lg bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
+          <span>Daily total after this entry</span>
+          <span className="font-semibold">{formatHours(otherDailyTotal + thisDuration)}</span>
         </div>
 
-        <div>
-          <SelectField
-            id="entry-project"
-            ariaLabel="Project"
-            value={projectId ?? ''}
-            variant="large"
-            label="Project"
-            error={visibleErrors.projectId}
-            className="mt-1 w-full"
-            disabled={projectOptions.length <= 1}
-            onChange={(event) => setProjectId(event.target.value ? Number(event.target.value) : null)}
-          >
-            {projectOptions.length === 0 && <option value="">Select a customer first</option>}
-            {projectOptions.length > 1 && <option value="">Select a project…</option>}
-            {projectOptions.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.projectNumber ? `(${project.projectNumber}) ` : ''}{getProjectDisplayName(project)}
-              </option>
-            ))}
-          </SelectField>
+        {submitError && (
+          <p role="alert" className="text-sm text-red-700">
+            {submitError}
+          </p>
+        )}
+
+        <div className="flex justify-end gap-3">
+          <Button type="button" variant="secondary" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={submitting}>
+            {existingEntry ? (submitting ? 'Saving…' : 'Save changes') : (submitting ? 'Adding…' : 'Add entry')}
+          </Button>
         </div>
-      </div>
-
-      <div>
-        <TextAreaField
-          id="entry-description"
-          ariaLabel="Work description"
-          value={workDescription}
-          onChange={(event) => setWorkDescription(event.target.value)}
-          label="Work description"
-          error={visibleErrors.workDescription}
-        />
-      </div>
-
-      <div className="flex justify-between rounded-lg bg-midnight-950/5 px-3 py-2 text-sm text-lakehouse-900/80">
-        <span>Duration of this entry</span>
-        <span className="font-semibold">{formatHours(thisDuration)}</span>
-      </div>
-      <div className="flex justify-between rounded-lg bg-midnight-950/5 px-3 py-2 text-sm text-lakehouse-900/80">
-        <span>Daily total after this entry</span>
-        <span className="font-semibold">{formatHours(otherDailyTotal + thisDuration)}</span>
-      </div>
-
-      {submitError && (
-        <p role="alert" className="text-sm text-red-700">
-          {submitError}
-        </p>
-      )}
-
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={submitting}>
-          {existingEntry ? (submitting ? 'Saving…' : 'Save changes') : (submitting ? 'Adding…' : 'Add entry')}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

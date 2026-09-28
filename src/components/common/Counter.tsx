@@ -12,14 +12,14 @@ const VARIANT_NUMBER_CLASSES: Record<Variant, string> = {
 
 interface CounterProps {
   title: string;
-  number: number;
+  number: number | string;
   variant?: Variant;
 }
 
 export function Counter({title, number, variant = 'primary'}: CounterProps) {
   return (
     <div className={`flex flex-col items-center border rounded-lg p-2 shadow-sm ${VARIANT_CLASSES[variant]}`}>
-      <p className='text-xs font-medium text-lakehouse-900/60'>{title}</p>
+      <p className='text-xs font-medium uppercase text-lakehouse-900/60'>{title}</p>
       <p className={`font-bold text-lg ${VARIANT_NUMBER_CLASSES[variant]}`}>{number}</p>
     </div>
   );

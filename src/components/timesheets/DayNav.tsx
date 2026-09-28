@@ -4,6 +4,7 @@ import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { CalendarIcon } from "@heroicons/react/24/outline";
+import { Title } from '../common/Title';
 
 export function DayNav({
   date,
@@ -41,15 +42,16 @@ export function DayNav({
         <ChevronLeftIcon className="h-4 w-4" />
       </Button>
       <div className="relative flex flex-1 items-center justify-center gap-1.5">
-        <span className="text-base font-semibold text-midnight-950">{formatLongDateLabel(date)}</span>
-        <button
+        <h2 className="text-base font-semibold text-midnight-950">{formatLongDateLabel(date)}</h2>
+        <Button
           type="button"
           aria-label="Choose date"
           onClick={openDatePicker}
-          className="rounded-lg p-1.5 text-lakehouse-900/70 hover:bg-cedar-100 hover:text-midnight-950"
+          variant="ghost"
+          className="!px-2 !py-2"
         >
           <CalendarIcon className="h-5 w-5 text-midnight-950" />
-        </button>
+        </Button>
         <input
           ref={dateInputRef}
           type="date"
