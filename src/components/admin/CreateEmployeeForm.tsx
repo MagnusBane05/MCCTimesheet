@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { validateEmployee } from "../../utils/validation";
 import { Button } from "../common/Button";
 import { Error } from "../common/Error";
 import { NewEmployeeInput } from "../../services/TimesheetService";
@@ -10,17 +11,6 @@ export interface CreateEmployeeFormProps {
     onCreateEmployee: (employee: NewEmployeeInput) => void;
 }
 
-function validateEmployeeForm(data: { username: string; displayName: string; role: UserRole }) {
-    const errors: Partial<Record<keyof typeof data, string>> = {};
-    if (!data.username?.trim()) {
-        errors.username = "Username is required";
-    }
-    if (!data.displayName?.trim()) {
-        errors.displayName = "Display name is required";
-    }
-    return errors;
-}
-
 export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps) {
     const [username, setUsername] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -29,7 +19,7 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
-    const errors = validateEmployeeForm({ username, displayName, role });
+    const errors = validateEmployee({ username, displayName, role });
     const visibleErrors = hasAttemptedSubmit ? errors : {};
 
     async function handleSubmit(event: FormEvent) {

@@ -18,6 +18,7 @@ import { ResetPasswordSuccess } from "../../components/admin/ResetPasswordSucces
 import { NewEmployeeInput } from "../../services/TimesheetService";
 import { TextField } from "../../components/form/TextField";
 import { SelectField } from "../../components/form/SelectField";
+import { validateEmployee } from "../../utils/validation";
 
 type ModalState = 'create' | 'creation-success' | 'reset-success' | null;
 
@@ -40,6 +41,7 @@ export function EmployeesPage() {
   const [creationResult, setCreationResult] = useState<EmployeeCreationResult | null>(null);
   const [resetResult, setResetResult] = useState<{ username: string; temporaryPassword: string } | null>(null);
   const [resetConfirmation, setResetConfirmation] = useState<ResetConfirmation | null>(null);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,9 +67,14 @@ export function EmployeesPage() {
     updateField,
     isEditing
   } = useRowEditor<User>();
+  
+  const errors = editingItem ? validateEmployee(editingItem) : {};
+  const visibleErrors = hasAttemptedSubmit ? errors : {};
 
   async function handleSave() {
     if (!editingItem) return;
+    setHasAttemptedSubmit(true);
+    if (Object.keys(errors).length > 0) return;
     try {
       await timesheetService.updateEmployee(editingItem.id, editingItem);
       cancelEditing();
@@ -75,12 +82,15 @@ export function EmployeesPage() {
     } catch (e) {
       console.error("Failed to update employee:", e);
       setSaveError("Failed to update employee. Please try again.");
+    } finally {
+      setHasAttemptedSubmit(false);
     }
   }
 
   function handleCancelEditing() {
     cancelEditing();
     setSaveError(null);
+    setHasAttemptedSubmit(false);
   }
 
   async function handleCreateEmployee(employeeInput: NewEmployeeInput) {
@@ -238,6 +248,7 @@ export function EmployeesPage() {
                       id={`username-${employee.id}`}
                       ariaLabel="Username"
                       value={displayedEntry.username}
+                      error={editing ? visibleErrors.username : undefined}
                       readOnly={!editing}
                       variant="inline"
                       onChange={(e) => updateField('username', e.target.value)}
@@ -248,6 +259,7 @@ export function EmployeesPage() {
                       id={`displayName-${employee.id}`}
                       ariaLabel="Display Name"
                       value={displayedEntry.displayName}
+                      error={editing ? visibleErrors.displayName : undefined}
                       readOnly={!editing}
                       variant="inline"
                       onChange={(e) => updateField('displayName', e.target.value)}

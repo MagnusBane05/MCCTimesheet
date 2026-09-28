@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry, canEmployeeViewDate, validateProject } from '../validation';
+import { doEntriesOverlap, canEmployeeModifyDate, validateTimeEntry, canEmployeeViewDate, validateProject, validateEmployee } from '../validation';
 import type { TimeEntry } from '../../domain/timeEntry';
+import { UserRole } from '../../domain/user';
 
 function entry(overrides: Partial<TimeEntry> = {}): TimeEntry {
   return {
@@ -152,4 +153,24 @@ describe('validateProject', () => {
     const errors = validateProject({ projectNumber: '', name: '', customer: '' });
     expect(errors.customer).toBeTruthy();
   });
+});
+
+describe('validateEmployee', () => {
+  const baseInput = {
+    username: 'johndoe',
+    displayName: 'John Doe',
+    role: 'EMPLOYEE' as UserRole,
+  };
+
+  it('passes for a valid employee', () => {
+    const errors = validateEmployee(baseInput);
+    expect(errors).toEqual({});
+  });
+
+  it('requires username and display name', () => {
+    const errors = validateEmployee({ username: '', displayName: '', role: '' as UserRole });
+    expect(errors.username).toBeTruthy();
+    expect(errors.displayName).toBeTruthy();
+  });
+
 });

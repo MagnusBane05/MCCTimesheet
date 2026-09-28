@@ -1,7 +1,7 @@
 import type { TimeEntry } from '../domain/timeEntry';
 import { getDurationHours, isValidTimeIncrement } from './time';
 import { getWeekStart, getWeekEnd, isFutureDate, startOfDay, parseDate } from './dates';
-import { NewProjectInput } from '../services/TimesheetService';
+import { NewEmployeeInput, NewProjectInput } from '../services/TimesheetService';
 
 export interface OverlapCandidate {
   workDate: string;
@@ -120,6 +120,21 @@ export function validateProject(input: NewProjectInput): ProjectValidationErrors
 
   if (!input.customer.trim()) {
     errors.customer = 'Customer is required.';
+  }
+
+  return errors;
+}
+
+export type EmployeeValidationErrors = Partial<Record<'username' | 'displayName', string>>;
+
+export function validateEmployee(input: NewEmployeeInput): EmployeeValidationErrors {
+  const errors: EmployeeValidationErrors = {};
+
+  if (!input.username?.trim()) {
+    errors.username = 'User name is required.';
+  }
+  if (!input.displayName?.trim()) {
+    errors.displayName = 'Display name is required.';
   }
 
   return errors;
