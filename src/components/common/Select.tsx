@@ -20,7 +20,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           border border-lakehouse-900/20 bg-white disabled:bg-midnight-950/10
           text-midnight-950
           focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500 
-          cursor-pointer
+          cursor-pointer disabled:cursor-default
           ${variant === 'inline' ? 'px-2 py-1 rounded text-sm ' : 
             variant === 'large' ? 'mt-1 rounded-lg px-3 py-2.5 text-base' : 
             'px-3 py-2 rounded-lg mt-1 text-sm '} ${className} ${selectClassName}`}
