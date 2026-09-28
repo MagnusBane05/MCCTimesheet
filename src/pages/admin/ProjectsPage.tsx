@@ -97,6 +97,7 @@ export function ProjectsPage() {
   
   return (
     <div>
+      <Title>Projects</Title>
       <div className="flex items-center justify-start gap-2 mb-4">
         <Button variant={filter === "active" ? "primary" : "secondary"} onClick={() => setFilter('active')}>Active</Button>
         <Button variant={filter === "inactive" ? "primary" : "secondary"} onClick={() => setFilter('inactive')}>Inactive</Button>

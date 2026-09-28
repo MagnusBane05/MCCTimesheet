@@ -6,6 +6,7 @@ import { Error as ErrorMessage } from '../../components/common/Error';
 import { LoadingState } from '../../components/common/LoadingState';
 import { timesheetService } from '../../services/service';
 import { TextField } from '../../components/form/TextField';
+import { Title } from '../../components/common/Title';
 
 export function SetNewPasswordPage() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export function SetNewPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-bold mb-2 text-midnight-950">Set Your Password</h1>
+        <Title>Set Your Password</Title>
         <p className="text-gray-600 mb-6">
           You've been assigned a temporary password. Please create a new password to continue.
         </p>

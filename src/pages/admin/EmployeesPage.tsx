@@ -19,6 +19,7 @@ import { NewEmployeeInput } from "../../services/TimesheetService";
 import { TextField } from "../../components/form/TextField";
 import { SelectField } from "../../components/form/SelectField";
 import { validateEmployee } from "../../utils/validation";
+import { Title } from "../../components/common/Title";
 
 type ModalState = 'create' | 'creation-success' | 'reset-success' | null;
 
@@ -166,6 +167,7 @@ export function EmployeesPage() {
 
   return (
     <div>
+      <Title>Employees</Title>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center justify-start gap-2">
           <Button variant={filter === "active" ? "primary" : "secondary"} onClick={() => setFilter('active')}>Active</Button>

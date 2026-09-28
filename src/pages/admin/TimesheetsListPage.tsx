@@ -18,6 +18,7 @@ import { TextField } from '../../components/form/TextField';
 import { Button } from '../../components/common/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { DateRangePicker } from '../../components/common/DateRangePicker';
+import { Title } from '../../components/common/Title';
 
 const TODAY = new Date();
 
@@ -169,13 +170,13 @@ export function TimesheetsListPage() {
         <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
           <ChevronLeftIcon className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-semibold text-midnight-950">
+        <Title className="mb-0">
           { areSameDay(fromDate, getWeekStart(fromDate))
             && areSameDay(toDate, getWeekEnd(fromDate)) ? 
           `Week of ${formatLongDateLabel(getWeekStart(fromDate))}` : 
           `${formatLongDateLabel(fromDate, includeYearInFromDate)} to ${formatLongDateLabel(toDate)}`
           }
-        </h1>
+        </Title>
         <DateRangePicker fromDate={fromDate} toDate={toDate} onRangeChange={handleWeekRangeChange} />
         <Button 
           variant="ghost"
