@@ -32,7 +32,7 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-midnight-950 px-4">
       <div className="w-full max-w-sm rounded-2xl bg-birch-50 p-8 shadow-xl">
         <div className="mb-6 flex justify-center">
-          <Logo className="h-16 w-auto" variant="secondary" />
+          <Logo className="h-20 w-auto" variant="secondary" />
         </div>
         <p className="text-center text-sm text-lakehouse-900/60">Sign in to continue. If you don't have an account, please contact your administrator.</p>
 

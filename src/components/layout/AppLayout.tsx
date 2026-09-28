@@ -19,7 +19,7 @@ export function AppLayout() {
     <div className="min-h-screen bg-cedar-50">
       <header className="bg-midnight-950 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Logo variant="secondary" />
+          <Logo variant="primary" />
           {currentUser && (
             <div className="flex items-center gap-3">
               <span className="hidden text-sm text-white/70 sm:inline">
