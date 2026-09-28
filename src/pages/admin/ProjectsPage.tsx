@@ -116,9 +116,11 @@ export function ProjectsPage() {
           <option value="name">Name</option>
           <option value="prjNumber">PRJ #</option>
         </SelectField>
-        <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>
-          <PlusIcon className="h-4 w-4" /> Create Project 
-        </Button>
+        {isAdmin && (
+          <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>
+            <PlusIcon className="h-4 w-4" /> Create Project 
+          </Button>
+        )}
       </div>
 
       {loading && <LoadingState label="Loading projects..." />}

@@ -175,11 +175,11 @@ export function EmployeesPage() {
           <Button variant={filter === "inactive" ? "primary" : "secondary"} onClick={() => setFilter('inactive')}>Inactive</Button>
           <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
         </div>
-        <div>
+        {isAdmin && 
           <Button variant="primary" onClick={() => setModalState('create')}>
             <PlusIcon className="h-4 w-4" /> Create Employee
           </Button>
-        </div>
+        }        
       </div>
 
       <ConfirmDialog

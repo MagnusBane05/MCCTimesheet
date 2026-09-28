@@ -1,4 +1,4 @@
-import { CheckIcon, PencilIcon, PencilSquareIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, PencilSquareIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { IconButton } from "./IconButton";
 
 interface EditDeleteProps {
