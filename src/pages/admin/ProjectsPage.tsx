@@ -15,6 +15,7 @@ import { validateProject } from "../../utils/validation";
 import { SelectField } from "../../components/form/SelectField";
 import { TextField } from "../../components/form/TextField";
 import { Badge } from "../../components/common/Badge";
+import { Title } from "../../components/common/Title";
 
 export function ProjectsPage() {
   const { currentUser } = useAuth();
@@ -96,27 +97,25 @@ export function ProjectsPage() {
   
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center justify-start gap-2">
-          <Button variant={filter === "active" ? "primary" : "secondary"} onClick={() => setFilter('active')}>Active</Button>
-          <Button variant={filter === "inactive" ? "primary" : "secondary"} onClick={() => setFilter('inactive')}>Inactive</Button>
-          <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
-        </div>
-        <div>
-          <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>Create Project</Button>
-        </div>
+      <div className="flex items-center justify-start gap-2 mb-4">
+        <Button variant={filter === "active" ? "primary" : "secondary"} onClick={() => setFilter('active')}>Active</Button>
+        <Button variant={filter === "inactive" ? "primary" : "secondary"} onClick={() => setFilter('inactive')}>Inactive</Button>
+        <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter('all')}>All</Button>
       </div>
-      <SelectField 
-        id="projects-sort" 
-        ariaLabel="Sort by"
-        label="Sort by" value={sort} 
-        labelVariant="small"
-        onChange={(e) => { setSort(e.target.value as 'customer' | 'name' | 'prjNumber'); }}
-        pt={{ container: "mb-4" }} >
-        <option value="customer">Customer</option>
-        <option value="name">Name</option>
-        <option value="prjNumber">PRJ #</option>
-      </SelectField>
+      <div className="flex items-center justify-between">
+        <SelectField 
+          id="projects-sort" 
+          ariaLabel="Sort by"
+          label="Sort by" value={sort} 
+          labelVariant="small"
+          onChange={(e) => { setSort(e.target.value as 'customer' | 'name' | 'prjNumber'); }}
+          pt={{ container: "mb-4" }} >
+          <option value="customer">Customer</option>
+          <option value="name">Name</option>
+          <option value="prjNumber">PRJ #</option>
+        </SelectField>
+        <Button variant="primary" onClick={() => { setIsCreateModalOpen(true); }}>Create Project</Button>
+      </div>
 
       {loading && <LoadingState label="Loading projects..." />}
       {!loading && error && <ErrorState message="Unable to load projects. Please try again." onRetry={load} />}
