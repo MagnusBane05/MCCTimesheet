@@ -4,7 +4,6 @@ import { canEmployeeViewDate } from '../../utils/validation';
 import { Button } from '../common/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { CalendarIcon } from "@heroicons/react/24/outline";
-import { Title } from '../common/Title';
 
 export function DayNav({
   date,

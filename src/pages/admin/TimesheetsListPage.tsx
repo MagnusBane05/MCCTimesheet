@@ -19,6 +19,7 @@ import { Button } from '../../components/common/Button';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { DateRangePicker } from '../../components/common/DateRangePicker';
 import { Title } from '../../components/common/Title';
+import { Counter } from '../../components/common/Counter';
 
 const TODAY = new Date();
 
@@ -79,6 +80,7 @@ export function TimesheetsListPage() {
   const employeesById = new Map(employees.map((employee) => [employee.id, employee]));
 
   const rangeEntries = entries.filter((entry) => parseDate(entry.workDate) >= fromDate && parseDate(entry.workDate) <= toDate);
+  const totalRangeHours = calculateWeeklyHours(rangeEntries);
 
   const searchTerm = search.trim().toLowerCase();
 
@@ -165,7 +167,6 @@ export function TimesheetsListPage() {
 
   return (
     <div className="flex flex-col gap-4">
-
       <div className="flex flex-wrap justify-center items-center gap-3 rounded-xl">
         <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
           <ChevronLeftIcon className="h-5 w-5" />
@@ -185,6 +186,11 @@ export function TimesheetsListPage() {
           className="!px-3">
           <ChevronRightIcon className="h-5 w-5" />
         </Button>
+      </div>
+
+      <div className="flex gap-3">
+        <Counter title="Total entries" number={rangeEntries.length} variant="secondary" />
+        <Counter title="Total hours" number={totalRangeHours} variant="primary" />
       </div>
 
       <div className='flex justify-between'>
