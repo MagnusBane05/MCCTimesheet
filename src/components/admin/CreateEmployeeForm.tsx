@@ -45,21 +45,25 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
     return (
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
-                <SelectField
-                    id="employee-role"
-                    ariaLabel="Role"
-                    label="Role"
-                    required
-                    value={role}
-                    pt={{container: "w-full"}}
-                    onChange={(e) => setRole(e.target.value as UserRole)}
-                >
-                    {USER_ROLES.map((option: UserRole) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
-                </SelectField>
+                <div className="flex flex-row">
+                    <SelectField
+                        id="employee-role"
+                        ariaLabel="Role"
+                        label="Role"
+                        required
+                        value={role}
+                        pt={{container: "w-full"}}
+                        className="w-full"
+                        onChange={(e) => setRole(e.target.value as UserRole)}
+                    >
+                        {USER_ROLES.map((option: UserRole) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </SelectField>
+                    <div className="flex-1 min-w-64"></div>
+                </div>
                 <div className="flex flex-row">
                     <div className="flex-1">
                         <TextField

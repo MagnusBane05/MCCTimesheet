@@ -34,7 +34,7 @@ export function LoginPage() {
         <div className="mb-6 flex justify-center">
           <Logo className="h-20 w-auto" variant="secondary" />
         </div>
-        <p className="text-center text-sm text-lakehouse-900/60">Sign in to continue. If you don't have an account, please contact your administrator.</p>
+        <p className="text-center text-sm text-lakehouse-900">Sign in to continue. If you don't have an account, please contact your administrator.</p>
 
         <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
           <div>

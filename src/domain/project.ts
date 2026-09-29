@@ -14,11 +14,11 @@ export const PRODUCTION_STATUS_LABELS: Record<ProductionStatus, string> = {
 };
 
 export const PRODUCTION_STATUS_COLOURS: Record<ProductionStatus, string> = {
-  ON_DECK: 'bg-gray-100 text-gray-700',
-  IN_PROGRESS: 'bg-yellow-100 text-yellow-700',
-  READY_FOR_FINISHING: 'bg-purple-100 text-purple-700',
-  READY_FOR_INSTALL: 'bg-blue-100 text-blue-700',
-  COMPLETE: 'bg-green-100 text-green-700',
+  ON_DECK: 'bg-lake-800/10 text-midnight-950',
+  IN_PROGRESS: 'bg-warning-100 text-midnight-950',
+  READY_FOR_FINISHING: 'bg-pine-400/40 text-midnight-950',
+  READY_FOR_INSTALL: 'bg-info-100 text-midnight-950',
+  COMPLETE: 'bg-success-100 text-midnight-950',
 };
 
 export const PRODUCTION_STATUSES: ProductionStatus[] = [

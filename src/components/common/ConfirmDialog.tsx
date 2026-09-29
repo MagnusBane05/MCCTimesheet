@@ -38,7 +38,7 @@ export function ConfirmDialog({
         if (event.key === 'Escape') onCancel();
       }}
     >
-      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
         <h2 id="confirm-dialog-title" className="text-lg font-semibold text-midnight-950">
           {title}
         </h2>

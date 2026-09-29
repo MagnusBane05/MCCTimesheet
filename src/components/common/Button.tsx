@@ -3,11 +3,11 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'inline';
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: 'rounded-lg px-4 py-2.5 bg-cedar-500 text-white enabled:hover:bg-pine-400 focus-visible:outline-cedar-500',
-  secondary: 'rounded-lg px-4 py-2.5 bg-white text-lakehouse-900 border border-lakehouse-900/20 enabled:hover:bg-birch-50 focus-visible:outline-lake-800',
-  danger: 'rounded-lg px-4 py-2.5 bg-red-600 text-white enabled:hover:bg-red-700 focus-visible:outline-red-800',
-  ghost: 'rounded-lg px-4 py-2.5 bg-transparent text-lakehouse-900 enabled:hover:bg-lakehouse-900/5 focus-visible:outline-lake-800',
-  inline: 'rounded-full bg-white text-lakehouse-900 border border-lakehouse-900/20 enabled:hover:bg-birch-50 focus-visible:outline-lake-800'
+  primary: 'rounded px-4 py-2.5 bg-pine-400 text-midnight-950 enabled:hover:bg-pine-400 focus-visible:outline-cedar-500',
+  secondary: 'rounded px-4 py-2.5 bg-white text-lakehouse-900 border border-lakehouse-900/20 enabled:hover:bg-birch-50 focus-visible:outline-lake-800',
+  danger: 'rounded px-4 py-2.5 bg-red-600 text-white enabled:hover:bg-red-700 focus-visible:outline-red-800',
+  ghost: 'rounded px-4 py-2.5 bg-transparent text-lakehouse-900 enabled:hover:bg-lakehouse-900/5 focus-visible:outline-lake-800',
+  inline: 'rounded bg-white text-lakehouse-900 border border-lakehouse-900/20 enabled:hover:bg-birch-50 focus-visible:outline-lake-800'
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

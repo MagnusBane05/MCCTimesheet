@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { formatTimeLabel, generateHourOptions, generateMinuteOptions, getHours, getMinutes } from '../../utils/time';
 
 const BUTTON_VARIANTS = {
-  default: 'mt-1 w-full rounded-lg border border-lakehouse-900/20 px-3 py-2.5 text-base ' + 
+  default: 'mt-1 w-full rounded border border-lakehouse-900/20 px-3 py-2.5 text-base ' + 
   'focus:border-cedar-500 focus:outline-none focus:ring-1 focus:ring-cedar-500',
   inline:
     'rounded border border-lakehouse-900/20 bg-white px-2 py-1.5 ' +
@@ -164,7 +164,7 @@ export function TimeSelect({ id, ariaLabel, value, timeVariant = '12', today, on
               left: pickerPosition.left,
               width: pickerPosition.width,
             }}
-            className="z-50 grid grid-cols-2 divide-x divide-lakehouse-900/10 rounded-lg 
+            className="z-50 grid grid-cols-2 divide-x divide-lakehouse-900/10 rounded
             border border-lakehouse-900/20 bg-white shadow-lg"
           >
             <div className="max-h-48 overflow-y-auto py-1">

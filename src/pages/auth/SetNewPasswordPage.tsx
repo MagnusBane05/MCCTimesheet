@@ -7,6 +7,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { timesheetService } from '../../services/service';
 import { TextField } from '../../components/form/TextField';
 import { Title } from '../../components/common/Title';
+import { Logo } from '../../components/common/Logo';
 
 export function SetNewPasswordPage() {
   const navigate = useNavigate();
@@ -68,80 +69,85 @@ export function SetNewPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-birch-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow p-8">
-        <Title>Set Your Password</Title>
-        <p className="text-lakehouse-900/60 mb-6">
-          You've been assigned a temporary password. Please create a new password to continue.
-        </p>
-
-        <form onSubmit={handleChangePassword} className="space-y-4">
-          <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-midnight-950 mb-1">
-              New Password
-            </label>
-            <TextField
-              id="new-password"
-              ariaLabel="New Password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              disabled={formLoading}
-              autoComplete="new-password"
-              required
-              className="w-full py-2 px-3"
-              placeholder="Enter new password"
-            />
-            <ul className="list-disc list-inside">
-              <li className="mt-1 text-xs text-lakehouse-900/60">Minimum 8 characters</li>
-              <li className="mt-1 text-xs text-lakehouse-900/60">Not too common or easily guessable</li>
-              <li className="mt-1 text-xs text-lakehouse-900/60">Not similar to username</li>
-            </ul>
-          </div>
-
-          <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-midnight-950 mb-1">
-              Confirm Password
-            </label>
-            <TextField
-              id="confirm-password"
-              ariaLabel="Confirm Password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={formLoading}
-              autoComplete="new-password"
-              required
-              className="w-full py-2 px-3"
-              placeholder="Confirm your password"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={formLoading}
-            className="w-full"
-          >
-            {formLoading ? 'Changing Password...' : 'Change Password'}
-          </Button>
-        </form>
-
-        {error && <ErrorMessage message={error} />}
-
-        <div className="mt-6 pt-6 border-t border-lakehouse-900/20">
-          <p className="text-xs text-lakehouse-900/60 mb-3">
-            Or log out and try again later.
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleLogout}
-            disabled={formLoading}
-            className="w-full"
-          >
-            Logout
-          </Button>
+      <div className="flex flex-col items-center">
+        <div className="mb-4 text-center">
+          <Logo variant="secondary" className="h-20" />
         </div>
+        <div className="w-full max-w-md bg-white rounded-md shadow p-8 pt-6">
+          <Title>Set Your Password</Title>
+          <p className="text-lakehouse-900 mb-6">
+            You've been assigned a temporary password. Please create a new password to continue.
+          </p>
+
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div>
+              <label htmlFor="new-password" className="block text-sm font-medium text-midnight-950 mb-1">
+                New Password
+              </label>
+              <TextField
+                id="new-password"
+                ariaLabel="New Password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={formLoading}
+                autoComplete="new-password"
+                required
+                className="w-full py-2 px-3"
+                placeholder="Enter new password"
+              />
+              <ul className="list-disc list-inside">
+                <li className="mt-1 text-xs text-lakehouse-900">Minimum 8 characters</li>
+                <li className="mt-1 text-xs text-lakehouse-900">Not too common or easily guessable</li>
+                <li className="mt-1 text-xs text-lakehouse-900">Not similar to username</li>
+              </ul>
+            </div>
+
+            <div>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-midnight-950 mb-1">
+                Confirm Password
+              </label>
+              <TextField
+                id="confirm-password"
+                ariaLabel="Confirm Password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={formLoading}
+                autoComplete="new-password"
+                required
+                className="w-full py-2 px-3"
+                placeholder="Confirm your password"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={formLoading}
+              className="w-full"
+            >
+              {formLoading ? 'Changing Password...' : 'Change Password'}
+            </Button>
+          </form>
+
+          {error && <ErrorMessage message={error} />}
+
+          <div className="mt-6 pt-6 border-t border-lakehouse-900/20">
+            <p className="text-xs text-lakehouse-900 mb-3">
+              Or log out and try again later.
+            </p>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleLogout}
+              disabled={formLoading}
+              className="w-full"
+            >
+              Logout
+            </Button>
+          </div>
+        </div>        
       </div>
     </div>
   );

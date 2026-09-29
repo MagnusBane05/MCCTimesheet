@@ -25,7 +25,7 @@ export function HoursGroupCard({
   children: ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+    <div className="overflow-hidden rounded-md bg-white shadow-sm">
       <button
         type="button"
         onClick={onToggle}

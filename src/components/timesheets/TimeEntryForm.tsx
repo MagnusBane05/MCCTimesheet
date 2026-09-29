@@ -128,12 +128,12 @@ export function TimeEntryForm({
   return (
     <div>
       {!hideHeading && (
-        <h2 className="text-center text-base font-semibold text-white bg-lakehouse-900 p-2 rounded-t-xl">
+        <h2 className="text-center text-base font-semibold text-white bg-lakehouse-900 p-2 rounded-t-md">
           {existingEntry ? 'Edit' : 'New'} entry for {formatShortDateLabel(parseDate(effectiveWorkDate))}
         </h2>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-b-xl bg-white p-4 shadow-sm " noValidate >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-b-md bg-white p-4 shadow-sm " noValidate >
 
         {visibleErrors.workDate && (
           <p role="alert" className="text-sm text-red-700">
@@ -222,11 +222,11 @@ export function TimeEntryForm({
           />
         </div>
 
-        <div className="flex justify-between rounded-lg bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
+        <div className="flex justify-between rounded bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
           <span>Duration of this entry</span>
           <span className="font-semibold">{formatHours(thisDuration)}</span>
         </div>
-        <div className="flex justify-between rounded-lg bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
+        <div className="flex justify-between rounded bg-cedar-500/10 px-3 py-2 text-sm text-lakehouse-900/80">
           <span>Daily total after this entry</span>
           <span className="font-semibold">{formatHours(otherDailyTotal + thisDuration)}</span>
         </div>

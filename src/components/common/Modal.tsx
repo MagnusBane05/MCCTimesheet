@@ -5,10 +5,11 @@ interface ModalProps {
   title: string;
   onClose(): void;
   children: ReactNode;
+  hideHeader?: boolean;
 }
 
 /** Generic overlay dialog, following the same fixed-overlay pattern as ConfirmDialog. */
-export function Modal({ open, title, onClose, children }: ModalProps) {
+export function Modal({ open, title, onClose, children, hideHeader }: ModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,21 +31,23 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
       <div
         ref={containerRef}
         tabIndex={-1}
-        className="w-full max-w-lg rounded-xl bg-white shadow-xl focus:outline-none"
+        className="w-full max-w-lg rounded-md bg-white shadow-xl focus:outline-none"
       >
-        <div className="flex items-center justify-between border-b border-lakehouse-900/10 px-4 py-3">
-          <h2 id="modal-title" className="text-base font-semibold text-midnight-950">
-            {title}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-lakehouse-900/60 hover:bg-cedar-100 hover:text-midnight-950"
-          >
-            ✕
-          </button>
-        </div>
+        {!hideHeader && (
+          <div className="flex items-center justify-between border-b border-lakehouse-900/10 px-4 py-3">
+            <h2 id="modal-title" className="text-base font-semibold text-midnight-950">
+              {title}
+            </h2>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-lakehouse-900/60 hover:bg-cedar-100 hover:text-midnight-950"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <div className="p-4">{children}</div>
       </div>
     </div>

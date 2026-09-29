@@ -204,6 +204,7 @@ export function EmployeesPage() {
         open={modalState !== null}
         title={getModalTitle()}
         onClose={closeModal}
+        hideHeader={modalState === 'reset-success' || modalState === 'creation-success'}
       >
         {modalState === 'create' && (
           <CreateEmployeeForm onCreateEmployee={handleCreateEmployee} />

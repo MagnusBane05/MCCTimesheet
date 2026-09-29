@@ -20,6 +20,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { DateRangePicker } from '../../components/common/DateRangePicker';
 import { Title } from '../../components/common/Title';
 import { Counter } from '../../components/common/Counter';
+import { Badge } from '../../components/common/Badge';
 
 const TODAY = new Date();
 
@@ -167,7 +168,7 @@ export function TimesheetsListPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap justify-center items-center gap-3 rounded-xl">
+      <div className="flex flex-wrap justify-center items-center gap-3 rounded-md">
         <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
           <ChevronLeftIcon className="h-5 w-5" />
         </Button>
@@ -228,8 +229,6 @@ export function TimesheetsListPage() {
               </>
             )}
           </SelectField>
-        </div>
-        <div className="flex flex-wrap gap-3">
           <TextField
             id="job-search"
             ariaLabel="Search"
@@ -259,16 +258,16 @@ export function TimesheetsListPage() {
                   subtitle={group.project ? `${group.project.customer} · ${group.project.projectNumber}` : undefined}
                   badge={
                     group.project && !group.project.active ? (
-                      <span className="rounded-full bg-lakehouse-900/10 px-2 py-0.5 text-xs font-medium text-lakehouse-900/60">
+                      <Badge variant="secondary">
                         Inactive
-                      </span>
+                      </Badge>
                     ) : undefined
                   }
                   secondaryBadge={
                     allInvoiced ? (
-                      <span className="rounded-full bg-success-100 px-2 py-0.5 font-medium text-success-800">
+                      <Badge variant="success">
                         Invoiced
-                      </span>
+                      </Badge>
                     ) : undefined
                   }
                   entryCount={group.entries.length}
@@ -301,9 +300,9 @@ export function TimesheetsListPage() {
                   title={group.employee?.displayName ?? 'Unknown employee'}
                   badge={
                     group.employee && !group.employee.active ? (
-                      <span className="rounded-full bg-lakehouse-900/10 px-2 py-0.5 text-xs font-medium text-lakehouse-900/60">
+                      <Badge variant="secondary">
                         Inactive
-                      </span>
+                      </Badge>
                     ) : undefined
                   }
                   entryCount={group.entries.length}

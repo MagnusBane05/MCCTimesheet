@@ -55,7 +55,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
       className={`
         w-full border-separate border-spacing-0
         ${bordered ? 'border border-lakehouse-900/20' : ''} bg-white 
-        ${rounded ? 'rounded-lg [&_thead_th:first-child]:rounded-tl-lg [&_thead_th:last-child]:rounded-tr-lg' : ''}
+        ${rounded ? 'rounded-md [&_thead_th:first-child]:rounded-tl-md [&_thead_th:last-child]:rounded-tr-md' : ''}
         ${striped ? '[&_tbody_tr:nth-child(even)]:bg-pine-400/10' : ''} 
         ${className}`}
       {...props}

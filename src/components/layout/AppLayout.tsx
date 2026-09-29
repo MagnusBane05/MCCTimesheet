@@ -20,7 +20,7 @@ export function AppLayout() {
           <Logo variant="primary" />
           {currentUser && (
             <div className="flex items-center gap-3">
-              <span className="hidden text-sm text-white/70 sm:inline">
+              <span className="hidden text-sm text-birch-50 sm:inline">
                 {currentUser.displayName}
                 {currentUser.role === 'VIEWER' && ' · Viewer'}
               </span>

@@ -216,7 +216,7 @@ export function ProjectsPage() {
                         readOnly={!editing}
                         variant="inline"
                         readOnlyContent={
-                          <div className={PRODUCTION_STATUS_COLOURS[project.productionStatus] + "w-fit whitespace-nowrap rounded-full px-2 py-1 text-center text-xs font-bold"}>
+                          <div className={PRODUCTION_STATUS_COLOURS[project.productionStatus] + " whitespace-nowrap rounded-full px-2 py-1 text-center text-xs font-bold"}>
                             {PRODUCTION_STATUS_LABELS[project.productionStatus]}
                           </div>
                         }

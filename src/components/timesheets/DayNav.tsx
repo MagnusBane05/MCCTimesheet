@@ -31,7 +31,7 @@ export function DayNav({
   }
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-xl bg-white p-2 shadow-sm">
+    <div className="flex items-center justify-between gap-2 rounded-md bg-white p-2 shadow-sm">
       <Button
         variant="ghost"
         aria-label="Previous day"
