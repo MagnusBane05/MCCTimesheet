@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MCC">
+  <rect width="512" height="512" rx="48" fill="#071826"/>
+  <g transform="translate(88.25 101.82) scale(3.05)">
+    <path d="M55,49.3L2,0H0v101.1h20.7v-46.7c0-4.7-.1-9.7-.3-13.1,2.7,2.8,6.2,6.2,9.7,9.2l24.9,22.3,20-17.3c5-4.7,10.8-10.3,14.6-14.2-.1,3.4-.3,8.4-.3,13.1v46.7h20.7V0h-2l-53,49.3Z" fill="#c78555"/>
+  </g>
+</svg>
