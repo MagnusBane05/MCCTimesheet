@@ -18,8 +18,14 @@ def api_exception_handler(exc, context):
         detail = str(data['detail'])
         errors = None
     else:
-        detail = 'The request could not be completed.'
         errors = data
+        # Extract first validation error message for the detail field
+        detail = 'The request could not be completed.'
+        if isinstance(errors, dict):
+            for _, field_errors in errors.items():
+                if isinstance(field_errors, list) and field_errors:
+                    detail = str(field_errors[0])
+                    break
 
     response.data = {'detail': detail, 'errors': errors}
     return response
