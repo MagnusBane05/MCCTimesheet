@@ -71,7 +71,7 @@ export function SetNewPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-birch-50 px-4">
       <div className="flex flex-col items-center">
         <div className="mb-4 text-center">
-          <Logo variant="secondary" className="h-20" />
+          <Logo variant="secondary" size="large" />
         </div>
         <div className="w-full max-w-md bg-white rounded-md shadow p-8 pt-6">
           <Title>Set Your Password</Title>

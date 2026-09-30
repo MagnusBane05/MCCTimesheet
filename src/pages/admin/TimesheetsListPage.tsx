@@ -172,7 +172,7 @@ export function TimesheetsListPage() {
         <Button variant="ghost" onClick={() => shiftWeek(-1)} className="!px-3">
           <ChevronLeftIcon className="h-5 w-5" />
         </Button>
-        <Title className="mb-0">
+        <Title className="!mb-0">
           { areSameDay(fromDate, getWeekStart(fromDate))
             && areSameDay(toDate, getWeekEnd(fromDate)) ? 
           `Week of ${formatLongDateLabel(getWeekStart(fromDate))}` : 
