@@ -1,5 +1,5 @@
 import { Button } from "../common/Button";
-import { CheckCircleIcon, ExclamationTriangleIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CopyButton } from "../common/CopyButton";
 
 export interface ResetPasswordSuccessProps {

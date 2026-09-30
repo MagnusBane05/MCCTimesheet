@@ -1,7 +1,6 @@
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
-import { formatShortDateLabel, isFutureDate, addMonths, getDaysInMonth, getFirstDayOfMonth, startOfDay } from "../../utils/dates";
-import { Button } from "./Button";
+import { isFutureDate, addMonths, getDaysInMonth, getFirstDayOfMonth, startOfDay } from "../../utils/dates";
 
 interface DateRangePickerProps {
   fromDate: Date;

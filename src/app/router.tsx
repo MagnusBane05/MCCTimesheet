@@ -6,7 +6,6 @@ import { RequirePasswordChange } from '../auth/RequirePasswordChange';
 import { LoginPage } from '../pages/LoginPage';
 import { SetNewPasswordPage } from '../pages/auth/SetNewPasswordPage';
 import { TimesheetPage } from '../pages/TimesheetPage';
-import { HoursSummaryPage } from '../pages/admin/HoursSummaryPage';
 import { ProjectsPage } from '../pages/admin/ProjectsPage';
 import { EmployeesPage } from '../pages/admin/EmployeesPage';
 
@@ -34,7 +33,6 @@ export const router = createBrowserRouter([
         element: <RequireRole allowedRoles={['VIEWER', 'ADMIN']} />,
         children: [
           { path: 'timesheets', element: <TimesheetsListPage /> },
-          { path: 'hours-summary', element: <HoursSummaryPage /> },
           { path: 'projects', element: <ProjectsPage /> },
           { path: 'employees', element: <EmployeesPage /> },
         ],
