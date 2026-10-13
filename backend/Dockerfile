@@ -1,8 +1,8 @@
-# Pinned to match the production Python version on BlackSun/cPanel (3.11.15
+# Pinned to match the production Python version on BlackSun/cPanel (3.11.17
 # has no official Windows installer, so local dev also runs through this
 # image). This matches the interpreter version only — CloudLinux/Passenger
 # is otherwise a materially different environment.
-FROM python:3.11.15-slim
+FROM python:3.11.17-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1

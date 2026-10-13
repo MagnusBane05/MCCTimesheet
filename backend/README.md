@@ -1,6 +1,6 @@
 # MCC Timesheet - Backend
 Local dev backend for the MCC Timesheet app. Runs in Docker because Python
-3.11 (to match BlackSun/cPanel production, exactly 3.11.15) has no
+3.11 (to match BlackSun/cPanel production, exactly 3.11.17) has no
 official Windows binary installer
 
 ## First-time setup
@@ -89,7 +89,7 @@ docker compose run --rm backend pip freeze > backend/requirements.txt
 ```
 
 ## Production / BlackSun deployment
-**cPanel -> Setup Pyton App**: Python version: `3.11.16`, Application root: any name, Application URL: `backend`, Application startup file: `app.py`, Applicaiton entry point: `application`
+**cPanel -> Setup Pyton App**: Python version: `3.11.17`, Application root: any name, Application URL: `backend`, Application startup file: `app.py`, Applicaiton entry point: `application`
 
 **models.py migration**: Only when models.py changes, `docker compose exec backend python manage.py makemigrations` locally, commit migration file then continue.
 
