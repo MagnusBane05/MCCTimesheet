@@ -20,5 +20,6 @@ urlpatterns = [
     path('auth/', include('accounts.auth_urls')),
     path('employees/', include('accounts.employees_urls')),
     path('projects/', include('projects.urls')),
+    path('', include('materials.urls')),
     path('', include('timesheets.urls')),
 ]
