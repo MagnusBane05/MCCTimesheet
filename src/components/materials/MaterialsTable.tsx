@@ -4,7 +4,7 @@ import { timesheetService } from "../../services/service";
 import { LoadingState } from "../common/LoadingState";
 import { ErrorState } from "../common/ErrorState";
 import { Project } from "../../domain/project";
-import { getDefaultProjectIdForCustomer, getProjectDisplayName, getProjectsWithCustomer, getUniqueCustomers } from "../../utils/projects";
+import { getProjectDisplayName } from "../../utils/projects";
 import { SelectField } from "../form/SelectField";
 import { Table, TableCell, TableHeader, TableRow } from "../common/Table";
 import { CheckboxField } from "../form/CheckboxField";
@@ -24,6 +24,7 @@ import { Modal } from "../common/Modal";
 import { MaterialEntryForm } from "./MaterialEntryForm";
 import { useLoad } from "../../hooks/useLoad";
 import { useAction } from "../../hooks/useAction";
+import { useCustomerProjectSelection } from "../../hooks/useCustomerProjectSelection";
 
 interface MaterialsTableProps {
 	materialTypes: MaterialType[];
@@ -34,8 +35,6 @@ export function MaterialsTable({ materialTypes, materialTypeCategories }: Materi
 	const { currentUser } = useAuth();
 	const isAdmin = currentUser?.role === 'ADMIN';
 
-	const [customer, setCustomer] = useState<string>('');
-	const [projectId, setProjectId] = useState<number | null>(null);
 	const [showInactiveProjects, setShowInactiveProjects] = useState(false);
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [deletingEntry, setDeletingEntry] = useState<MaterialEntry | null>(null);
@@ -71,12 +70,16 @@ export function MaterialsTable({ materialTypes, materialTypeCategories }: Materi
 
 	const filteredProjects = useMemo(() => showInactiveProjects ? projects : projects.filter((project) => project.active)
 		, [showInactiveProjects, projects]);
-	const customerOptions = useMemo(() => getUniqueCustomers(filteredProjects), [filteredProjects])
 
-	const projectOptions = useMemo(() => {
-		const customerProjects = getProjectsWithCustomer(filteredProjects, customer);
-		return [...customerProjects].sort((a, b) => a.name.localeCompare(b.name));
-	}, [filteredProjects, customer]);
+	const {
+		customer,
+		projectId,
+		customerOptions,
+		projectOptions,
+		selectCustomer,
+		setProjectId,
+		syncToProjects,
+	} = useCustomerProjectSelection(filteredProjects);
 
 	const selectedProject = useMemo(() => projects.find((project) => project.id === projectId), [projects, projectId]);
 
@@ -88,24 +91,10 @@ export function MaterialsTable({ materialTypes, materialTypeCategories }: Materi
 		return employees.find((employee) => employee.id === id);
 	}
 
-	function handleCustomerChange(event: ChangeEvent<HTMLSelectElement>) {
-		const newCustomer = event.target.value;
-		setCustomer(newCustomer);
-		const defaultProjectId = getDefaultProjectIdForCustomer(newCustomer, filteredProjects);
-		setProjectId(defaultProjectId);
-	}
-
 	function handleToggleActiveProjects(event: ChangeEvent<HTMLInputElement>) {
 		const showInactive = event.target.checked;
 		setShowInactiveProjects(showInactive);
-		if (showInactive || !selectedProject || selectedProject.active) return;
-		const activeProjects = projects.filter((project) => project.active);
-		if (getProjectsWithCustomer(activeProjects, customer).length === 0) {
-			setCustomer('');
-			setProjectId(null);
-		} else {
-			setProjectId(getDefaultProjectIdForCustomer(customer, activeProjects));
-		}
+		if (!showInactive) syncToProjects(projects.filter((project) => project.active));
 	}
 
 	const originalEditingType = useMemo(() => {
@@ -190,7 +179,7 @@ export function MaterialsTable({ materialTypes, materialTypeCategories }: Materi
 						ariaLabel="Customer"
 						value={customer}
 						label="Customer"
-						onChange={handleCustomerChange}
+						onChange={(e) => selectCustomer(e.target.value)}
 					>
 						<option key="" value="">{customerOptions.length === 0 ? "No projects available" : "Select a customer..."}</option>
 						{customerOptions.map((customer) => (

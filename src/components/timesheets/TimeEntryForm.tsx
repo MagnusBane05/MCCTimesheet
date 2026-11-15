@@ -1,21 +1,16 @@
-import { ChangeEvent, useMemo, useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import type { Project } from '../../domain/project';
 import type { TimeEntry } from '../../domain/timeEntry';
 import { formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
-import { getUniqueCustomers, getProjectDisplayName } from '../../utils/projects';
+import { getProjectDisplayName } from '../../utils/projects';
 import { TimeField } from '../form/TimeField';
 import { SelectField } from '../form/SelectField';
 import { TextAreaField } from '../form/TextAreaField';
 import { useAction } from '../../hooks/useAction';
-
-function getCustomerFromProject(projectId: number | null, projects: Project[]): string {
-  if (projectId == null) return '';
-  const project = projects.find(p => p.id === projectId);
-  return project?.customer ?? '';
-}
+import { useCustomerProjectSelection } from '../../hooks/useCustomerProjectSelection';
 
 export interface TimeEntryFormValues {
   workDate: string;
@@ -50,11 +45,9 @@ export function TimeEntryForm({
 }) {
   const [startTime, setStartTime] = useState(existingEntry?.startTime ?? '');
   const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '');
-  const [projectId, setProjectId] = useState<number | null>(existingEntry?.projectId ?? null);
   const [workDescription, setWorkDescription] = useState(existingEntry?.workDescription ?? '');
   const submit = useAction();
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-  const [customer, setCustomer] = useState(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
 
   const effectiveWorkDate = workDate;
 
@@ -62,17 +55,19 @@ export function TimeEntryForm({
     return projects.filter((project) => project.active);
   }, [projects]);
 
-  const customerOptions = useMemo(() => {
-    return getUniqueCustomers(activeProjects);
-  }, [activeProjects]);
+  const pinnedProject = useMemo(
+    () => projects.find((project) => project.id === existingEntry?.projectId),
+    [projects, existingEntry]);
 
-  const projectOptions = useMemo(() => {
-    const customerProjects = activeProjects.filter((project) => project.customer === customer);
-    const options = existingEntry && !customerProjects.some((project) => project.id === existingEntry.projectId)
-      ? [...customerProjects, ...projects.filter((project) => project.id === existingEntry.projectId)]
-      : customerProjects;
-    return [...options].sort((a, b) => a.name.localeCompare(b.name));
-  }, [activeProjects, existingEntry, customer, projects]);
+  const {
+    customer,
+    projectId,
+    customerOptions,
+    projectOptions,
+    selectCustomer,
+    setProjectId,
+    reset: resetCustomerProject,
+  } = useCustomerProjectSelection(activeProjects, { pinnedProject });
 
   const input: TimeEntryInput = { workDate: effectiveWorkDate, startTime, endTime, projectId, workDescription };
   const errors = validateTimeEntry(input, {
@@ -88,21 +83,10 @@ export function TimeEntryForm({
     .filter((entry) => entry.workDate === effectiveWorkDate && entry.id !== existingEntry?.id)
     .reduce((total, entry) => total + getDurationHours(entry.startTime, entry.endTime), 0);
 
-  function handleCustomerChange(event: ChangeEvent<HTMLSelectElement>) {
-    setCustomer(event.target.value);
-    const customerProjects = activeProjects.filter((project) => project.customer === event.target.value);
-    if (customerProjects.length === 1) {
-      setProjectId(customerProjects[0].id);
-    } else {
-      setProjectId(null);
-    }
-  }
-
   function handleCancel() {
     setStartTime(existingEntry?.startTime ?? '');
     setEndTime(existingEntry?.endTime ?? '');
-    setCustomer(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
-    setProjectId(existingEntry?.projectId ?? null);
+    resetCustomerProject();
     setWorkDescription(existingEntry?.workDescription ?? '');
     setHasAttemptedSubmit(false);
     submit.setError(null);
@@ -167,7 +151,7 @@ export function TimeEntryForm({
               value={customer}
               variant="large"
               label="Customer"
-              onChange={handleCustomerChange}
+              onChange={(event) => selectCustomer(event.target.value)}
               className="mt-1 w-full"
             >
               <option value="">Select a customer…</option>
