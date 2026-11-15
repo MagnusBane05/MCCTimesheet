@@ -6,9 +6,10 @@ import { NewProjectInput } from "../../services/TimesheetService";
 import { PRODUCTION_STATUS_LABELS, PRODUCTION_STATUSES, ProductionStatus } from "../../domain/project";
 import { TextField } from "../form/TextField";
 import { SelectField } from "../form/SelectField";
+import { useAction } from "../../hooks/useAction";
 
 export interface CreateProjectFormProps {
-    onCreateProject: (project: NewProjectInput) => void;
+    onCreateProject: (project: NewProjectInput) => Promise<void>;
 }
 
 export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
@@ -17,8 +18,7 @@ export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
     const [customer, setCustomer] = useState('');
     const [productionStatus, setProductionStatus] = useState<ProductionStatus>('ON_DECK'); 
     const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [formError, setFormError] = useState<string | null>(null);
+    const submit = useAction();
 
     const errors = validateProject({ projectNumber, name, customer });
     const visibleErrors = hasAttemptedSubmit ? errors : {};
@@ -27,21 +27,13 @@ export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
         event.preventDefault();
         setHasAttemptedSubmit(true);
         if (Object.keys(errors).length > 0) return;
-        setSubmitting(true);
-        setFormError(null);
-        try {
-            await onCreateProject({ 
+        await submit.run(() => onCreateProject({ 
                 projectNumber, 
                 name, 
                 customer,
                 active: true,
                 productionStatus: productionStatus,
-            });
-        } catch (error) {
-            setFormError((error as Error).message);
-        } finally {
-            setSubmitting(false);
-        }
+            }));
     };
 
     return (
@@ -101,9 +93,9 @@ export function CreateProjectForm({ onCreateProject }: CreateProjectFormProps) {
                 </div>
             </div>
             <div className="w-full flex flex-col justify-stretch">
-                {formError && <Error message={formError} />}
-                <Button type="submit" disabled={submitting}>
-                    {submitting ? "Creating..." : "Create Project"}
+                <Error message={submit.error} />
+                <Button type="submit" disabled={submit.pending}>
+                    {submit.pending ? "Creating..." : "Create Project"}
                 </Button>
             </div>
         </form>

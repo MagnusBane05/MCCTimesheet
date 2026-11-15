@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../auth/useAuth';
 import { timesheetService } from '../../services/service';
 import type { Project } from '../../domain/project';
@@ -21,6 +21,7 @@ import { DateRangePicker } from '../../components/common/DateRangePicker';
 import { Title } from '../../components/common/Title';
 import { Counter } from '../../components/common/Counter';
 import { Badge } from '../../components/common/Badge';
+import { useLoad } from '../../hooks/useLoad';
 
 const TODAY = new Date();
 
@@ -31,12 +32,6 @@ export function TimesheetsListPage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
 
-  const [employees, setEmployees] = useState<User[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [entries, setEntries] = useState<TimeEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
   const [fromDate, setFromDate] = useState(getWeekStart(TODAY));
   const [toDate, setToDate] = useState(getWeekEnd(TODAY));
   const [search, setSearch] = useState('');
@@ -44,30 +39,16 @@ export function TimesheetsListPage() {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [groupBy, setGroupBy] = useState<GroupBy>('project');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const dateFrom = fromDate.toISOString().split('T')[0];
-      const dateTo = toDate.toISOString().split('T')[0];
-      const [employeeList, projectList, entryList] = await Promise.all([
-        timesheetService.getEmployees(),
-        timesheetService.getProjects(),
-        timesheetService.getTimeEntries({ dateFrom, dateTo }),
-      ]);
-      setEmployees(employeeList);
-      setProjects(projectList);
-      setEntries(entryList);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [fromDate, toDate]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data: { employees, projects, entries }, loading, error, load } = useLoad(async () => {
+    const dateFrom = fromDate.toISOString().split('T')[0];
+    const dateTo = toDate.toISOString().split('T')[0];
+    const [employees, projects, entries] = await Promise.all([
+      timesheetService.getEmployees(),
+      timesheetService.getProjects(),
+      timesheetService.getTimeEntries({ dateFrom, dateTo }),
+    ]);
+    return { employees, projects, entries };
+  }, [fromDate, toDate], { employees: [] as User[], projects: [] as Project[], entries: [] as TimeEntry[] });
       
   const {
     editingItem: editingEntry,

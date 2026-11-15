@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../common/Button';
 import { TextField } from '../form/TextField';
+import { useAction } from '../../hooks/useAction';
 
 interface InvoiceNumberFieldProps {
   value: string | null;
@@ -19,8 +20,7 @@ export function InvoiceNumberField({
   onSave,
 }: InvoiceNumberFieldProps) {
   const [draft, setDraft] = useState(value ?? '');
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(false);
+  const save = useAction();
 
   useEffect(() => {
     setDraft(value ?? '');
@@ -33,15 +33,7 @@ export function InvoiceNumberField({
   const dirty = draft.trim() !== (value ?? '');
 
   async function handleSave() {
-    setSaving(true);
-    setError(false);
-    try {
-      await onSave(draft.trim() === '' ? null : draft.trim());
-    } catch {
-      setError(true);
-    } finally {
-      setSaving(false);
-    }
+    await save.run(() => onSave(draft.trim() === '' ? null : draft.trim()));
   }
 
   return (
@@ -52,14 +44,14 @@ export function InvoiceNumberField({
         type="text"
         variant='inline'
         value={draft}
-        error={error ? "Unable to save." : undefined}
+        error={save.error ?? undefined}
         placeholder="No invoice number"
         onChange={(event) => setDraft(event.target.value)}
         className="w-36"
       />
       {dirty && (
-        <Button variant="secondary" className="!px-2.5 !py-1.5 text-xs" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save'}
+        <Button variant="secondary" className="!px-2.5 !py-1.5 text-xs" onClick={handleSave} disabled={save.pending}>
+          {save.pending ? 'Saving…' : 'Save'}
         </Button>
       )}
     </div>

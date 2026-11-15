@@ -6,9 +6,10 @@ import { NewEmployeeInput } from "../../services/TimesheetService";
 import { USER_ROLES, UserRole } from "../../domain/user";
 import { SelectField } from "../form/SelectField";
 import { TextField } from "../form/TextField";
+import { useAction } from "../../hooks/useAction";
 
 export interface CreateEmployeeFormProps {
-    onCreateEmployee: (employee: NewEmployeeInput) => void;
+    onCreateEmployee: (employee: NewEmployeeInput) => Promise<void>;
 }
 
 export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps) {
@@ -16,8 +17,7 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
     const [displayName, setDisplayName] = useState('');
     const [role, setRole] = useState<UserRole>('EMPLOYEE');
     const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [formError, setFormError] = useState<string | null>(null);
+    const submit = useAction();
 
     const errors = validateEmployee({ username, displayName, role });
     const visibleErrors = hasAttemptedSubmit ? errors : {};
@@ -26,20 +26,12 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
         event.preventDefault();
         setHasAttemptedSubmit(true);
         if (Object.keys(errors).length > 0) return;
-        setSubmitting(true);
-        setFormError(null);
-        try {
-            await onCreateEmployee({
+        await submit.run(() => onCreateEmployee({
                 username,
                 displayName,
                 role,
                 active: true,
-            });
-        } catch (error) {
-            setFormError((error as Error).message);
-        } finally {
-            setSubmitting(false);
-        }
+            }));
     }
 
     return (
@@ -93,9 +85,9 @@ export function CreateEmployeeForm({ onCreateEmployee }: CreateEmployeeFormProps
             </div>
 
             <div className="w-full flex flex-col justify-stretch">
-                {formError && <Error message={formError} />}
-                <Button type="submit" disabled={submitting}>
-                    {submitting ? "Creating..." : "Create Employee"}
+                <Error message={submit.error} />
+                <Button type="submit" disabled={submit.pending}>
+                    {submit.pending ? "Creating..." : "Create Employee"}
                 </Button>
             </div>
         </form>

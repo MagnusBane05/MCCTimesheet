@@ -1,8 +1,10 @@
-from typing import Optional, cast
+from typing import Any, Optional, cast
 
-from django.db.models import ProtectedError, QuerySet
-from rest_framework import serializers, viewsets
+from django.db.models import QuerySet
+from rest_framework import serializers, status, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 from accounts.models import User, UserRole
 from core.permissions import HasChangedInitialPassword
@@ -89,16 +91,11 @@ class MaterialTypeViewSet(viewsets.ModelViewSet):
 
         serializer.save()
 
-    def perform_destroy(self, instance: MaterialType) -> None:
-        user = cast(User, self.request.user)
-
-        if user.role == UserRole.VIEWER.value or user.role == UserRole.EMPLOYEE.value:
-            raise serializers.ValidationError("Only admins can delete material types.")
-
-        try:
-            instance.delete()
-        except ProtectedError:
-            raise serializers.ValidationError("This material type is still used by material entries and cannot be deleted")
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:  # type: ignore[override]
+        return Response(
+            {'detail': 'Material types cannot be deleted. Use PATCH with active: false to expire instead.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
 class MaterialTypeCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = MaterialTypeCategorySerializer
@@ -123,14 +120,9 @@ class MaterialTypeCategoryViewSet(viewsets.ModelViewSet):
 
         serializer.save()
 
-    def perform_destroy(self, instance: MaterialTypeCategory) -> None:
-        user = cast(User, self.request.user)
-
-        if user.role == UserRole.VIEWER.value or user.role == UserRole.EMPLOYEE.value:
-            raise serializers.ValidationError("Only admins can delete material type categories.")
-
-        try:
-            instance.delete()
-        except ProtectedError:
-            raise serializers.ValidationError("This material type category is still used by material types and cannot be deleted")
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:  # type: ignore[override]
+        return Response(
+            {'detail': 'Material type categories cannot be deleted. Use PATCH with active: false to expire instead.'},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { Button } from './Button';
+import { Error } from './Error';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -7,6 +8,8 @@ interface ConfirmDialogProps {
   description?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
+  busy?: boolean;
+  error?: string | null;
   onConfirm(): void;
   onCancel(): void;
 }
@@ -17,6 +20,8 @@ export function ConfirmDialog({
   description,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
+  busy = false,
+  error,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -35,7 +40,7 @@ export function ConfirmDialog({
       aria-modal="true"
       aria-labelledby="confirm-dialog-title"
       onKeyDown={(event) => {
-        if (event.key === 'Escape') onCancel();
+        if (event.key === 'Escape' && !busy) onCancel();
       }}
     >
       <div className="w-full max-w-sm rounded-md bg-white p-6 shadow-xl">
@@ -43,11 +48,12 @@ export function ConfirmDialog({
           {title}
         </h2>
         {description && <div className="mt-2 text-sm text-lakehouse-900/80">{description}</div>}
+        {error && <Error message={error} />}
         <div className="mt-6 flex justify-end gap-3">
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </Button>
-          <Button variant="danger" onClick={onConfirm} ref={confirmButtonRef}>
+          <Button variant="danger" onClick={onConfirm} ref={confirmButtonRef} disabled={busy}>
             {confirmLabel}
           </Button>
         </div>

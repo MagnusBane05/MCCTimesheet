@@ -6,7 +6,8 @@ Covers:
 - Admin-only management of material types and categories
 - Name validation
 - Query param filtering
-- Deleting types/categories that are still in use (PROTECT)
+- Types/categories cannot be deleted, only expired
+- Entries cannot use expired types
 """
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -77,9 +78,9 @@ class MaterialsAPITestCase(TestCase):
         self.entry1 = MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_alice,
-            name='3/4" Maple Plywood',
             material_type=self.material_type,
             description='Cabinet boxes',
+            quantity=1,
         )
 
     def entry_payload(self, employee_id: int, **overrides: object) -> dict[str, object]:
@@ -87,9 +88,9 @@ class MaterialsAPITestCase(TestCase):
         payload: dict[str, object] = {
             'project': self.project.id,  # type: ignore[attr-defined]
             'employee': employee_id,
-            'name': '1/2" Birch Plywood',
             'material_type': self.material_type.id,  # type: ignore[attr-defined]
             'description': 'Drawer bottoms',
+            'quantity': 4,
         }
         payload.update(overrides)
         return payload
@@ -108,9 +109,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_bob,
-            name='Bob material',
             material_type=self.material_type,
             description='Bob work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
@@ -124,9 +125,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_bob,
-            name='Bob material',
             material_type=self.material_type,
             description='Bob work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.viewer)  # type: ignore[attr-defined]
@@ -139,9 +140,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_bob,
-            name='Bob material',
             material_type=self.material_type,
             description='Bob work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
@@ -188,12 +189,12 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['employee'], self.employee_bob.id)  # type: ignore[attr-defined]
 
-    def test_create_entry_whitespace_name_rejected(self) -> None:
-        """Entry names cannot be only whitespace."""
+    def test_create_entry_whitespace_description_rejected(self) -> None:
+        """Entry descriptions cannot be only whitespace."""
         self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
         response = self.client.post(
             '/api/material-entries/',
-            self.entry_payload(self.employee_alice.id, name='   '),  # type: ignore[attr-defined]
+            self.entry_payload(self.employee_alice.id, description='   '),  # type: ignore[attr-defined]
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -205,6 +206,35 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
             self.entry_payload(self.employee_alice.id, material_type=99999),  # type: ignore[attr-defined]
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_entry_saves_quantity(self) -> None:
+        """Quantity is stored and returned as an integer."""
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.post(
+            '/api/material-entries/',
+            self.entry_payload(self.employee_alice.id, quantity=12),  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['quantity'], 12)  # type: ignore[attr-defined]
+
+    def test_create_entry_missing_quantity_rejected(self) -> None:
+        """Quantity is required."""
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        payload = self.entry_payload(self.employee_alice.id)  # type: ignore[attr-defined]
+        del payload['quantity']
+        response = self.client.post('/api/material-entries/', payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_entry_invalid_quantity_rejected(self) -> None:
+        """Quantity must be a whole number greater than zero."""
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        for quantity in (0, -1, '1.5'):
+            with self.subTest(quantity=quantity):
+                response = self.client.post(
+                    '/api/material-entries/',
+                    self.entry_payload(self.employee_alice.id, quantity=quantity),  # type: ignore[attr-defined]
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_entry_employee_own_entry(self) -> None:
         """Employees can update their own entries."""
@@ -266,9 +296,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_bob,
-            name='Bob material',
             material_type=self.material_type,
             description='Bob work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
@@ -282,9 +312,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.project,
             employee=self.employee_bob,
-            name='Bob material',
             material_type=self.material_type,
             description='Bob work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
@@ -298,9 +328,9 @@ class MaterialEntryAPITestCase(MaterialsAPITestCase):
         MaterialEntry.objects.create(
             project=self.other_project,
             employee=self.employee_alice,
-            name='Other project material',
             material_type=self.material_type,
             description='Other work',
+            quantity=1,
         )
 
         self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
@@ -392,29 +422,44 @@ class MaterialTypeAPITestCase(MaterialsAPITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_delete_unused_type_admin(self) -> None:
-        """Admins can delete a material type that no entries use."""
+    def test_delete_type_not_allowed(self) -> None:
+        """Material types cannot be deleted, even unused ones."""
         unused = MaterialType.objects.create(category=self.category, name='Unused')
         self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
         response = self.client.delete(f'/api/material-types/{unused.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(MaterialType.objects.filter(id=unused.id).exists())  # type: ignore[attr-defined]
-
-    def test_delete_type_in_use_rejected(self) -> None:
-        """Deleting a material type still used by entries returns 400, not 500."""
-        self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
-        response = self.client.delete(f'/api/material-types/{self.material_type.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertTrue(MaterialType.objects.filter(id=self.material_type.id).exists())  # type: ignore[attr-defined]
-
-    def test_delete_type_employee_forbidden(self) -> None:
-        """Employees cannot delete material types."""
-        unused = MaterialType.objects.create(category=self.category, name='Unused')
-        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
-        response = self.client.delete(f'/api/material-types/{unused.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertTrue(MaterialType.objects.filter(id=unused.id).exists())  # type: ignore[attr-defined]
 
+    def test_expire_type_admin(self) -> None:
+        """Admins can expire a material type that is in use."""
+        self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/material-types/{self.material_type.id}/',  # type: ignore[attr-defined]
+            {'active': False},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['active'])  # type: ignore[attr-defined]
+
+    def test_expire_type_employee_forbidden(self) -> None:
+        """Employees cannot expire material types."""
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/material-types/{self.material_type.id}/',  # type: ignore[attr-defined]
+            {'active': False},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.material_type.refresh_from_db()
+        self.assertTrue(self.material_type.active)
+
+    def test_list_types_includes_expired(self) -> None:
+        """Expired types are still listed so existing entries can display them."""
+        self.material_type.active = False
+        self.material_type.save()
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.get('/api/material-types/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)  # type: ignore[attr-defined]
+        self.assertFalse(response.data[0]['active'])  # type: ignore[attr-defined,index]
 
 class MaterialTypeCategoryAPITestCase(MaterialsAPITestCase):
     """Test the MaterialTypeCategory REST API."""
@@ -471,25 +516,77 @@ class MaterialTypeCategoryAPITestCase(MaterialsAPITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_delete_empty_category_admin(self) -> None:
-        """Admins can delete a category with no material types."""
+    def test_delete_category_not_allowed(self) -> None:
+        """Categories cannot be deleted, even empty ones."""
         empty = MaterialTypeCategory.objects.create(name='Empty')
         self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
         response = self.client.delete(f'/api/material-type-categories/{empty.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(MaterialTypeCategory.objects.filter(id=empty.id).exists())  # type: ignore[attr-defined]
-
-    def test_delete_category_in_use_rejected(self) -> None:
-        """Deleting a category that still has material types returns 400, not 500."""
-        self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
-        response = self.client.delete(f'/api/material-type-categories/{self.category.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertTrue(MaterialTypeCategory.objects.filter(id=self.category.id).exists())  # type: ignore[attr-defined]
-
-    def test_delete_category_employee_forbidden(self) -> None:
-        """Employees cannot delete categories."""
-        empty = MaterialTypeCategory.objects.create(name='Empty')
-        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
-        response = self.client.delete(f'/api/material-type-categories/{empty.id}/')  # type: ignore[attr-defined]
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertTrue(MaterialTypeCategory.objects.filter(id=empty.id).exists())  # type: ignore[attr-defined]
+
+    def test_expire_category_admin(self) -> None:
+        """Expiring a category leaves its types' own active flags unchanged."""
+        self.client.force_authenticate(user=self.admin)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/material-type-categories/{self.category.id}/',  # type: ignore[attr-defined]
+            {'active': False},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['active'])  # type: ignore[attr-defined]
+        self.material_type.refresh_from_db()
+        self.assertTrue(self.material_type.active)
+
+    def test_expire_category_employee_forbidden(self) -> None:
+        """Employees cannot expire categories."""
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/material-type-categories/{self.category.id}/',  # type: ignore[attr-defined]
+            {'active': False},
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.category.refresh_from_db()
+        self.assertTrue(self.category.active)
+
+
+class ExpiredMaterialTypeEntryTestCase(MaterialsAPITestCase):
+    """Entries cannot newly reference an expired type, but existing ones keep theirs."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.client.force_authenticate(user=self.employee_alice)  # type: ignore[attr-defined]
+
+    def test_create_entry_with_expired_type_rejected(self) -> None:
+        self.material_type.active = False
+        self.material_type.save()
+        response = self.client.post(
+            '/api/material-entries/',
+            self.entry_payload(self.employee_alice.id),  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_entry_with_type_in_expired_category_rejected(self) -> None:
+        self.category.active = False
+        self.category.save()
+        response = self.client.post(
+            '/api/material-entries/',
+            self.entry_payload(self.employee_alice.id),  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_entry_keeping_expired_type_allowed(self) -> None:
+        self.material_type.active = False
+        self.material_type.save()
+        response = self.client.patch(
+            f'/api/material-entries/{self.entry1.id}/',  # type: ignore[attr-defined]
+            {'material_type': self.material_type.id, 'quantity': 3},  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['quantity'], 3)  # type: ignore[attr-defined]
+
+    def test_update_entry_switching_to_expired_type_rejected(self) -> None:
+        expired = MaterialType.objects.create(category=self.category, name='Old', active=False)
+        response = self.client.patch(
+            f'/api/material-entries/{self.entry1.id}/',  # type: ignore[attr-defined]
+            {'material_type': expired.id},  # type: ignore[attr-defined]
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

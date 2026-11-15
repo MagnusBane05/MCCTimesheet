@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../auth/useAuth';
 import { timesheetService } from '../services/service';
 import type { Project } from '../domain/project';
@@ -15,42 +15,30 @@ import { LoadingState } from '../components/common/LoadingState';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
 import { Counter } from '../components/common/Counter';
+import { useLoad } from '../hooks/useLoad';
+import { useAction } from '../hooks/useAction';
 
 const TODAY = new Date();
 
 type FormState = { mode: 'add' } | { mode: 'edit'; entry: TimeEntry };
 
+const EMPTY_DATA = { entries: [] as TimeEntry[], projects: [] as Project[] };
+
 export function TimesheetPage() {
   const { currentUser } = useAuth();
   const [selectedDate, setSelectedDate] = useState(TODAY);
-  const [entries, setEntries] = useState<TimeEntry[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [formState, setFormState] = useState<FormState>({ mode: 'add' });
   const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
 
-  const load = useCallback(async () => {
-    if (!currentUser) return;
-    setLoading(true);
-    setError(false);
-    try {
-      const [entryList, projectList] = await Promise.all([
-        timesheetService.getTimeEntries({ employeeId: currentUser.id }),
-        timesheetService.getProjects(),
-      ]);
-      setEntries(entryList);
-      setProjects(projectList);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data: { entries, projects }, loading, error, load } = useLoad(async () => {
+    if (!currentUser) return EMPTY_DATA;
+    const [entries, projects] = await Promise.all([
+      timesheetService.getTimeEntries({ employeeId: currentUser.id }),
+      timesheetService.getProjects(),
+    ]);
+    return { entries, projects };
+  }, [currentUser], EMPTY_DATA);
+  const remove = useAction(load);
 
   if (!currentUser) return null;
 
@@ -82,9 +70,7 @@ export function TimesheetPage() {
 
   async function handleDeleteConfirm() {
     if (!deletingEntry) return;
-    await timesheetService.deleteTimeEntry(deletingEntry.id);
-    setDeletingEntry(null);
-    await load();
+    await remove.run(() => timesheetService.deleteTimeEntry(deletingEntry.id), () => setDeletingEntry(null));
   }
 
   function handleDateChange(newDate: Date) {
@@ -146,8 +132,10 @@ export function TimesheetPage() {
         title="Delete this time entry?"
         description="This cannot be undone."
         confirmLabel="Delete"
+        busy={remove.pending}
+        error={remove.error}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingEntry(null)}
+        onCancel={() => { setDeletingEntry(null); remove.setError(null); }}
       />
     </div>
   );

@@ -12,7 +12,15 @@ import type {
   UpdateProjectInput,
   UpdateTimeEntryInput,
   ResetPasswordResult,
+  MaterialEntryFilter,
+  NewMaterialTypeInput,
+  UpdateMaterialTypeInput,
+  UpdateMaterialTypeCategoryInput,
+  NewMaterialTypeCategoryInput,
+  NewMaterialEntryInput,
+  UpdateMaterialEntryInput,
 } from './TimesheetService';
+import { MaterialEntry, MaterialType, MaterialTypeCategory } from '../domain/material';
 
 // Wire shapes returned by Django (snake_case) — mapping to/from the
 // frontend's camelCase domain types is centralized here, never in components.
@@ -53,6 +61,34 @@ interface ApiTimeEntry {
   end_time: string;
   work_description: string;
   invoice_number: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiMaterialEntry { 
+  id: number;
+  employee: number;
+  project: number;
+  material_type: number;
+  description: string;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiMaterialType {
+  id: number;
+  category: number;
+  name: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ApiMaterialTypeCategory {
+  id: number;
+  name: string;
+  active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -103,6 +139,40 @@ function timeEntryFromApi(entry: ApiTimeEntry): TimeEntry {
     invoiceNumber: entry.invoice_number,
     createdAt: entry.created_at,
     updatedAt: entry.updated_at,
+  };
+}
+
+function materialEntryFromApi(entry: ApiMaterialEntry): MaterialEntry {
+  return {
+    id: entry.id,
+    employeeId: entry.employee,
+    projectId: entry.project,
+    materialType: entry.material_type,
+    description: entry.description,
+    quantity: entry.quantity,
+    createdAt: entry.created_at,
+    updatedAt: entry.updated_at,
+  };
+}
+
+function materialTypeFromApi(materialType: ApiMaterialType): MaterialType {
+  return {
+    id: materialType.id,
+    category: materialType.category,
+    name: materialType.name,
+    active: materialType.active,
+    createdAt: materialType.created_at,
+    updatedAt: materialType.updated_at,
+  };
+}
+
+function materialTypeCategoryFromApi(category: ApiMaterialTypeCategory): MaterialTypeCategory {
+  return {
+    id: category.id,
+    name: category.name,
+    active: category.active,
+    createdAt: category.created_at,
+    updatedAt: category.updated_at,
   };
 }
 
@@ -259,5 +329,94 @@ export class ApiTimesheetService implements TimesheetService {
     return {
       temporaryPassword: result.temporary_password,
     };
+  }
+
+  async getMaterialEntries(filter: MaterialEntryFilter): Promise<MaterialEntry[]> {
+    const entries = await apiRequest<ApiMaterialEntry[]>(`/material-entries/`, {
+      query: { employeeId: filter.employeeId, projectId: filter.projectId },
+    })
+    return entries.map(materialEntryFromApi);
+  }
+
+  async createMaterialEntry(input: NewMaterialEntryInput): Promise<MaterialEntry> {
+    const result = await apiRequest<ApiMaterialEntry>('/material-entries/', {
+      method: 'POST',
+      body: {
+        project: input.projectId,
+        employee: input.employeeId,
+        material_type: input.type,
+        description: input.description,
+        quantity: input.quantity,
+      },
+    });
+    return materialEntryFromApi(result);
+  }
+
+  async updateMaterialEntry(id: number, input: UpdateMaterialEntryInput): Promise<MaterialEntry> {
+    const result = await apiRequest<ApiMaterialEntry>(`/material-entries/${id}/`, {
+      method: 'PATCH',
+      body: {
+        material_type: input.type,
+        description: input.description,
+        quantity: input.quantity,
+      },
+    });
+    return materialEntryFromApi(result);
+  }
+
+  async deleteMaterialEntry(id: number): Promise<void> {
+    await apiRequest<void>(`/material-entries/${id}/`, { method: 'DELETE' });
+  }
+
+  async getMaterialTypes(): Promise<MaterialType[]> {
+    const result = await apiRequest<ApiMaterialType[]>(`/material-types/`);
+    return result.map(materialTypeFromApi);
+  }
+
+  async createMaterialType(input: NewMaterialTypeInput): Promise<MaterialType> {
+    const result = await apiRequest<ApiMaterialType>('/material-types/', {
+      method: 'POST',
+      body: {
+        category: input.category,
+        name: input.name,
+      },
+    });
+    return materialTypeFromApi(result);
+  }
+
+  async updateMaterialType(id: number, input: UpdateMaterialTypeInput): Promise<MaterialType> {
+    const result = await apiRequest<ApiMaterialType>(`/material-types/${id}/`, {
+      method: 'PATCH',
+      body: {
+        category: input.category,
+        name: input.name,
+        active: input.active,
+      },
+    });
+    return materialTypeFromApi(result);
+  }
+
+  async getMaterialTypeCategories(): Promise<MaterialTypeCategory[]> {
+    const result = await apiRequest<ApiMaterialTypeCategory[]>(`/material-type-categories/`);
+    return result.map(materialTypeCategoryFromApi);
+  }
+
+  async createMaterialTypeCategory(input: NewMaterialTypeCategoryInput): Promise<MaterialTypeCategory> {
+    const result = await apiRequest<ApiMaterialTypeCategory>('/material-type-categories/', {
+      method: 'POST',
+      body: { name: input.name },
+    });
+    return materialTypeCategoryFromApi(result);
+  }
+
+  async updateMaterialTypeCategory(id: number, input: UpdateMaterialTypeCategoryInput): Promise<MaterialTypeCategory> {
+    const result = await apiRequest<ApiMaterialTypeCategory>(`/material-type-categories/${id}/`, {
+      method: 'PATCH',
+      body: {
+        name: input.name,
+        active: input.active,
+      },
+    });
+    return materialTypeCategoryFromApi(result);
   }
 }

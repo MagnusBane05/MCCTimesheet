@@ -4,6 +4,8 @@ import type { TimeEntry } from '../domain/timeEntry';
 import { mockUsers } from '../mock/users';
 import { mockProjects } from '../mock/projects';
 import { mockTimeEntries } from '../mock/timeEntries';
+import type { MaterialEntry, MaterialType, MaterialTypeCategory } from '../domain/material';
+import { mockMaterialEntries, mockMaterialTypeCategories, mockMaterialTypes } from '../mock/materials';
 import type {
   NewEmployeeInput,
   NewProjectInput,
@@ -14,6 +16,13 @@ import type {
   UpdateProjectInput,
   UpdateTimeEntryInput,
   ResetPasswordResult,
+  MaterialEntryFilter,
+  NewMaterialEntryInput,
+  UpdateMaterialEntryInput,
+  NewMaterialTypeInput,
+  UpdateMaterialTypeInput,
+  UpdateMaterialTypeCategoryInput,
+  NewMaterialTypeCategoryInput,
 } from './TimesheetService';
 
 const SIMULATED_LATENCY_MS = 250;
@@ -50,6 +59,9 @@ export class MockTimesheetService implements TimesheetService {
   private users: User[] = mockUsers.map((user) => ({ ...user }));
   private projects: Project[] = mockProjects.map((project) => ({ ...project }));
   private timeEntries: TimeEntry[] = mockTimeEntries.map((entry) => ({ ...entry }));
+  private materialEntries: MaterialEntry[] = mockMaterialEntries.map((entry) => ({ ...entry }));
+  private materialTypes: MaterialType[] = mockMaterialTypes.map((type) => ({ ...type }));
+  private materialTypeCategories: MaterialTypeCategory[] = mockMaterialTypeCategories.map((category) => ({ ...category }));
 
   async getCurrentUser(): Promise<User | null> {
     const userId = Number(sessionStorage.getItem(SESSION_KEY));
@@ -182,5 +194,92 @@ export class MockTimesheetService implements TimesheetService {
     const temporaryPassword = generateMockPassword();
     user.mustChangePassword = true;
     return delay({ temporaryPassword });
+  }
+
+  async getMaterialEntries(filter: MaterialEntryFilter): Promise<MaterialEntry[]> {
+    const entries = this.materialEntries.filter((entry) =>
+      (!filter.employeeId || entry.employeeId === Number(filter.employeeId)) &&
+      (!filter.projectId || entry.projectId === Number(filter.projectId)));
+    return delay(entries.map((entry) => ({ ...entry })));
+  }
+
+  async createMaterialEntry(input: NewMaterialEntryInput): Promise<MaterialEntry> {
+    const now = new Date().toISOString();
+    const entry: MaterialEntry = {
+      id: nextId(this.materialEntries),
+      employeeId: input.employeeId,
+      projectId: input.projectId,
+      materialType: input.type,
+      description: input.description,
+      quantity: input.quantity,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.materialEntries.push(entry);
+    return delay({ ...entry });
+  }
+
+  async updateMaterialEntry(id: number, input: UpdateMaterialEntryInput): Promise<MaterialEntry> {
+    const existing = this.materialEntries.find((entry) => entry.id === id);
+    if (!existing) throw new Error(`Material entry ${id} not found`);
+    const { type, ...rest } = input;
+    Object.assign(existing, rest, type === undefined ? {} : { materialType: type }, { updatedAt: new Date().toISOString() });
+    return delay({ ...existing });
+  }
+
+  async deleteMaterialEntry(id: number): Promise<void> {
+    const index = this.materialEntries.findIndex((entry) => entry.id === id);
+    if (index === -1) throw new Error(`Material entry ${id} not found`);
+    this.materialEntries.splice(index, 1);
+    return delay(undefined);
+  }
+
+  async getMaterialTypes(): Promise<MaterialType[]> {
+    return delay(this.materialTypes.map((type) => ({ ...type })));
+  }
+
+  async createMaterialType(input: NewMaterialTypeInput): Promise<MaterialType> {
+    const now = new Date().toISOString();
+    const type: MaterialType = {
+      id: nextId(this.materialTypes),
+      category: input.category,
+      name: input.name,
+      active: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.materialTypes.push(type);
+    return delay({ ...type });
+  }
+
+  async updateMaterialType(id: number, input: UpdateMaterialTypeInput): Promise<MaterialType> {
+    const existing = this.materialTypes.find((type) => type.id === id);
+    if (!existing) throw new Error(`Material type ${id} not found`);
+    Object.assign(existing, input, { updatedAt: new Date().toISOString() });
+    return delay({ ...existing });
+  }
+
+  async getMaterialTypeCategories(): Promise<MaterialTypeCategory[]> {
+    return delay(this.materialTypeCategories.map((category) => ({ ...category })));
+  }
+
+  async createMaterialTypeCategory(input: NewMaterialTypeCategoryInput): Promise<MaterialTypeCategory> {
+    const now = new Date().toISOString();
+    const category: MaterialTypeCategory = {
+      id: nextId(this.materialTypeCategories),
+      name: input.name,
+      active: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.materialTypeCategories.push(category);
+    return delay({ ...category });
+  }
+
+  async updateMaterialTypeCategory(id: number, input: UpdateMaterialTypeCategoryInput): Promise<MaterialTypeCategory> {
+    const existing = this.materialTypeCategories.find((category) => category.id === id);
+    if (!existing) throw new Error(`Material type category ${id} not found`);
+    Object.assign(existing, input, { updatedAt: new Date().toISOString() });
+    return delay({ ...existing });
   }
 }

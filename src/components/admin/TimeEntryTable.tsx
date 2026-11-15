@@ -16,6 +16,7 @@ import { SelectField } from "../form/SelectField";
 import { TextField } from "../form/TextField";
 import { TimeField } from "../form/TimeField";
 import { DateField } from "../form/DateField";
+import { useAction } from "../../hooks/useAction";
 
 const TODAY = new Date();
 
@@ -67,8 +68,8 @@ export function TimeEntryTable({
 }: TimeEntryTableProps) {
   const [deletingEntry, setDeletingEntry] = useState<TimeEntry | null>(null);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const save = useAction();
+  const remove = useAction();
 
   const projectOptions = useMemo(() => getSortedSelectableValues(
     projectsById, editingEntry?.projectId, (project) => project.name),
@@ -103,13 +104,13 @@ export function TimeEntryTable({
 
   function handleStartEditing(entry: TimeEntry) {
     setHasAttemptedSubmit(false);
-    setSubmitError(null);
+    save.setError(null);
     onStartEditing(entry);
   }
 
   function handleCancelEditing() {
     setHasAttemptedSubmit(false);
-    setSubmitError(null);
+    save.setError(null);
     onCancelEditing();
   }
 
@@ -117,18 +118,7 @@ export function TimeEntryTable({
     if (!editingEntry) return;
     setHasAttemptedSubmit(true);
     if (Object.keys(errors).length > 0 ) return;
-    setSubmitting(true);
-    setSubmitError(null);
-    try {
-      await onUpdateEntry(editingEntry.id, editingEntry);
-      setHasAttemptedSubmit(false);
-      onCancelEditing();
-    } catch (error) {
-      console.error("Failed to update entry:", error);
-      setSubmitError("Failed to update entry. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    await save.run(() => onUpdateEntry(editingEntry.id, editingEntry), handleCancelEditing);
   }
   
   async function handleSaveInvoice(entry: TimeEntry, invoiceNumber: string | null) {
@@ -137,8 +127,7 @@ export function TimeEntryTable({
 
   async function handleDeleteConfirm() {
     if (!deletingEntry) return;
-    await onDeleteEntry(deletingEntry.id);
-    setDeletingEntry(null);
+    await remove.run(() => onDeleteEntry(deletingEntry.id), () => setDeletingEntry(null));
   }
   
   return (
@@ -273,15 +262,13 @@ export function TimeEntryTable({
                   <TableCell>
                     <EditDelete
                       isEditing={editing}
-                      submitting={submitting}
+                      submitting={save.pending}
                       onEdit={() => handleStartEditing(entry)}
                       onCancelEdit={handleCancelEditing}
                       onSave={handleEditSubmit}
                       onDelete={() => setDeletingEntry(entry)}
                     />
-                    {editing && submitError && (
-                      <Error message={submitError} />
-                    )}
+                    {editing && <Error message={save.error} />}
                   </TableCell>
                 }
               </TableRow>
@@ -305,8 +292,10 @@ export function TimeEntryTable({
           )
         }
         confirmLabel="Delete"
+        busy={remove.pending}
+        error={remove.error}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeletingEntry(null)}
+        onCancel={() => { setDeletingEntry(null); remove.setError(null); }}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import { SetNewPasswordPage } from '../pages/auth/SetNewPasswordPage';
 import { TimesheetPage } from '../pages/TimesheetPage';
 import { ProjectsPage } from '../pages/admin/ProjectsPage';
 import { EmployeesPage } from '../pages/admin/EmployeesPage';
+import { MaterialsPage } from '../pages/MaterialsPage';
 
 /**
  * These guards are prototype UX only (see RequireRole) — the future Django
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
           { path: 'timesheets', element: <TimesheetsListPage /> },
           { path: 'projects', element: <ProjectsPage /> },
           { path: 'employees', element: <EmployeesPage /> },
+          { path: 'materials', element: <MaterialsPage /> },
         ],
       },
     ],

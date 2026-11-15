@@ -1,6 +1,7 @@
 import type { User, UserRole, EmployeeCreationResult } from '../domain/user';
 import type { Project } from '../domain/project';
 import type { TimeEntry } from '../domain/timeEntry';
+import type { MaterialEntry, MaterialType, MaterialTypeCategory } from '../domain/material';
 
 export interface TimeEntryFilter {
   employeeId?: number;
@@ -43,6 +44,37 @@ export interface ResetPasswordResult {
   temporaryPassword: string;
 }
 
+export interface NewMaterialEntryInput {
+  type: number;
+  quantity: number;
+  description: string;
+  employeeId: number;
+  projectId: number;
+}
+
+export type UpdateMaterialEntryInput = Partial<Pick<NewMaterialEntryInput, 'type' | 'quantity' | 'description'>>;
+
+export interface NewMaterialTypeInput {
+  category: number;
+  name: string;
+}
+
+export type UpdateMaterialTypeInput = Partial<NewMaterialTypeInput> & { active?: boolean };
+
+export interface NewMaterialTypeCategoryInput {
+  name: string;
+}
+
+export interface UpdateMaterialTypeCategoryInput {
+  name?: string;
+  active?: boolean;
+}
+
+export interface MaterialEntryFilter {
+  employeeId?: string;
+  projectId?: string;
+}
+
 /**
  * Data-access contract shared by MockTimesheetService and ApiTimesheetService
  * so components never need to know which backend is active.
@@ -68,4 +100,15 @@ export interface TimesheetService {
   createEmployee(input: NewEmployeeInput): Promise<EmployeeCreationResult>;
   updateEmployee(id: number, input: UpdateEmployeeInput): Promise<User>;
   resetEmployeePassword(id: number): Promise<ResetPasswordResult>;
+  
+  getMaterialEntries(filter: MaterialEntryFilter): Promise<MaterialEntry[]>;
+  createMaterialEntry(input: NewMaterialEntryInput): Promise<MaterialEntry>;
+  updateMaterialEntry(id: number, input: UpdateMaterialEntryInput): Promise<MaterialEntry>;
+  deleteMaterialEntry(id: number): Promise<void>;
+  getMaterialTypes(): Promise<MaterialType[]>;
+  createMaterialType(input: NewMaterialTypeInput): Promise<MaterialType>;
+  updateMaterialType(id: number, input: UpdateMaterialTypeInput): Promise<MaterialType>;
+  getMaterialTypeCategories(): Promise<MaterialTypeCategory[]>;
+  createMaterialTypeCategory(input: NewMaterialTypeCategoryInput): Promise<MaterialTypeCategory>;
+  updateMaterialTypeCategory(id: number, input: UpdateMaterialTypeCategoryInput): Promise<MaterialTypeCategory>;
 }

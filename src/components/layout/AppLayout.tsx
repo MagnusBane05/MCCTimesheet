@@ -5,6 +5,7 @@ import { Logo } from '../common/Logo';
 
 const ADMIN_NAV = [
   { to: '/admin/timesheets', label: 'Timesheets' },
+  { to: '/admin/materials', label: 'Materials' },
   { to: '/admin/projects', label: 'Projects' },
   { to: '/admin/employees', label: 'Employees' },
 ];

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { PRODUCTION_STATUS_COLOURS, PRODUCTION_STATUS_LABELS, PRODUCTION_STATUSES, ProductionStatus, Project, sortProjectStatuses } from "../../domain/project";
 import { timesheetService } from "../../services/service";
 import { LoadingState } from "../../components/common/LoadingState";
@@ -17,6 +17,9 @@ import { TextField } from "../../components/form/TextField";
 import { Badge } from "../../components/common/Badge";
 import { Title } from "../../components/common/Title";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { Error } from "../../components/common/Error";
+import { useLoad } from "../../hooks/useLoad";
+import { useAction } from "../../hooks/useAction";
 
 type SortOption = 'customer' | 'name' | 'prjNumber' | 'productionStatus';
 
@@ -24,31 +27,13 @@ export function ProjectsPage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
   
-  const [ projects, setProjects ] = useState<Project[]>([]);
-  const [ loading, setLoading ] = useState(false);
-  const [ error, setError ] = useState(false);
-  const [ _, setSaveError ] = useState(false);
   const [ filter, setFilter ] = useState<'active' | 'inactive' | 'all'>('active');
   const [ isCreateModalOpen, setIsCreateModalOpen ] = useState(false);
   const [ sort, setSort ] = useState<SortOption>('customer');
   const [ hasAttemptedSubmit, setHasAttemptedSubmit ] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const projectList = await timesheetService.getProjects();
-      setProjects(projectList);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data: projects, loading, error, load } = useLoad(() => timesheetService.getProjects(), [], [] as Project[]);
+  const save = useAction(load);
 
   const {
     editingItem: editingProject,
@@ -65,16 +50,8 @@ export function ProjectsPage() {
     if (!editingProject) return;
     setHasAttemptedSubmit(true);
     if (Object.keys(errors).length > 0) return;
-    try {
-      await timesheetService.updateProject(editingProject.id, editingProject);
-      cancelEditing();
-      await load();
-    } catch {
-      setSaveError(true);
-    } finally {
-      setHasAttemptedSubmit(false);
-    }
-  };
+    await save.run(() => timesheetService.updateProject(editingProject.id, editingProject), handleCancel);
+  }
 
   async function handleCreateProject(project: NewProjectInput) {
     await timesheetService.createProject(project);
@@ -84,6 +61,7 @@ export function ProjectsPage() {
 
   function handleCancel() {
     setHasAttemptedSubmit(false);
+    save.setError(null);
     cancelEditing();
   }
 
@@ -231,11 +209,13 @@ export function ProjectsPage() {
                     {isAdmin && (
                       <TableCell>
                         <EditDelete
-                          isEditing={isEditing(project)}
+                          isEditing={editing}
+                          submitting={save.pending}
                           onEdit={() => startEditing(project)}
                           onCancelEdit={handleCancel}
-                          onSave={handleSave}               
+                          onSave={handleSave}
                         />
+                        {editing && <Error message={save.error} />}
                       </TableCell>
                     )}
                   </TableRow>

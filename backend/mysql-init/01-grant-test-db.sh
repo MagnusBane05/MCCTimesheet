@@ -4,4 +4,4 @@
 # Django's test runner creates/drops a `test_<DB_NAME>` database per run,
 # which the app user otherwise has no privileges on.
 set -e
-mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON test_%.* TO '$MYSQL_USER'@'%'; FLUSH PRIVILEGES;"
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON \`test\_%\`.* TO '$MYSQL_USER'@'%'; FLUSH PRIVILEGES;"

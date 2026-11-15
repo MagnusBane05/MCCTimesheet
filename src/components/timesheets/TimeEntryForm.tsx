@@ -5,10 +5,11 @@ import { formatShortDateLabel, parseDate } from '../../utils/dates';
 import { MINUTE_INCREMENT, getDurationHours, formatHours } from '../../utils/time';
 import { validateTimeEntry, type TimeEntryInput } from '../../utils/validation';
 import { Button } from '../common/Button';
-import { getProjectDisplayName } from '../../utils/projects';
+import { getUniqueCustomers, getProjectDisplayName } from '../../utils/projects';
 import { TimeField } from '../form/TimeField';
 import { SelectField } from '../form/SelectField';
 import { TextAreaField } from '../form/TextAreaField';
+import { useAction } from '../../hooks/useAction';
 
 function getCustomerFromProject(projectId: number | null, projects: Project[]): string {
   if (projectId == null) return '';
@@ -51,8 +52,7 @@ export function TimeEntryForm({
   const [endTime, setEndTime] = useState(existingEntry?.endTime ?? '');
   const [projectId, setProjectId] = useState<number | null>(existingEntry?.projectId ?? null);
   const [workDescription, setWorkDescription] = useState(existingEntry?.workDescription ?? '');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submit = useAction();
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [customer, setCustomer] = useState(getCustomerFromProject(existingEntry?.projectId ?? null, projects));
 
@@ -63,8 +63,7 @@ export function TimeEntryForm({
   }, [projects]);
 
   const customerOptions = useMemo(() => {
-    const customers = activeProjects.map((project) => project.customer);
-    return Array.from(new Set(customers)).sort((a, b) => a.localeCompare(b));
+    return getUniqueCustomers(activeProjects);
   }, [activeProjects]);
 
   const projectOptions = useMemo(() => {
@@ -106,7 +105,7 @@ export function TimeEntryForm({
     setProjectId(existingEntry?.projectId ?? null);
     setWorkDescription(existingEntry?.workDescription ?? '');
     setHasAttemptedSubmit(false);
-    setSubmitError(null);
+    submit.setError(null);
     onCancel();
   }
 
@@ -114,15 +113,7 @@ export function TimeEntryForm({
     event.preventDefault();
     setHasAttemptedSubmit(true);
     if (Object.keys(errors).length > 0 || projectId === null) return;
-    setSubmitting(true);
-    setSubmitError(null);
-    try {
-      await onSubmit({ workDate: effectiveWorkDate, startTime, endTime, projectId, workDescription });
-    } catch {
-      setSubmitError('Unable to save this entry. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
+    await submit.run(() => onSubmit({ workDate: effectiveWorkDate, startTime, endTime, projectId, workDescription }));
   }
 
   return (
@@ -231,9 +222,9 @@ export function TimeEntryForm({
           <span className="font-semibold">{formatHours(otherDailyTotal + thisDuration)}</span>
         </div>
 
-        {submitError && (
+        {submit.error && (
           <p role="alert" className="text-sm text-red-700">
-            {submitError}
+            {submit.error}
           </p>
         )}
 
@@ -241,8 +232,8 @@ export function TimeEntryForm({
           <Button type="button" variant="secondary" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={submitting}>
-            {existingEntry ? (submitting ? 'Saving…' : 'Save changes') : (submitting ? 'Adding…' : 'Add entry')}
+          <Button type="submit" disabled={submit.pending}>
+            {existingEntry ? (submit.pending ? 'Saving…' : 'Save changes') : (submit.pending ? 'Adding…' : 'Add entry')}
           </Button>
         </div>
       </form>

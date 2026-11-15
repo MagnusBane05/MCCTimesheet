@@ -9,6 +9,7 @@ interface EditDeleteProps {
   onCancelEdit: () => void;
   onSave: () => void;
   onDelete?: () => void;
+  deleteLabel?: string;
 }
 
 export function EditDelete({ 
@@ -18,7 +19,8 @@ export function EditDelete({
   onEdit, 
   onCancelEdit, 
   onSave, 
-  onDelete 
+  onDelete,
+  deleteLabel = "Delete row",
 }: EditDeleteProps) {
   return (
     <div className="flex items-center gap-2">
@@ -54,7 +56,7 @@ export function EditDelete({
               onClick={onDelete} 
               disabled={disabled}
               className='p-1 hover:bg-midnight-950/10 hover:rounded'
-              aria-label="Delete row" 
+              aria-label={deleteLabel}
             />
           )}
         </>

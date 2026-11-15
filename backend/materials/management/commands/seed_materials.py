@@ -66,31 +66,32 @@ class Command(BaseCommand):
 
         material_entries: list[dict[str, Any]] = [
             # Alice
-            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Plywood'], 'name': '3/4" Maple Plywood', 'description': '12 sheets for ICU cabinet boxes'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Edge Banding'], 'name': 'Maple Edge Banding 15/16"', 'description': '2 rolls'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Hinges'], 'name': 'Concealed Soft-Close Hinges', 'description': '48 hinges for upper and lower doors'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-103'], 'material_type': types_by_name['White Oak'], 'name': '8/4 Rift White Oak', 'description': 'Library shelf nosing, 60 bd ft'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-103'], 'material_type': types_by_name['Stain'], 'name': 'Natural Oak Stain', 'description': '2 gallons'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-112'], 'material_type': types_by_name['Melamine'], 'name': '3/4" White Melamine', 'description': 'Workstation carcasses, 20 sheets'},
-            {'employee': alice, 'project': projects_by_number['MCC-2024-112'], 'material_type': types_by_name['Drawer Slides'], 'name': '22" Full-Extension Slides', 'description': '36 pairs'},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Plywood'], 'description': '3/4" Maple Plywood - sheets for ICU cabinet boxes', 'quantity': 12},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Edge Banding'], 'description': 'Maple Edge Banding 15/16" - rolls', 'quantity': 2},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-101'], 'material_type': types_by_name['Hinges'], 'description': 'Concealed Soft-Close Hinges - hinges for upper and lower doors', 'quantity': 48},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-103'], 'material_type': types_by_name['White Oak'], 'description': '8/4 Rift White Oak - library shelf nosing, bd ft', 'quantity': 60},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-103'], 'material_type': types_by_name['Stain'], 'description': 'Natural Oak Stain - gallons', 'quantity': 2},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-112'], 'material_type': types_by_name['Melamine'], 'description': '3/4" White Melamine - workstation carcasses, sheets', 'quantity': 20},
+            {'employee': alice, 'project': projects_by_number['MCC-2024-112'], 'material_type': types_by_name['Drawer Slides'], 'description': '22" Full-Extension Slides - pairs', 'quantity': 36},
 
             # Bob
-            {'employee': bob, 'project': projects_by_number['MCC-2024-102'], 'material_type': types_by_name['MDF'], 'name': '3/4" MDF', 'description': 'Reception desk substrate, 8 sheets'},
-            {'employee': bob, 'project': projects_by_number['MCC-2024-102'], 'material_type': types_by_name['High-Pressure Laminate'], 'name': 'Matte Charcoal HPL', 'description': 'Desk transaction top, 4 sheets'},
-            {'employee': bob, 'project': projects_by_number['MCC-2024-105'], 'material_type': types_by_name['Walnut'], 'name': 'Walnut Veneer Panels', 'description': 'Executive suite wall panels'},
-            {'employee': bob, 'project': projects_by_number['MCC-2024-105'], 'material_type': types_by_name['Lacquer'], 'name': 'Satin Pre-Cat Lacquer', 'description': '5 gallons'},
-            {'employee': bob, 'project': projects_by_number['MCC-2024-106'], 'material_type': types_by_name['Walnut'], 'name': '8/4 Black Walnut', 'description': 'Boardroom table top, 120 bd ft'},
-            {'employee': bob, 'project': projects_by_number['MCC-2024-106'], 'material_type': types_by_name['Fasteners'], 'name': 'Table Top Fasteners', 'description': '1 box of 100'},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-102'], 'material_type': types_by_name['MDF'], 'description': '3/4" MDF - reception desk substrate, sheets', 'quantity': 8},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-102'], 'material_type': types_by_name['High-Pressure Laminate'], 'description': 'Matte Charcoal HPL - desk transaction top, sheets', 'quantity': 4},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-105'], 'material_type': types_by_name['Walnut'], 'description': 'Walnut Veneer Panels - executive suite wall panels', 'quantity': 1},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-105'], 'material_type': types_by_name['Lacquer'], 'description': 'Satin Pre-Cat Lacquer - gallons', 'quantity': 5},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-106'], 'material_type': types_by_name['Walnut'], 'description': '8/4 Black Walnut - boardroom table top, bd ft', 'quantity': 120},
+            {'employee': bob, 'project': projects_by_number['MCC-2024-106'], 'material_type': types_by_name['Fasteners'], 'description': 'Table Top Fasteners - box of 100', 'quantity': 1},
         ]
 
         for entry_data in material_entries:
             if not MaterialEntry.objects.filter(
                 employee=entry_data['employee'],
                 project=entry_data['project'],
-                name=entry_data['name'],
+                material_type=entry_data['material_type'],
+                description=entry_data['description'],
             ).exists():
                 MaterialEntry.objects.create(**entry_data)
                 emp = entry_data['employee']
-                self.stdout.write(f"  Created material entry: {emp.username} {entry_data['project'].project_number} {entry_data['name']}")
+                self.stdout.write(f"  Created material entry: {emp.username} {entry_data['project'].project_number} {entry_data['material_type'].name}")
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded materials data'))

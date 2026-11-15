@@ -1,5 +1,5 @@
 import { Table, TableCell, TableHeader } from "../../components/common/Table";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../auth/useAuth";
 import { User, UserRole, USER_ROLES, EmployeeCreationResult } from "../../domain/user";
 import { timesheetService } from "../../services/service";
@@ -21,6 +21,8 @@ import { SelectField } from "../../components/form/SelectField";
 import { validateEmployee } from "../../utils/validation";
 import { Title } from "../../components/common/Title";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { useLoad } from "../../hooks/useLoad";
+import { useAction } from "../../hooks/useAction";
 
 type ModalState = 'create' | 'creation-success' | 'reset-success' | null;
 
@@ -33,11 +35,6 @@ export function EmployeesPage() {
   const { currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
 
-  const [employees, setEmployees] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [resetError, setResetError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'active' | 'inactive' | 'all'>('active');
   const [modalState, setModalState] = useState<ModalState>(null);
   const [creationResult, setCreationResult] = useState<EmployeeCreationResult | null>(null);
@@ -45,22 +42,9 @@ export function EmployeesPage() {
   const [resetConfirmation, setResetConfirmation] = useState<ResetConfirmation | null>(null);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const employeeList = await timesheetService.getEmployees();
-      setEmployees(employeeList);
-    } catch (e) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data: employees, loading, error, load } = useLoad(() => timesheetService.getEmployees(), [], [] as User[]);
+  const save = useAction(load);
+  const reset = useAction();
 
   const {
     editingItem,
@@ -77,33 +61,19 @@ export function EmployeesPage() {
     if (!editingItem) return;
     setHasAttemptedSubmit(true);
     if (Object.keys(errors).length > 0) return;
-    try {
-      await timesheetService.updateEmployee(editingItem.id, editingItem);
-      cancelEditing();
-      await load();
-    } catch (e) {
-      console.error("Failed to update employee:", e);
-      setSaveError("Failed to update employee. Please try again.");
-    } finally {
-      setHasAttemptedSubmit(false);
-    }
+    await save.run(() => timesheetService.updateEmployee(editingItem.id, editingItem), handleCancelEditing);
   }
 
   function handleCancelEditing() {
     cancelEditing();
-    setSaveError(null);
+    save.setError(null);
     setHasAttemptedSubmit(false);
   }
 
   async function handleCreateEmployee(employeeInput: NewEmployeeInput) {
-    try {
-      const result = await timesheetService.createEmployee(employeeInput);
-      setCreationResult(result);
-      setModalState('creation-success');
-    } catch (e) {
-      console.error("Failed to create employee:", e);
-      throw e;
-    }
+    const result = await timesheetService.createEmployee(employeeInput);
+    setCreationResult(result);
+    setModalState('creation-success');
   }
 
   function handleResetPasswordClick(employeeId: number, username: string) {
@@ -112,21 +82,17 @@ export function EmployeesPage() {
 
   async function handleResetPasswordConfirm() {
     if (!resetConfirmation) return;
-    try {
+    await reset.run(async () => {
       const result = await timesheetService.resetEmployeePassword(resetConfirmation.employeeId);
       setResetResult({ username: resetConfirmation.username, temporaryPassword: result.temporaryPassword });
       setModalState('reset-success');
       setResetConfirmation(null);
-      setResetError(null);
-    } catch (e) {
-      console.error("Failed to reset password:", e);
-      setResetError("Failed to reset password. Please try again.");
-    }
+    });
   }
 
   function handleResetPasswordCancel() {
     setResetConfirmation(null);
-    setResetError(null);
+    reset.setError(null);
   }
 
   function handleCreationDone() {
@@ -190,12 +156,13 @@ export function EmployeesPage() {
             <div>
               <p>Are you sure you want to reset the password for <strong>{resetConfirmation.username}</strong>?</p>
               <p className="mt-2 text-xs text-gray-600">A new temporary password will be generated and must be changed on next login.</p>
-              {resetError && <Error message={resetError} />}
             </div>
           )
         }
         confirmLabel="Reset Password"
         cancelLabel="Cancel"
+        busy={reset.pending}
+        error={reset.error}
         onConfirm={handleResetPasswordConfirm}
         onCancel={handleResetPasswordCancel}
       />
@@ -336,14 +303,13 @@ export function EmployeesPage() {
                       {editing && (
                         <EditDelete
                           isEditing={editing}
+                          submitting={save.pending}
                           onEdit={() => startEditing(employee)}
                           onCancelEdit={handleCancelEditing}
                           onSave={handleSave}
                         />
                       )}
-                      {editing && saveError && (
-                        <Error message={saveError} />
-                      )}
+                      {editing && <Error message={save.error} />}
                     </TableCell>
                   )}
                 </tr>
