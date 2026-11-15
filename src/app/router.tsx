@@ -6,9 +6,11 @@ import { RequirePasswordChange } from '../auth/RequirePasswordChange';
 import { LoginPage } from '../pages/LoginPage';
 import { SetNewPasswordPage } from '../pages/auth/SetNewPasswordPage';
 import { TimesheetPage } from '../pages/TimesheetPage';
+import { EmployeePage } from '../pages/EmployeePage';
+import { EmployeeMaterialsPage } from '../pages/EmployeeMaterialsPage';
 import { ProjectsPage } from '../pages/admin/ProjectsPage';
 import { EmployeesPage } from '../pages/admin/EmployeesPage';
-import { MaterialsPage } from '../pages/MaterialsPage';
+import { MaterialsPage } from '../pages/admin/MaterialsPage';
 
 /**
  * These guards are prototype UX only (see RequireRole) — the future Django
@@ -27,7 +29,15 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <RequireRole allowedRoles={['EMPLOYEE']} />,
-        children: [{ path: '/timesheets', element: <TimesheetPage /> }],
+        children: [
+          {
+            element: <EmployeePage />,
+            children: [
+              { path: '/timesheets', element: <TimesheetPage /> },
+              { path: '/materials', element: <EmployeeMaterialsPage /> },
+            ],
+          },
+        ],
       },
       {
         path: '/admin',

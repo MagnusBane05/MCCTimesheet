@@ -1,9 +1,9 @@
-import { MaterialTypeTable } from "../components/admin/MaterialTypeTable";
-import { Title } from "../components/common/Title";
-import { MaterialsTable } from "../components/materials/MaterialsTable";
-import { MaterialType, MaterialTypeCategory } from "../domain/material";
-import { useLoad } from "../hooks/useLoad";
-import { timesheetService } from "../services/service";
+import { MaterialTypeTable } from "../../components/admin/MaterialTypeTable";
+import { Title } from "../../components/common/Title";
+import { MaterialsTable } from "../../components/materials/MaterialsTable";
+import { MaterialType, MaterialTypeCategory } from "../../domain/material";
+import { useLoad } from "../../hooks/useLoad";
+import { timesheetService } from "../../services/service";
 
 export function MaterialsPage() {
 	const { data: { materialTypes, materialTypeCategories }, loading, error, load } = useLoad(async () => {
