@@ -1,23 +1,31 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 const EMPLOYEE_TABS = [
-	{ to: "/timesheets", label: "Timesheet" },
-	{ to: "/materials", label: "Materials" },
+	{
+		to: "/timesheets",
+		label: "Timesheet",
+		shape: "-mr-[5px] [clip-path:polygon(0_0,calc(100%-14px)_0,100%_100%,0_100%)]",
+	},
+	{
+		to: "/materials",
+		label: "Materials",
+		shape: "-ml-[5px] [clip-path:polygon(0_0,100%_0,100%_100%,14px_100%)]",
+	},
 ];
 
 export function EmployeePage() {
 	return (
 		<div className="flex flex-col gap-4">
-			<nav className="grid grid-cols-2 gap-1 rounded-lg bg-midnight-950/5 p-1" aria-label="Employee navigation">
+			<nav className="mx-auto grid w-full max-w-md grid-cols-2 md:max-w-[480px]" aria-label="Employee navigation">
 				{EMPLOYEE_TABS.map((tab) => (
 					<NavLink
 						key={tab.to}
 						to={tab.to}
 						className={({ isActive }) =>
-							`rounded-md px-3 py-2 text-center text-sm font-medium transition-colors ${
+							`flex h-11 items-center justify-center px-5 text-sm transition-colors focus-visible:underline focus-visible:underline-offset-4 focus-visible:outline-none ${tab.shape} ${
 								isActive
-									? "bg-white text-midnight-950 shadow-sm"
-									: "text-midnight-950/60 hover:text-midnight-950"
+									? "bg-cedar-500 font-bold text-midnight-950"
+									: "bg-cedar-500/30 font-medium text-midnight-950/70 hover:text-midnight-950"
 							}`
 						}
 					>
