@@ -68,11 +68,12 @@ export function MaterialEntryForm({categories, materials, project, onCreateEntry
 
 	return (
 		<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-			<div className="flex flex-row gap-2">
+			<div className="flex flex-col gap-4 sm:flex-row sm:gap-2">
 				<SelectField
 					id="entry-category"
 					ariaLabel="Category"
-					pt={{container: "grow"}}
+					pt={{container: "min-w-0 sm:flex-1"}}
+					variant="large"
 					selectClassName="w-full"
 					label="Category"
 					required
@@ -89,7 +90,8 @@ export function MaterialEntryForm({categories, materials, project, onCreateEntry
 				<SelectField 
 					id="entry-type"
 					ariaLabel="Type"
-					pt={{container: "grow"}}
+					pt={{container: "min-w-0 sm:flex-1"}}
+					variant="large"
 					selectClassName="w-full"
 					label="Material"
 					required
@@ -104,6 +106,9 @@ export function MaterialEntryForm({categories, materials, project, onCreateEntry
 				<IntegerField
 					id="entry-quantity"
 					ariaLabel="Quantity"
+					pt={{container: "shrink-0"}}
+					variant="large"
+					className="w-full sm:w-14"
 					min={MATERIAL_MIN_QUANTITY}
 					label="Quantity"
 					required
