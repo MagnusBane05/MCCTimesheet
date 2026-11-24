@@ -79,7 +79,7 @@ export function TimesheetPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-4 md:w-full">
+    <div className="flex flex-col gap-4 py-4">
       <DayNav
         date={selectedDate}
         today={TODAY}

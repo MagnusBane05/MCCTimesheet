@@ -15,8 +15,8 @@ const EMPLOYEE_TABS = [
 
 export function EmployeePage() {
 	return (
-		<div className="flex flex-col gap-4">
-			<nav className="mx-auto grid w-full max-w-md grid-cols-2 md:max-w-[480px]" aria-label="Employee navigation">
+		<div className="mx-auto flex w-full max-w-[480px] flex-col gap-4">
+			<nav className="grid grid-cols-2" aria-label="Employee navigation">
 				{EMPLOYEE_TABS.map((tab) => (
 					<NavLink
 						key={tab.to}

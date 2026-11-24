@@ -59,7 +59,7 @@ export function EmployeeMaterialsPage() {
 	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-lg flex-col gap-4 px-4 py-4">
+		<div className="flex flex-col gap-4 py-4">
 			<div>
 				<h2 className="rounded-t-md bg-lakehouse-900 p-2 text-center text-base font-semibold text-white">Project materials</h2>
 				<div className="flex flex-col gap-4 rounded-b-md bg-white p-4 shadow-sm">
