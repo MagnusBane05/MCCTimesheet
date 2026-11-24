@@ -13,12 +13,12 @@ const BUTTON_VARIANTS = {
 
 const OPTION_VARIANTS = {
   default: {
-    selected: 'bg-cedar-500 font-semibold text-white',
-    unselected: 'text-lakehouse-900 hover:bg-cedar-100',
+    selected: 'bg-cedar-500 font-semibold text-midnight-950',
+    unselected: 'text-lakehouse-900 hover:bg-cedar-500/20',
   },
   inline: {
-    selected: 'bg-cedar-500 font-semibold text-white',
-    unselected: 'text-lakehouse-900 hover:bg-cedar-100',
+    selected: 'bg-cedar-500 font-semibold text-midnight-950',
+    unselected: 'text-lakehouse-900 hover:bg-cedar-500/20',
   },
 };
 
@@ -201,7 +201,7 @@ export function TimeSelect({ id, ariaLabel, value, timeVariant = '12', today, on
                     aria-selected={selected}
                     onClick={() => selectMinute(option)}
                     className={`w-full px-3 py-1.5 text-center text-sm ${
-                      selected ? 'bg-cedar-500 font-semibold text-white' : 'text-lakehouse-900 hover:bg-cedar-100'
+                      selected ? 'bg-cedar-500 font-semibold text-midnight-950' : 'text-lakehouse-900 hover:bg-cedar-500/20'
                     }`}
                   >
                     {option}

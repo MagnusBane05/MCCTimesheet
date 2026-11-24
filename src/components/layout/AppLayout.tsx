@@ -15,7 +15,7 @@ export function AppLayout() {
   const isAdminOrViewer = currentUser?.role === 'ADMIN' || currentUser?.role === 'VIEWER';
 
   return (
-    <div className="min-h-screen bg-cedar-50">
+    <div className="min-h-screen">
       <header className="bg-midnight-950 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Logo variant="primary" />

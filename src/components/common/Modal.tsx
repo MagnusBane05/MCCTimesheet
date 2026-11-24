@@ -42,7 +42,7 @@ export function Modal({ open, title, onClose, children, hideHeader }: ModalProps
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="rounded-lg p-1.5 text-lakehouse-900/60 hover:bg-cedar-100 hover:text-midnight-950"
+              className="rounded-lg p-1.5 text-lakehouse-900/60 hover:bg-lakehouse-900/5 hover:text-midnight-950"
             >
               ✕
             </button>
