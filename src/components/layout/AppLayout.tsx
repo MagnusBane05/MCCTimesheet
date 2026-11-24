@@ -32,16 +32,16 @@ export function AppLayout() {
           )}
         </div>
         {isAdminOrViewer && (
-          <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 sm:px-6" aria-label="Admin navigation">
+          <nav className="mx-auto flex max-w-6xl overflow-x-auto px-4 sm:px-6" aria-label="Admin navigation">
             {ADMIN_NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium transition-colors ${
+                  `relative isolate -ml-[9px] flex h-[42px] shrink-0 items-center whitespace-nowrap px-4 text-sm transition-colors first:ml-0 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white sm:px-6 before:absolute before:inset-0 before:-z-10 before:content-[''] before:[clip-path:polygon(0_0,calc(100%-13px)_0,100%_100%,13px_100%)] ${
                     isActive
-                      ? 'border-cedar-500 text-white'
-                      : 'border-transparent text-white/60 hover:text-white'
+                      ? 'font-semibold text-white before:bg-[linear-gradient(theme(colors.lake.800)_calc(100%-5px),theme(colors.cedar.500)_calc(100%-5px))]'
+                      : 'font-medium text-white/60 hover:text-white hover:before:bg-white/5'
                   }`
                 }
               >
